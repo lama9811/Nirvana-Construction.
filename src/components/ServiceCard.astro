@@ -1,0 +1,98 @@
+---
+/* ServiceCard.astro — one of the six sector cards. */
+import type { Service } from "../data/services";
+interface Props {
+  service: Service;
+  href?: string;
+}
+const { service, href = `/services/#${service.slug}` } = Astro.props;
+---
+
+<a class="svc" href={href} data-reveal>
+  <div class="svc__head">
+    <span class="svc__idx label">{service.index}</span>
+    <span class="svc__bracket" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M5 19L19 5M19 5H8M19 5v11" stroke="currentColor" stroke-width="1.6" />
+      </svg>
+    </span>
+  </div>
+  <h3 class="svc__title">{service.title}</h3>
+  <p class="svc__blurb">{service.blurb}</p>
+  <span class="svc__line" aria-hidden="true"></span>
+</a>
+
+<style>
+  .svc {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+    padding: 1.75rem 1.5rem 2rem;
+    background: var(--color-graphite);
+    border: 1px solid color-mix(in oklab, var(--color-bone) 7%, transparent);
+    transition:
+      transform 0.5s var(--ease-out-expo),
+      border-color 0.4s,
+      background-color 0.4s;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .svc::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(
+        ellipse 80% 100% at 100% 0%,
+        color-mix(in oklab, var(--color-flare) 18%, transparent),
+        transparent 60%
+      );
+    opacity: 0;
+    transition: opacity 0.5s var(--ease-out-expo);
+    z-index: -1;
+  }
+  .svc:hover,
+  .svc:focus-visible {
+    transform: translateY(-4px);
+    border-color: color-mix(in oklab, var(--color-flare) 35%, transparent);
+  }
+  .svc:hover::before { opacity: 1; }
+
+  .svc__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .svc__idx { color: var(--color-emerald); }
+  .svc__bracket {
+    color: var(--color-ash);
+    transition: color 0.3s, transform 0.45s var(--ease-out-expo);
+  }
+  .svc__bracket svg { width: 1.05rem; height: 1.05rem; }
+  .svc:hover .svc__bracket { color: var(--color-flare); transform: translate(3px, -3px); }
+
+  .svc__title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.5rem, 2.2vw, 1.95rem);
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+  }
+  .svc__blurb {
+    color: var(--color-ash);
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+
+  .svc__line {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 2px;
+    width: 0;
+    background: var(--color-flare);
+    transition: width 0.55s var(--ease-out-expo);
+  }
+  .svc:hover .svc__line { width: 100%; }
+</style>

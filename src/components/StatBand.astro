@@ -1,0 +1,61 @@
+---
+/* StatBand.astro — honest figures band (no invented numbers). */
+import { figures } from "../data/company";
+---
+
+<section class="stats">
+  <div class="stats__inner">
+    {
+      figures.map((f, i) => (
+        <div class="stats__cell" data-reveal>
+          <span class="stats__num">{f.value}</span>
+          <span class="label stats__lbl">{f.label}</span>
+          {i === 0 && <span class="stats__plus" aria-hidden="true">+</span>}
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .stats {
+    border-top: 1px solid color-mix(in oklab, var(--color-bone) 9%, transparent);
+    border-bottom: 1px solid color-mix(in oklab, var(--color-bone) 9%, transparent);
+    padding: clamp(2.5rem, 5vw, 4rem) clamp(1.25rem, 4vw, 3.5rem);
+  }
+  .stats__inner {
+    max-width: 96rem;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2.25rem;
+  }
+  .stats__cell {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+  .stats__num {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.75rem, 6vw, 5rem);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    color: var(--color-bone);
+  }
+  .stats__lbl { color: var(--color-ash); }
+  .stats__plus {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translate(calc(100% + 0.2rem), 0.15rem);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.5rem, 3vw, 2.4rem);
+    color: var(--color-flare);
+  }
+  @media (min-width: 760px) {
+    .stats__inner { grid-template-columns: repeat(4, 1fr); }
+  }
+</style>

@@ -1,0 +1,224 @@
+/* ============================================================
+   NIRVANA CONSTRUCTION — "Cinematic Blueprint" design system
+   ============================================================ */
+
+@import "tailwindcss";
+
+/* ---------- Self-hosted typefaces -------------------------- */
+@font-face {
+  font-family: "Clash Display";
+  src: url("/fonts/ClashDisplay-Semibold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Clash Display";
+  src: url("/fonts/ClashDisplay-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Switzer";
+  src: url("/fonts/Switzer-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Switzer";
+  src: url("/fonts/Switzer-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Switzer";
+  src: url("/fonts/Switzer-Semibold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/fonts/JetBrainsMono-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/fonts/JetBrainsMono-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---------- Design tokens ---------------------------------- */
+@theme {
+  /* surfaces — warm cream paper */
+  --color-ink: #f5f1e7;        /* page background (was charcoal) */
+  --color-graphite: #ece6d4;   /* elevated surface */
+  --color-graphite-2: #e0d9c3; /* deeper warm */
+  --color-steel: #b8b1a0;      /* mid warm gray */
+
+  /* text — deep on cream */
+  --color-bone: #1a1f1b;       /* primary text — near-black, green-tinted */
+  --color-ash: #5a625a;        /* secondary */
+  --color-concrete: #8b9088;   /* tertiary */
+
+  /* brand — green is the primary, orange is the action accent */
+  --color-emerald: #0e9c46;
+  --color-emerald-deep: #0a6c31;
+  --color-emerald-glow: #18c95a;
+
+  --color-flare: #e85427;
+  --color-flare-deep: #b03e1a;
+  --color-flare-glow: #ff7448;
+
+  /* typefaces */
+  --font-display: "Clash Display", "Arial Narrow", sans-serif;
+  --font-body: "Switzer", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-sans: "Switzer", ui-sans-serif, system-ui, sans-serif;
+
+  /* motion */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quint: cubic-bezier(0.83, 0, 0.17, 1);
+
+  /* container */
+  --breakpoint-xs: 30rem;
+}
+
+/* ---------- Base ------------------------------------------- */
+@layer base {
+  * {
+    border-color: color-mix(in oklab, var(--color-bone) 10%, transparent);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: auto; /* Lenis owns scrolling */
+    background-color: var(--color-ink);
+  }
+
+  body {
+    background-color: var(--color-ink);
+    color: var(--color-bone);
+    font-family: var(--font-body);
+    font-weight: 400;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  ::selection {
+    background-color: var(--color-flare);
+    color: var(--color-ink);
+  }
+
+  /* dark, slim scrollbar */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: var(--color-ink); }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-steel);
+    border: 2px solid var(--color-ink);
+    border-radius: 99px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: var(--color-concrete); }
+
+  :focus-visible {
+    outline: 2px solid var(--color-flare);
+    outline-offset: 3px;
+  }
+
+  /* Lenis */
+  html.lenis, html.lenis body { height: auto; }
+  .lenis.lenis-smooth { scroll-behavior: auto !important; }
+  .lenis.lenis-stopped { overflow: hidden; }
+}
+
+/* ---------- Reusable atoms --------------------------------- */
+@layer components {
+  /* mono "blueprint annotation" label */
+  .label {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-ash);
+  }
+
+  /* faint blueprint grid backdrop */
+  .bg-blueprint {
+    background-image:
+      linear-gradient(color-mix(in oklab, var(--color-bone) 4%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in oklab, var(--color-bone) 4%, transparent) 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
+
+  /* hairline rule */
+  .rule {
+    height: 1px;
+    background: color-mix(in oklab, var(--color-bone) 12%, transparent);
+  }
+}
+
+/* ---------- Utilities -------------------------------------- */
+@utility text-stroke {
+  -webkit-text-stroke: 1px color-mix(in oklab, var(--color-bone) 38%, transparent);
+  color: transparent;
+}
+
+/* fluid display sizing helpers */
+@utility text-hero {
+  font-size: clamp(3.25rem, 11vw, 12rem);
+  line-height: 0.9;
+  letter-spacing: -0.035em;
+}
+@utility text-section {
+  font-size: clamp(2.25rem, 6vw, 5.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+
+/* ---------- Scroll-reveal (JS-driven, CSS fallback) -------- */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 1s var(--ease-out-expo),
+    transform 1s var(--ease-out-expo);
+  will-change: opacity, transform;
+}
+[data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* page-load: prevent flash before JS reveals */
+.no-js [data-reveal] { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  [data-reveal] { opacity: 1 !important; transform: none !important; }
+}

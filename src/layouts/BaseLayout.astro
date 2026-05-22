@@ -1,0 +1,88 @@
+---
+import "../styles/global.css";
+import { ClientRouter } from "astro:transitions";
+import SEO from "../components/SEO.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import GrainOverlay from "../components/GrainOverlay.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  path?: string;
+  image?: string;
+}
+
+const {
+  title,
+  description,
+  path = Astro.url.pathname,
+  image,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link
+      rel="preload"
+      href="/fonts/ClashDisplay-Bold.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/Switzer-Regular.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/JetBrainsMono-Regular.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <SEO title={title} description={description} path={path} image={image} />
+    <ClientRouter />
+    <script is:inline>
+      document.documentElement.classList.remove("no-js");
+    </script>
+  </head>
+  <body>
+    <a href="#main" class="skip-link">Skip to content</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    <GrainOverlay />
+
+    <style>
+      .skip-link {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 100;
+        padding: 0.75rem 1.25rem;
+        background: var(--color-flare);
+        color: var(--color-ink);
+        font-weight: 600;
+        font-size: 0.85rem;
+        transform: translateY(-120%);
+        transition: transform 0.25s var(--ease-out-expo);
+      }
+      .skip-link:focus { transform: translateY(0); }
+    </style>
+
+    <script>
+      import { initMotion } from "../lib/motion";
+      document.addEventListener("astro:page-load", initMotion);
+    </script>
+  </body>
+</html>

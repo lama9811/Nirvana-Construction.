@@ -1,0 +1,15 @@
+---
+/* Reveal.astro — wraps content so it fades + rises into view.
+   Driven by the IntersectionObserver in motion.ts. */
+interface Props {
+  as?: keyof HTMLElementTagNameMap;
+  delay?: number;
+  class?: string;
+}
+const { as = "div", delay = 0, class: className = "" } = Astro.props;
+const Tag = as as any;
+---
+
+<Tag data-reveal class={className} style={delay ? `transition-delay:${delay}ms` : undefined}>
+  <slot />
+</Tag>

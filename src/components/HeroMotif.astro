@@ -1,0 +1,133 @@
+---
+/* HeroMotif.astro — a lightweight SVG framing/perspective motif
+   for inner page heroes. Pure CSS animation, no WebGL. */
+interface Props {
+  section?: string;
+  coords?: string;
+}
+const { section = "Section A-A", coords = "N 39.371° W 76.476°" } = Astro.props;
+---
+
+<div class="motif">
+  <svg
+    class="motif__svg"
+    viewBox="0 0 600 500"
+    xmlns="http://www.w3.org/2000/svg"
+    preserveAspectRatio="xMidYMid slice"
+    role="img"
+    aria-label="Receding metal-stud framing perspective"
+  >
+    <!-- horizon plates -->
+    <line class="plate" x1="0" y1="84" x2="600" y2="84" />
+    <line class="plate" x1="0" y1="416" x2="600" y2="416" />
+
+    <!-- vanishing sight lines -->
+    <g class="sight">
+      <line x1="0" y1="0" x2="300" y2="250" />
+      <line x1="600" y1="0" x2="300" y2="250" />
+      <line x1="0" y1="500" x2="300" y2="250" />
+      <line x1="600" y1="500" x2="300" y2="250" />
+    </g>
+
+    <!-- rank 1 — foreground studs -->
+    <g class="rank rank-1">
+      <line x1="60" y1="84" x2="60" y2="416" />
+      <line x1="180" y1="84" x2="180" y2="416" />
+      <line x1="300" y1="84" x2="300" y2="416" />
+      <line x1="420" y1="84" x2="420" y2="416" />
+      <line x1="540" y1="84" x2="540" y2="416" />
+    </g>
+
+    <!-- rank 2 — mid studs -->
+    <g class="rank rank-2">
+      <line x1="135" y1="132" x2="135" y2="368" />
+      <line x1="225" y1="132" x2="225" y2="368" />
+      <line x1="375" y1="132" x2="375" y2="368" />
+      <line x1="465" y1="132" x2="465" y2="368" />
+    </g>
+
+    <!-- rank 3 — back studs -->
+    <g class="rank rank-3">
+      <line x1="200" y1="172" x2="200" y2="328" />
+      <line x1="260" y1="172" x2="260" y2="328" />
+      <line x1="340" y1="172" x2="340" y2="328" />
+      <line x1="400" y1="172" x2="400" y2="328" />
+    </g>
+
+    <!-- vanishing marker -->
+    <rect class="marker" x="295" y="244" width="10" height="12" />
+
+    <!-- mono annotations -->
+    <text class="annot" x="14" y="22">{section}</text>
+    <text class="annot annot--right" x="586" y="22">{coords}</text>
+    <text class="annot" x="14" y="494">Framing · 12'-0"</text>
+    <text class="annot annot--right" x="586" y="494">Scale 1:48</text>
+  </svg>
+</div>
+
+<style>
+  .motif {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 6 / 5;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse 70% 50% at 50% 50%, color-mix(in oklab, var(--color-emerald) 6%, transparent), transparent 70%),
+      color-mix(in oklab, var(--color-graphite) 80%, transparent);
+    border: 1px solid color-mix(in oklab, var(--color-bone) 8%, transparent);
+  }
+  .motif__svg { width: 100%; height: 100%; display: block; }
+
+  .plate { stroke: color-mix(in oklab, var(--color-bone) 24%, transparent); stroke-width: 1; }
+  .sight line { stroke: color-mix(in oklab, var(--color-bone) 6%, transparent); stroke-width: 1; }
+  .rank line { fill: none; vector-effect: non-scaling-stroke; }
+  .rank-1 line { stroke: color-mix(in oklab, var(--color-bone) 42%, transparent); stroke-width: 1.5; }
+  .rank-2 line { stroke: color-mix(in oklab, var(--color-bone) 20%, transparent); stroke-width: 1.1; }
+  .rank-3 line { stroke: color-mix(in oklab, var(--color-bone) 11%, transparent); stroke-width: 0.9; }
+  .marker { fill: var(--color-emerald); transform-box: fill-box; transform-origin: center; }
+
+  .annot {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    fill: var(--color-concrete);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+  .annot--right { text-anchor: end; }
+
+  /* draw-in on load */
+  .rank line, .plate, .sight line {
+    stroke-dasharray: 600;
+    stroke-dashoffset: 600;
+    animation: motif-draw 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .plate { animation-delay: 0.10s; }
+  .rank-1 line { animation-delay: 0.25s; }
+  .rank-2 line { animation-delay: 0.40s; }
+  .rank-3 line { animation-delay: 0.55s; }
+  .sight line { animation-delay: 0.80s; animation-duration: 2.4s; }
+  @keyframes motif-draw {
+    to { stroke-dashoffset: 0; }
+  }
+
+  .marker {
+    opacity: 0;
+    animation: motif-mark 2.6s cubic-bezier(0.83, 0, 0.17, 1) 1s infinite;
+  }
+  @keyframes motif-mark {
+    0% { opacity: 0; transform: scale(0.6); }
+    18%, 60% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.4); }
+  }
+  .annot {
+    opacity: 0;
+    animation: motif-fade 1s ease forwards 1.2s;
+  }
+  @keyframes motif-fade { to { opacity: 1; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rank line, .plate, .sight line { animation: none; stroke-dashoffset: 0; }
+    .marker { animation: none; opacity: 1; }
+    .annot { animation: none; opacity: 1; }
+  }
+</style>

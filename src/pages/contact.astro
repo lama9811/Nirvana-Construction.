@@ -1,0 +1,393 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Hero from "../components/Hero.astro";
+import HeroMotif from "../components/HeroMotif.astro";
+import { company } from "../data/company";
+import { services } from "../data/services";
+
+/* Pluggable endpoint — drop in a Formspree form ID or switch
+   to Netlify Forms by changing the value below. Until then,
+   the form submits in "demo" mode and shows the success state. */
+const FORM_ENDPOINT = ""; // e.g. "https://formspree.io/f/xxxxxxxx"
+---
+
+<BaseLayout
+  title="Contact"
+  description="Request a quote, ask a question, or get a callback from Nirvana Construction. Mon–Fri 8–4. Baltimore, MD."
+>
+  <Hero
+    index="Page 05 / 05"
+    meta="Mon–Fri · 08:00–16:00"
+    eyebrow="Contact"
+    title={`Start a project.<br /><em>Get a callback.</em>`}
+    lead="Tell us about the job — scope, schedule, location — and we'll be in touch quickly. Or just call."
+  >
+    <HeroMotif slot="visual" section="Contact · 05" coords={company.address.zip} />
+  </Hero>
+
+  <section class="ct">
+    <div class="ct__inner">
+      <!-- =============== INFO COLUMN =============== -->
+      <aside class="ct__info" data-reveal>
+        <p class="label ct__eyebrow">
+          <span class="ct__bar"></span>Direct lines
+        </p>
+        <h2 class="ct__h">Quickest way to&nbsp;reach&nbsp;us.</h2>
+        <p class="ct__sub">
+          Hit the phone or email below — we answer fast during business hours.
+        </p>
+
+        <div class="ct__card">
+          <p class="label">Phone</p>
+          <a href={company.phoneHref} class="ct__big">{company.phone}</a>
+        </div>
+        <div class="ct__card">
+          <p class="label">Email</p>
+          <a href={company.emailHref} class="ct__big ct__big--mono">{company.email}</a>
+        </div>
+        <div class="ct__card">
+          <p class="label">Office</p>
+          <p class="ct__addr">
+            {company.address.street}<br />
+            {company.address.city}, {company.address.state} {company.address.zip}
+          </p>
+          <p class="label ct__coords">N&nbsp;39.371° · W&nbsp;76.476°</p>
+        </div>
+        <div class="ct__card">
+          <p class="label">Hours</p>
+          <p class="ct__addr">{company.hours}</p>
+        </div>
+      </aside>
+
+      <!-- =============== FORM COLUMN =============== -->
+      <div class="ct__form-wrap" data-reveal>
+        <p class="label ct__eyebrow">
+          <span class="ct__bar"></span>Request a quote
+        </p>
+        <h2 class="ct__h">Tell us about the&nbsp;job.</h2>
+
+        <form
+          class="ct__form"
+          data-form
+          action={FORM_ENDPOINT || "#"}
+          method="POST"
+          novalidate
+        >
+          <input type="text" name="website" tabindex="-1" autocomplete="off" class="ct__honey" aria-hidden="true" />
+
+          <div class="ct__grid">
+            <label class="field">
+              <span class="field__lbl label">Name *</span>
+              <input class="field__input" type="text" name="name" required autocomplete="name" />
+              <span class="field__err">Please enter your name</span>
+            </label>
+
+            <label class="field">
+              <span class="field__lbl label">Company</span>
+              <input class="field__input" type="text" name="company" autocomplete="organization" />
+            </label>
+
+            <label class="field">
+              <span class="field__lbl label">Email *</span>
+              <input class="field__input" type="email" name="email" required autocomplete="email" />
+              <span class="field__err">Please enter a valid email</span>
+            </label>
+
+            <label class="field">
+              <span class="field__lbl label">Phone</span>
+              <input class="field__input" type="tel" name="phone" autocomplete="tel" />
+            </label>
+
+            <label class="field field--full">
+              <span class="field__lbl label">Project type</span>
+              <select class="field__input field__input--select" name="project_type">
+                <option value="">Select a sector</option>
+                {services.map((s) => <option value={s.title}>{s.title}</option>)}
+                <option value="Other">Other / Multiple</option>
+              </select>
+            </label>
+
+            <label class="field field--full">
+              <span class="field__lbl label">Project details *</span>
+              <textarea class="field__input field__input--area" name="message" rows="5" required placeholder="Scope, location, schedule, anything relevant…"></textarea>
+              <span class="field__err">Please add a few details</span>
+            </label>
+          </div>
+
+          <div class="ct__submit-row">
+            <button type="submit" class="ct__submit">
+              <span class="ct__submit-label">Send request</span>
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M5 19L19 5M19 5H8M19 5v11" stroke="currentColor" stroke-width="2" />
+              </svg>
+            </button>
+            <p class="label ct__legal">No spam. Replies within 1 business day.</p>
+          </div>
+        </form>
+
+        <!-- success -->
+        <div class="ct__success" data-success aria-live="polite">
+          <svg viewBox="0 0 56 56" class="ct__check" aria-hidden="true">
+            <circle cx="28" cy="28" r="26" fill="none" stroke="currentColor" stroke-width="1.5" />
+            <path d="M16 28l9 9 16-18" fill="none" stroke="currentColor" stroke-width="2.5" />
+          </svg>
+          <h3 class="ct__success-h">Request received.</h3>
+          <p>Thanks — we'll be in touch shortly. Need it faster? <a href={company.phoneHref}>Call {company.phone}</a>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* ----- shared bits ----- */
+  .ct__bar {
+    display: inline-block;
+    width: 1.5rem;
+    height: 1px;
+    background: var(--color-emerald);
+    margin-right: 0.7rem;
+    vertical-align: middle;
+  }
+  .ct__eyebrow { color: var(--color-emerald); margin-bottom: 1.25rem; }
+  .ct__h {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    line-height: 0.98;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+
+  /* ----- layout ----- */
+  .ct { padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 4vw, 3.5rem) clamp(4rem, 8vw, 7rem); }
+  .ct__inner {
+    max-width: 96rem;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+  @media (min-width: 980px) {
+    .ct__inner { grid-template-columns: 0.85fr 1.15fr; gap: 5rem; }
+  }
+
+  /* ----- info column ----- */
+  .ct__sub { color: var(--color-ash); margin-top: 1.25rem; max-width: 28rem; }
+  .ct__card {
+    margin-top: 1.5rem;
+    padding: 1.4rem 1.5rem;
+    background: var(--color-graphite);
+    border: 1px solid color-mix(in oklab, var(--color-bone) 7%, transparent);
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+  .ct__big {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.45rem;
+    color: var(--color-bone);
+    transition: color 0.25s;
+  }
+  .ct__big--mono { font-family: var(--font-mono); font-size: 1rem; letter-spacing: 0.02em; }
+  .ct__big:hover { color: var(--color-flare); }
+  .ct__addr { color: var(--color-ash); line-height: 1.6; }
+  .ct__coords { margin-top: 0.4rem; color: var(--color-concrete); }
+
+  /* ----- form ----- */
+  .ct__form-wrap { position: relative; }
+  .ct__form {
+    margin-top: 2.5rem;
+    transition: opacity 0.5s var(--ease-out-expo), transform 0.5s var(--ease-out-expo);
+  }
+  .ct__honey {
+    position: absolute !important;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+  .ct__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+  @media (min-width: 640px) { .ct__grid { grid-template-columns: 1fr 1fr; } }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    position: relative;
+  }
+  .field--full { grid-column: 1 / -1; }
+  .field__lbl { color: var(--color-concrete); transition: color 0.25s; }
+  .field__input {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid color-mix(in oklab, var(--color-bone) 16%, transparent);
+    padding: 0.7rem 0 0.85rem;
+    color: var(--color-bone);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    transition: border-color 0.3s, color 0.3s;
+    width: 100%;
+  }
+  .field__input::placeholder { color: var(--color-concrete); }
+  .field__input:focus {
+    outline: none;
+    border-bottom-color: var(--color-flare);
+  }
+  .field:focus-within .field__lbl { color: var(--color-flare); }
+  .field__input--select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23f3f1ec' stroke-width='1.4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0 center;
+    background-size: 12px 12px;
+    padding-right: 1.5rem;
+  }
+  .field__input--area {
+    resize: vertical;
+    min-height: 6rem;
+    line-height: 1.55;
+  }
+  .field__err {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-flare);
+    opacity: 0;
+    transform: translateY(-2px);
+    transition: opacity 0.2s;
+  }
+  .field.has-error .field__err { opacity: 1; transform: none; }
+  .field.has-error .field__input { border-bottom-color: var(--color-flare); }
+
+  .ct__submit-row {
+    margin-top: 2.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .ct__submit {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.05rem 1.65rem;
+    background: var(--color-flare);
+    color: var(--color-ink);
+    font-weight: 600;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .ct__submit svg { width: 1rem; height: 1rem; transition: transform 0.4s var(--ease-out-expo); }
+  .ct__submit::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--color-bone);
+    transform: translateY(101%);
+    transition: transform 0.5s var(--ease-out-expo);
+    z-index: -1;
+  }
+  .ct__submit:hover::before { transform: translateY(0); }
+  .ct__submit:hover svg { transform: translate(3px, -3px); }
+  .ct__submit:disabled { opacity: 0.6; cursor: not-allowed; }
+  .ct__legal { color: var(--color-concrete); }
+
+  /* success state */
+  .ct__success {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: left;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px);
+    transition: opacity 0.6s var(--ease-out-expo), transform 0.6s var(--ease-out-expo);
+  }
+  .ct__check { width: 3.5rem; height: 3.5rem; color: var(--color-emerald); margin-bottom: 1.5rem; }
+  .ct__success-h {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    line-height: 1;
+    letter-spacing: -0.025em;
+    margin-bottom: 1rem;
+  }
+  .ct__success p { color: var(--color-ash); max-width: 32rem; }
+  .ct__success a {
+    color: var(--color-flare);
+    border-bottom: 1px solid currentColor;
+  }
+  .ct__form-wrap.is-sent .ct__form { opacity: 0; transform: translateY(-12px); pointer-events: none; }
+  .ct__form-wrap.is-sent .ct__success { opacity: 1; transform: none; pointer-events: auto; }
+</style>
+
+<script define:vars={{ endpoint: FORM_ENDPOINT }}>
+  function setupForm() {
+    const wrap = document.querySelector("[data-form]")?.closest(".ct__form-wrap");
+    const form = document.querySelector("[data-form]");
+    if (!form || !wrap) return;
+
+    const showError = (field, on) => field.classList.toggle("has-error", on);
+
+    const validate = () => {
+      let ok = true;
+      const fields = form.querySelectorAll(".field");
+      fields.forEach((f) => {
+        const input = f.querySelector("input, textarea, select");
+        if (!input || !input.required) return showError(f, false);
+        const val = String(input.value || "").trim();
+        let bad = !val;
+        if (!bad && input.type === "email") {
+          bad = !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+        }
+        showError(f, bad);
+        if (bad) ok = false;
+      });
+      return ok;
+    };
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      // honeypot — silently succeed
+      const hp = form.querySelector("[name=website]");
+      if (hp && hp.value) {
+        wrap.classList.add("is-sent");
+        return;
+      }
+      if (!validate()) return;
+
+      const submit = form.querySelector(".ct__submit");
+      submit?.setAttribute("disabled", "");
+
+      try {
+        if (endpoint) {
+          const fd = new FormData(form);
+          const res = await fetch(endpoint, {
+            method: "POST",
+            body: fd,
+            headers: { Accept: "application/json" },
+          });
+          if (!res.ok) throw new Error("HTTP " + res.status);
+        } else {
+          /* demo mode — placeholder endpoint not configured yet */
+          await new Promise((r) => setTimeout(r, 700));
+        }
+        wrap.classList.add("is-sent");
+      } catch (err) {
+        submit?.removeAttribute("disabled");
+        alert("Sorry — something went wrong. Please call " + "+1 (410) 650-9850" + ".");
+      }
+    });
+  }
+  document.addEventListener("astro:page-load", setupForm);
+</script>

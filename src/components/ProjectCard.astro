@@ -1,0 +1,186 @@
+---
+/* ProjectCard.astro — photo variant (real image) or type variant
+   (graded type card) depending on whether a photo exists. */
+import type { Project } from "../data/projects";
+interface Props {
+  project: Project;
+  feature?: boolean;
+}
+const { project, feature = false } = Astro.props;
+const photo = project.photo;
+const sizes = feature
+  ? "(min-width: 1100px) 60vw, 100vw"
+  : "(min-width: 1100px) 32vw, (min-width: 720px) 48vw, 100vw";
+---
+
+<article class:list={["card", { "card--feature": feature, "card--type": !photo }]} data-reveal>
+  {
+    photo ? (
+      <div class="card__media">
+        <img
+          src={`/images/projects/${photo}.webp`}
+          srcset={`/images/projects/${photo}-800.webp 800w, /images/projects/${photo}.webp 1600w`}
+          sizes={sizes}
+          width="1600"
+          height="1067"
+          alt={`${project.name}, ${project.location}`}
+          loading="lazy"
+          decoding="async"
+        />
+        <div class="card__veil" aria-hidden="true"></div>
+      </div>
+    ) : (
+      <div class="card__type bg-blueprint" aria-hidden="true">
+        <span class="card__type-name">{project.name}</span>
+      </div>
+    )
+  }
+
+  <div class="card__head">
+    <span class="label card__idx">{project.index}</span>
+    <span class="label card__cat">{project.category}</span>
+  </div>
+
+  <div class="card__foot">
+    <h3 class="card__title">{project.name}</h3>
+    <p class="label card__loc">{project.location}</p>
+    <p class="card__desc">{project.descriptor}</p>
+  </div>
+
+  <span class="card__line" aria-hidden="true"></span>
+</article>
+
+<style>
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-graphite);
+    border: 1px solid color-mix(in oklab, var(--color-bone) 8%, transparent);
+    overflow: hidden;
+    isolation: isolate;
+    transition: transform 0.55s var(--ease-out-expo), border-color 0.4s;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    border-color: color-mix(in oklab, var(--color-flare) 28%, transparent);
+  }
+
+  /* photo variant */
+  .card__media {
+    position: relative;
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+  }
+  .card__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.04);
+    transition: transform 1.4s var(--ease-out-expo);
+    filter: contrast(1.04);
+  }
+  .card:hover .card__media img { transform: scale(1.10); }
+  .card__veil {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 110% 80% at 50% 100%, color-mix(in oklab, var(--color-ink) 75%, transparent), transparent 55%),
+      linear-gradient(180deg, transparent 35%, color-mix(in oklab, var(--color-ink) 55%, transparent));
+    pointer-events: none;
+  }
+
+  /* type variant (no photo) */
+  .card__type {
+    position: relative;
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    background-color: var(--color-graphite-2);
+  }
+  .card__type::before,
+  .card__type::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 30% 30%, color-mix(in oklab, var(--color-flare) 12%, transparent), transparent 60%),
+      linear-gradient(135deg, color-mix(in oklab, var(--color-bone) 5%, transparent), transparent 50%);
+  }
+  .card__type::after {
+    background:
+      linear-gradient(180deg, transparent 60%, color-mix(in oklab, var(--color-ink) 70%, transparent));
+  }
+  .card__type-name {
+    position: relative;
+    z-index: 1;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    letter-spacing: -0.03em;
+    text-align: center;
+    line-height: 0.95;
+    padding: 0 1.5rem;
+    color: var(--color-bone);
+    text-wrap: balance;
+    -webkit-text-stroke: 1px color-mix(in oklab, var(--color-bone) 45%, transparent);
+    color: transparent;
+  }
+
+  /* head & foot */
+  .card__head {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    right: 1rem;
+    display: flex;
+    justify-content: space-between;
+    z-index: 2;
+    color: var(--color-bone);
+  }
+  .card__idx { color: var(--color-emerald); }
+  .card__cat {
+    padding: 0.25rem 0.55rem;
+    border: 1px solid color-mix(in oklab, var(--color-bone) 22%, transparent);
+    background: color-mix(in oklab, var(--color-ink) 60%, transparent);
+    backdrop-filter: blur(6px);
+  }
+
+  .card__foot {
+    position: relative;
+    z-index: 1;
+    padding: 1.35rem 1.4rem 1.55rem;
+  }
+  .card__title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.4rem;
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+  }
+  .card__loc { margin-top: 0.45rem; color: var(--color-concrete); }
+  .card__desc {
+    margin-top: 0.75rem;
+    color: var(--color-ash);
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
+
+  .card__line {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 2px;
+    width: 0;
+    background: var(--color-flare);
+    transition: width 0.55s var(--ease-out-expo);
+  }
+  .card:hover .card__line { width: 100%; }
+
+  /* feature variant — wider, larger */
+  .card--feature .card__media,
+  .card--feature .card__type { aspect-ratio: 16 / 9; }
+  .card--feature .card__title { font-size: clamp(1.6rem, 2.4vw, 2.2rem); }
+  .card--feature .card__type-name { font-size: clamp(3.5rem, 7vw, 6rem); }
+</style>

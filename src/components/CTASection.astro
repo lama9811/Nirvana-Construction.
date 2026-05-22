@@ -1,0 +1,130 @@
+---
+/* CTASection.astro — pre-footer call-to-action band. */
+import { company } from "../data/company";
+interface Props {
+  eyebrow?: string;
+  title?: string;
+}
+const {
+  eyebrow = "Next step",
+  title = "Have a project? Let's frame it.",
+} = Astro.props;
+---
+
+<section class="cta">
+  <div class="cta__rule rule"></div>
+  <div class="cta__inner">
+    <div class="cta__copy">
+      <p class="label cta__eyebrow" data-reveal>
+        <span class="cta__dot"></span>{eyebrow}
+      </p>
+      <h2 class="cta__title" data-reveal>{title}</h2>
+    </div>
+    <div class="cta__actions" data-reveal>
+      <a href="/contact/" class="cta__primary">
+        Request a quote
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M5 19L19 5M19 5H8M19 5v11" stroke="currentColor" stroke-width="2" />
+        </svg>
+      </a>
+      <a href={company.phoneHref} class="cta__phone">
+        <span class="label">Call</span>
+        <span>{company.phone}</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta {
+    position: relative;
+    padding: clamp(4rem, 9vw, 8rem) clamp(1.25rem, 4vw, 3.5rem);
+  }
+  .cta__rule {
+    max-width: 96rem;
+    margin: 0 auto 5rem;
+  }
+  .cta__inner {
+    max-width: 96rem;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+  .cta__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    color: var(--color-emerald);
+    margin-bottom: 1.5rem;
+  }
+  .cta__dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    background: var(--color-emerald);
+    border-radius: 999px;
+  }
+  .cta__title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(2.4rem, 7vw, 6.5rem);
+    line-height: 0.94;
+    letter-spacing: -0.03em;
+    max-width: 22ch;
+  }
+  .cta__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: flex-start;
+  }
+  .cta__primary {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 1.05rem 1.6rem;
+    background: var(--color-flare);
+    color: var(--color-ink);
+    font-weight: 600;
+    font-size: 1rem;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .cta__primary svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    transition: transform 0.45s var(--ease-out-expo);
+  }
+  .cta__primary:hover svg { transform: translate(4px, -4px); }
+  .cta__primary::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--color-bone);
+    transform: translateY(101%);
+    transition: transform 0.5s var(--ease-out-expo);
+    z-index: -1;
+  }
+  .cta__primary:hover::before { transform: translateY(0); }
+  .cta__phone {
+    display: flex;
+    align-items: baseline;
+    gap: 0.7rem;
+    color: var(--color-bone);
+    font-family: var(--font-mono);
+    font-size: 1.05rem;
+    transition: color 0.3s;
+  }
+  .cta__phone:hover { color: var(--color-flare); }
+  .cta__phone .label { color: var(--color-concrete); }
+
+  @media (min-width: 880px) {
+    .cta__inner {
+      grid-template-columns: 1.4fr 1fr;
+      align-items: end;
+      gap: 4rem;
+    }
+    .cta__actions { flex-direction: column; align-items: flex-end; }
+  }
+</style>

@@ -1,0 +1,243 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Hero from "../components/Hero.astro";
+import HeroMotif from "../components/HeroMotif.astro";
+import StatBand from "../components/StatBand.astro";
+import CTASection from "../components/CTASection.astro";
+import Reveal from "../components/Reveal.astro";
+import { company } from "../data/company";
+---
+
+<BaseLayout
+  title="About"
+  description="Nirvana Construction is a commercial drywall and metal-stud framing subcontractor serving Maryland. DBE / MBE / SBE certified. Built to the line."
+>
+  <Hero
+    index="Page 02 / 05"
+    meta="N 39.371° · W 76.476°"
+    eyebrow="About"
+    title={`A commercial trade <em>partner.</em><br /><span class="stroke">Not a sales pitch.</span>`}
+    lead="Nirvana Construction is a commercial drywall and metal-stud framing subcontractor working with general contractors across Maryland and the Greater Baltimore region."
+  >
+    <HeroMotif slot="visual" section="Section · About" />
+  </Hero>
+
+  <!-- ============= WHO WE ARE ============= -->
+  <section class="about-who">
+    <div class="about-who__inner">
+      <div class="about-who__col">
+        <p class="label about-who__eyebrow" data-reveal>
+          <span class="about-who__bar"></span>The company
+        </p>
+        <h2 class="text-section" data-reveal>
+          We frame &amp; finish<br />commercial interiors.
+        </h2>
+      </div>
+      <div class="about-who__col">
+        <p data-reveal>
+          We deliver high-quality commercial drywall and metal-stud framing with
+          speed, precision and accountability — backed by experienced crews and
+          proven field leadership. From fast-track tenant improvements to
+          large-scale commercial builds, we handle projects of every size in the
+          Baltimore region.
+        </p>
+        <p data-reveal>
+          We work the way a good trade partner should: communicating clearly,
+          coordinating closely with every other trade, and executing exactly
+          what was drawn — square, plumb, on layout, and ready for inspection.
+        </p>
+        <p data-reveal>
+          Quality and production come first. Strict QC and safety standards
+          mean clean installs, accurate layouts, and schedules that hold.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <StatBand />
+
+  <!-- ============= CERTIFICATION ============= -->
+  <section class="about-cert">
+    <div class="about-cert__inner">
+      <div class="about-cert__plaque" data-reveal>
+        <div class="about-cert__corner about-cert__corner--tl"></div>
+        <div class="about-cert__corner about-cert__corner--tr"></div>
+        <div class="about-cert__corner about-cert__corner--bl"></div>
+        <div class="about-cert__corner about-cert__corner--br"></div>
+        <p class="label about-cert__label">Certification</p>
+        <p class="about-cert__name">DBE&nbsp;·&nbsp;MBE&nbsp;·&nbsp;SBE</p>
+        <p class="label about-cert__num">Cert.&nbsp;No.&nbsp;22-204</p>
+      </div>
+      <div class="about-cert__copy">
+        <h2 class="text-section" data-reveal>Eligible for public &amp; institutional work.</h2>
+        <p data-reveal>
+          Nirvana Construction is a DBE / MBE / SBE certified business —
+          eligible for Disadvantaged, Minority and Small Business Enterprise
+          participation on public, institutional and federally-funded
+          construction projects in Maryland.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============= SERVICE AREA ============= -->
+  <section class="about-area">
+    <div class="about-area__inner">
+      <div class="about-area__copy">
+        <p class="label" data-reveal>
+          <span class="about-who__bar"></span>Service area
+        </p>
+        <h2 class="text-section" data-reveal>{company.serviceArea}.</h2>
+        <p data-reveal>
+          Headquartered at 9546 Belair Rd in Nottingham, MD, we work
+          throughout the Baltimore metropolitan area and across the state of
+          Maryland — from Annapolis to Aberdeen, Owings Mills to Forest Hill.
+        </p>
+        <ul class="about-area__cities" data-reveal>
+          <li>Baltimore</li><li>Annapolis</li><li>Towson</li><li>Owings Mills</li>
+          <li>Bel Air</li><li>Forest Hill</li><li>Aberdeen</li><li>Glen Burnie</li>
+          <li>Dundalk</li><li>Middle River</li><li>Gaithersburg</li><li>Nottingham</li>
+        </ul>
+      </div>
+      <div class="about-area__visual" data-reveal>
+        <HeroMotif section="Maryland · MD" coords="Greater Baltimore" />
+      </div>
+    </div>
+  </section>
+
+  <CTASection eyebrow="Start here" />
+</BaseLayout>
+
+<style>
+  /* shared eyebrow bar */
+  .about-who__bar {
+    display: inline-block;
+    width: 1.5rem;
+    height: 1px;
+    background: var(--color-emerald);
+    margin-right: 0.7rem;
+    vertical-align: middle;
+  }
+
+  /* WHO */
+  .about-who { padding: clamp(4rem, 9vw, 8rem) clamp(1.25rem, 4vw, 3.5rem); }
+  .about-who__inner {
+    max-width: 96rem;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+  .about-who__eyebrow { color: var(--color-emerald); margin-bottom: 1.25rem; }
+  .about-who__col p {
+    color: var(--color-ash);
+    line-height: 1.65;
+    margin-top: 1.25rem;
+    max-width: 36rem;
+  }
+  @media (min-width: 980px) {
+    .about-who__inner { grid-template-columns: 0.9fr 1.1fr; gap: 5rem; align-items: start; }
+  }
+
+  /* CERT */
+  .about-cert {
+    padding: clamp(4rem, 8vw, 7rem) clamp(1.25rem, 4vw, 3.5rem);
+    background: var(--color-graphite);
+  }
+  .about-cert__inner {
+    max-width: 96rem;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+  .about-cert__plaque {
+    position: relative;
+    padding: 2.5rem;
+    aspect-ratio: 5 / 4;
+    background:
+      radial-gradient(ellipse 70% 50% at 50% 50%, color-mix(in oklab, var(--color-flare) 10%, transparent), transparent 70%),
+      var(--color-ink);
+    border: 1px solid color-mix(in oklab, var(--color-bone) 12%, transparent);
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+  }
+  .about-cert__corner {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border-color: var(--color-emerald);
+    border-style: solid;
+    border-width: 0;
+  }
+  .about-cert__corner--tl { top: 12px; left: 12px; border-top-width: 1.5px; border-left-width: 1.5px; }
+  .about-cert__corner--tr { top: 12px; right: 12px; border-top-width: 1.5px; border-right-width: 1.5px; }
+  .about-cert__corner--bl { bottom: 12px; left: 12px; border-bottom-width: 1.5px; border-left-width: 1.5px; }
+  .about-cert__corner--br { bottom: 12px; right: 12px; border-bottom-width: 1.5px; border-right-width: 1.5px; }
+  .about-cert__label { color: var(--color-emerald); }
+  .about-cert__name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    letter-spacing: -0.02em;
+    align-self: center;
+    color: var(--color-bone);
+  }
+  .about-cert__num { color: var(--color-ash); align-self: end; }
+  .about-cert__copy p {
+    color: var(--color-ash);
+    line-height: 1.65;
+    margin-top: 1.25rem;
+    max-width: 32rem;
+  }
+  @media (min-width: 900px) {
+    .about-cert__inner { grid-template-columns: 0.85fr 1.15fr; gap: 5rem; }
+  }
+
+  /* AREA */
+  .about-area { padding: clamp(4rem, 8vw, 7rem) clamp(1.25rem, 4vw, 3.5rem); }
+  .about-area__inner {
+    max-width: 96rem;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+  .about-area__copy p {
+    margin-top: 1.25rem;
+    color: var(--color-ash);
+    line-height: 1.65;
+    max-width: 34rem;
+  }
+  .about-area__cities {
+    margin-top: 2.25rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem 1.5rem;
+    color: var(--color-ash);
+  }
+  .about-area__cities li {
+    position: relative;
+    padding-left: 1.1rem;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+  }
+  .about-area__cities li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.55rem;
+    width: 0.42rem;
+    height: 1px;
+    background: var(--color-emerald);
+  }
+  @media (min-width: 600px) {
+    .about-area__cities { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (min-width: 980px) {
+    .about-area__inner { grid-template-columns: 1.1fr 0.9fr; gap: 5rem; }
+  }
+</style>

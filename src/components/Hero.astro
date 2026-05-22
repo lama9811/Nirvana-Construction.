@@ -1,0 +1,145 @@
+---
+/* Hero.astro — flexible page-hero used on inner pages.
+   Homepage builds its own hero around the StructureScene. */
+interface Props {
+  eyebrow?: string;
+  title: string;          // accepts inline <em> / <span> for styling
+  lead?: string;
+  index?: string;         // e.g. "Page 02 / 05"
+  meta?: string;          // mono coordinates / status line
+}
+const { eyebrow, title, lead, index, meta } = Astro.props;
+---
+
+<section class="hero">
+  <div class="hero__grid bg-blueprint" aria-hidden="true"></div>
+
+  <div class="hero__inner">
+    <header class="hero__meta">
+      {index && <p class="label">{index}</p>}
+      {meta && <p class="label hero__coords">{meta}</p>}
+    </header>
+
+    <div class="hero__copy">
+      {eyebrow && <p class="label hero__eyebrow" data-reveal>{eyebrow}</p>}
+      <h1 class="hero__title" data-reveal set:html={title} />
+      {lead && <p class="hero__lead" data-reveal>{lead}</p>}
+    </div>
+
+    <div class="hero__visual"><slot name="visual" /></div>
+
+    <div class="hero__scroll" aria-hidden="true">
+      <span class="label">Scroll</span>
+      <span class="hero__scroll-line"></span>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 78vh;
+    padding-top: 7.5rem;
+    overflow: hidden;
+  }
+  .hero__grid {
+    position: absolute;
+    inset: 0;
+    mask-image: radial-gradient(ellipse 80% 60% at 30% 30%, #000, transparent 75%);
+    opacity: 0.7;
+  }
+  .hero__inner {
+    position: relative;
+    max-width: 96rem;
+    margin: 0 auto;
+    padding: 0 clamp(1.25rem, 4vw, 3.5rem) 4rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+    row-gap: 2.5rem;
+  }
+  .hero__meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .hero__coords { color: var(--color-concrete); }
+  .hero__copy { max-width: 50rem; }
+  .hero__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    color: var(--color-emerald);
+    margin-bottom: 1.5rem;
+  }
+  .hero__eyebrow::before {
+    content: "";
+    width: 1.5rem;
+    height: 1px;
+    background: var(--color-emerald);
+  }
+  .hero__title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(2.75rem, 8vw, 7.5rem);
+    line-height: 0.94;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+  .hero__title :global(em) {
+    font-style: normal;
+    color: var(--color-flare);
+  }
+  .hero__title :global(span.stroke) {
+    -webkit-text-stroke: 1px color-mix(in oklab, var(--color-bone) 38%, transparent);
+    color: transparent;
+  }
+  .hero__lead {
+    margin-top: 1.75rem;
+    max-width: 36rem;
+    color: var(--color-ash);
+    font-size: 1.07rem;
+    line-height: 1.6;
+  }
+
+  .hero__visual { position: relative; min-height: 0; }
+
+  .hero__scroll {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    color: var(--color-concrete);
+  }
+  .hero__scroll-line {
+    width: 4rem;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      var(--color-concrete) 0%,
+      transparent 100%
+    );
+    animation: scroll-cue 2.2s var(--ease-in-out-quint) infinite;
+  }
+  @keyframes scroll-cue {
+    0%, 100% { transform: translateX(0); opacity: 1; }
+    50% { transform: translateX(0.6rem); opacity: 0.4; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero__scroll-line { animation: none; }
+  }
+
+  @media (min-width: 980px) {
+    .hero {
+      min-height: 88vh;
+    }
+    .hero__inner {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+      grid-template-rows: auto 1fr auto;
+      column-gap: 3rem;
+    }
+    .hero__meta { grid-column: 1 / -1; }
+    .hero__copy { grid-column: 1; grid-row: 2; align-self: end; }
+    .hero__visual { grid-column: 2; grid-row: 2; }
+    .hero__scroll { grid-column: 1 / -1; grid-row: 3; }
+  }
+</style>

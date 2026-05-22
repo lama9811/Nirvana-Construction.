@@ -1,0 +1,140 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Hero from "../components/Hero.astro";
+import HeroMotif from "../components/HeroMotif.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import CTASection from "../components/CTASection.astro";
+import { projects, projectCategories } from "../data/projects";
+---
+
+<BaseLayout
+  title="Projects"
+  description="Selected commercial projects framed and finished by Nirvana Construction across Maryland — ALDI, Chipotle, DaVita, Golf Galaxy, JCC, MACE Medical and more."
+>
+  <Hero
+    index="Page 04 / 05"
+    meta="10 · Selected projects"
+    eyebrow="Projects"
+    title={`Ten commercial builds.<br /><em>One state.</em>`}
+    lead="Selected work delivered across Maryland — national-brand retail, healthcare, education, hospitality and community projects."
+  >
+    <HeroMotif slot="visual" section="Projects · P-01" coords="10 · Builds" />
+  </Hero>
+
+  <!-- ============= FILTER BAR ============= -->
+  <section class="prj-filter">
+    <div class="prj-filter__inner">
+      <p class="label prj-filter__lbl">Filter</p>
+      <div class="prj-filter__btns" role="tablist" data-prj-filter>
+        <button class="prj-filter__btn is-active" data-cat="all">
+          <span>All</span><span class="prj-filter__count">{projects.length}</span>
+        </button>
+        {
+          projectCategories.map((cat) => {
+            const count = projects.filter((p) => p.category === cat).length;
+            return (
+              <button class="prj-filter__btn" data-cat={cat}>
+                <span>{cat}</span><span class="prj-filter__count">{count}</span>
+              </button>
+            );
+          })
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ============= GRID ============= -->
+  <section class="prj-grid-wrap">
+    <div class="prj-grid" data-prj-grid>
+      {projects.map((p) => (
+        <div class="prj-grid__cell" data-cat={p.category}>
+          <ProjectCard project={p} />
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <CTASection title="Want this kind of work on your next project?" />
+</BaseLayout>
+
+<style>
+  .prj-filter {
+    padding: 2.5rem clamp(1.25rem, 4vw, 3.5rem) 0;
+  }
+  .prj-filter__inner {
+    max-width: 96rem;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+  .prj-filter__lbl { color: var(--color-concrete); }
+  .prj-filter__btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .prj-filter__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.55rem 0.9rem;
+    background: var(--color-graphite);
+    border: 1px solid color-mix(in oklab, var(--color-bone) 8%, transparent);
+    color: var(--color-ash);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    transition: color 0.25s, background-color 0.25s, border-color 0.25s;
+  }
+  .prj-filter__btn:hover { color: var(--color-bone); border-color: color-mix(in oklab, var(--color-flare) 35%, transparent); }
+  .prj-filter__btn.is-active {
+    background: var(--color-flare);
+    color: var(--color-ink);
+    border-color: var(--color-flare);
+  }
+  .prj-filter__count { color: var(--color-concrete); }
+  .prj-filter__btn.is-active .prj-filter__count { color: color-mix(in oklab, var(--color-ink) 60%, transparent); }
+  .prj-filter__btn:hover .prj-filter__count { color: var(--color-ash); }
+
+  .prj-grid-wrap { padding: 3rem clamp(1.25rem, 4vw, 3.5rem) clamp(3rem, 6vw, 5rem); }
+  .prj-grid {
+    max-width: 96rem;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .prj-grid__cell {
+    transition: opacity 0.4s var(--ease-out-expo), transform 0.4s var(--ease-out-expo);
+  }
+  .prj-grid__cell.is-hidden {
+    display: none;
+  }
+  @media (min-width: 700px) { .prj-grid { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 1100px) { .prj-grid { grid-template-columns: repeat(3, 1fr); } }
+</style>
+
+<script>
+  function setupFilter() {
+    const wrap = document.querySelector<HTMLElement>("[data-prj-filter]");
+    const grid = document.querySelector<HTMLElement>("[data-prj-grid]");
+    if (!wrap || !grid) return;
+
+    const buttons = wrap.querySelectorAll<HTMLButtonElement>(".prj-filter__btn");
+    const cells = grid.querySelectorAll<HTMLElement>(".prj-grid__cell");
+
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const cat = btn.dataset.cat ?? "all";
+        buttons.forEach((b) => b.classList.toggle("is-active", b === btn));
+        cells.forEach((c) => {
+          const ok = cat === "all" || c.dataset.cat === cat;
+          c.classList.toggle("is-hidden", !ok);
+        });
+      });
+    });
+  }
+  document.addEventListener("astro:page-load", setupFilter);
+</script>

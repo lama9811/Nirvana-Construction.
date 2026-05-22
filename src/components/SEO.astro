@@ -1,0 +1,76 @@
+---
+/* SEO.astro — per-page meta, Open Graph, and LocalBusiness JSON-LD. */
+import { company } from "../data/company";
+
+interface Props {
+  title: string;
+  description: string;
+  path?: string;
+  image?: string;
+}
+
+const { title, description, path = "/", image = "/images/projects/golf-galaxy.webp" } =
+  Astro.props;
+
+const site =
+  Astro.site?.toString().replace(/\/$/, "") ?? "https://nirvanaconstruction.net";
+const canonical = site + path;
+const ogImage = site + image;
+const fullTitle = `${title} · ${company.legalName}`;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "GeneralContractor",
+  "@id": `${site}/#business`,
+  name: company.legalName,
+  alternateName: company.name,
+  description:
+    "Commercial drywall and metal-stud framing subcontractor serving Maryland and the Greater Baltimore region.",
+  url: `${site}/`,
+  image: ogImage,
+  telephone: "+14106509850",
+  email: company.email,
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: company.address.street,
+    addressLocality: company.address.city,
+    addressRegion: company.address.state,
+    postalCode: company.address.zip,
+    addressCountry: "US",
+  },
+  geo: {
+    "@type": "GeoCoordinates",
+    latitude: company.geo.lat,
+    longitude: company.geo.lng,
+  },
+  areaServed: { "@type": "State", name: "Maryland" },
+  openingHoursSpecification: {
+    "@type": "OpeningHoursSpecification",
+    dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+    opens: "08:00",
+    closes: "16:00",
+  },
+  priceRange: "$$",
+};
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content={company.legalName} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImage} />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />
+
+<meta name="theme-color" content="#0b0b0d" />
+<meta name="robots" content="index, follow" />
+
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />

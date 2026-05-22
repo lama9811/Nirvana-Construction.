@@ -1,0 +1,130 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import HeroMotif from "../components/HeroMotif.astro";
+import { company } from "../data/company";
+---
+
+<BaseLayout
+  title="Not found"
+  description="The page you were looking for isn't on the plans."
+  path="/404/"
+>
+  <section class="nf">
+    <div class="nf__inner">
+      <div class="nf__motif">
+        <HeroMotif section="Error · 404" coords="Off blueprint" />
+      </div>
+
+      <div class="nf__copy">
+        <p class="label nf__eyebrow">
+          <span class="nf__bar"></span>Error · 404
+        </p>
+        <h1 class="nf__title">
+          <span>Off the</span>
+          <span class="nf__em">blueprint.</span>
+        </h1>
+        <p class="nf__lead">
+          The page you were looking for isn't on the drawings. Let's get you
+          back on layout.
+        </p>
+        <div class="nf__ctas">
+          <a href="/" class="nf__primary">
+            Back to home
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M5 19L19 5M19 5H8M19 5v11" stroke="currentColor" stroke-width="2" />
+            </svg>
+          </a>
+          <a href={company.phoneHref} class="nf__secondary">Or call {company.phone}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .nf {
+    min-height: 100vh;
+    padding: 8rem clamp(1.25rem, 4vw, 3.5rem) 4rem;
+    display: grid;
+    align-items: center;
+  }
+  .nf__inner {
+    max-width: 96rem;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+  .nf__motif { max-width: 28rem; }
+  .nf__bar {
+    display: inline-block;
+    width: 1.5rem;
+    height: 1px;
+    background: var(--color-emerald);
+    margin-right: 0.7rem;
+    vertical-align: middle;
+  }
+  .nf__eyebrow { color: var(--color-emerald); margin-bottom: 1.25rem; }
+  .nf__title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(3.5rem, 10vw, 8.5rem);
+    line-height: 0.94;
+    letter-spacing: -0.035em;
+    display: flex;
+    flex-direction: column;
+  }
+  .nf__em { color: var(--color-flare); }
+  .nf__lead {
+    margin-top: 1.75rem;
+    color: var(--color-ash);
+    max-width: 32rem;
+    font-size: 1.05rem;
+    line-height: 1.6;
+  }
+  .nf__ctas {
+    margin-top: 2.5rem;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+  .nf__primary {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 1rem 1.5rem;
+    background: var(--color-flare);
+    color: var(--color-ink);
+    font-weight: 600;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .nf__primary svg { width: 1rem; height: 1rem; transition: transform 0.4s var(--ease-out-expo); }
+  .nf__primary::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--color-bone);
+    transform: translateY(101%);
+    transition: transform 0.5s var(--ease-out-expo);
+    z-index: -1;
+  }
+  .nf__primary:hover::before { transform: translateY(0); }
+  .nf__primary:hover svg { transform: translate(3px, -3px); }
+  .nf__secondary {
+    color: var(--color-bone);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    border-bottom: 1px solid var(--color-flare);
+    padding-bottom: 0.4rem;
+    transition: color 0.3s;
+  }
+  .nf__secondary:hover { color: var(--color-flare); }
+
+  @media (min-width: 900px) {
+    .nf__inner { grid-template-columns: 0.9fr 1.1fr; gap: 5rem; }
+  }
+</style>

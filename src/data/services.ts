@@ -19,18 +19,18 @@ export const services: Service[] = [
     slug: "retail",
     title: "Retail & Restaurant",
     blurb:
-      "Storefronts, big-box fit-outs, and quick-service restaurants — finished flawless, opened on time.",
+      "Storefronts, big-box fit-outs, and quick-service restaurants — opened on schedule.",
     detail:
-      "Retail schedules don't move. We frame and finish shopping-center spaces, anchor stores, and brand-standard restaurants on fixed timelines, coordinating tightly with general contractors so the doors open on the date that was promised.",
+      "Storefronts, big-box fit-outs, and brand-standard restaurants delivered on tight schedules, with clean finishes and doors opening on the date that was promised.",
   },
   {
     index: "02",
     slug: "hospitality",
     title: "Hospitality",
     blurb:
-      "Hotels and guest-facing interiors where every wall is part of the experience.",
+      "Hotel and guest-facing interiors where every wall is part of the experience.",
     detail:
-      "In hospitality, the wall is the product. We deliver clean lines, proper sound separation between rooms, and finishes that hold up to constant traffic — the quiet, durable craft behind a great guest experience.",
+      "Hotel and guest-room interiors with clean lines, proper sound separation, and finishes that hold up to constant traffic.",
   },
   {
     index: "03",
@@ -39,7 +39,7 @@ export const services: Service[] = [
     blurb:
       "Clinics and medical offices framed to healthcare standards and built inspection-ready.",
     detail:
-      "Healthcare work leaves no margin for error. We build infection-control framing, lead-lined and rated assemblies, and finishes that pass inspection the first time — for clinics, dialysis centers, and medical office build-outs.",
+      "Infection-control framing, lead-lined and rated assemblies, and finishes that pass inspection the first time — for clinics, dialysis centers, and medical offices.",
   },
   {
     index: "04",
@@ -48,7 +48,7 @@ export const services: Service[] = [
     blurb:
       "Schools and institutional buildings framed for decades of hard daily use.",
     detail:
-      "Institutional buildings are built to last and built to code. We deliver metal-stud framing and drywall for schools and public facilities — durable assemblies, fire-rated separations, and finishes ready for the next thirty years.",
+      "Metal-stud framing and drywall for schools and public facilities, with durable assemblies and fire-rated separations built to last.",
   },
   {
     index: "05",
@@ -57,7 +57,7 @@ export const services: Service[] = [
     blurb:
       "Corporate offices, tenant fit-outs, and core-and-shell interiors, floor by floor.",
     detail:
-      "From base-building core-and-shell to full tenant fit-outs, we frame and finish functional, code-compliant office interiors — coordinating with every trade to keep the build moving floor by floor.",
+      "Core-and-shell builds and full tenant fit-outs, delivering functional, code-compliant office interiors that are coordinated floor by floor.",
   },
   {
     index: "06",
@@ -66,7 +66,7 @@ export const services: Service[] = [
     blurb:
       "Occupied-space remodels and adaptive reuse, phased around your operations.",
     detail:
-      "Modernizing a commercial space while it stays open takes planning. We work in phases, after hours when needed, and around your operations — upgrading and remodeling interiors with minimal disruption to the business inside.",
+      "Occupied-space remodels and adaptive reuse, worked in phases and after hours when needed, with minimal disruption to the business inside.",
   },
 ];
 

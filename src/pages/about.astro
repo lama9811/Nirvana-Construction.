@@ -1,243 +1,412 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import Hero from "../components/Hero.astro";
-import HeroMotif from "../components/HeroMotif.astro";
-import StatBand from "../components/StatBand.astro";
-import CTASection from "../components/CTASection.astro";
-import Reveal from "../components/Reveal.astro";
-import { company } from "../data/company";
+import { company, figures } from "../data/company";
+
+const cities = [
+  "Baltimore",
+  "Annapolis",
+  "Towson",
+  "Owings Mills",
+  "Bel Air",
+  "Forest Hill",
+  "Aberdeen",
+  "Glen Burnie",
+  "Dundalk",
+  "Middle River",
+  "Gaithersburg",
+  "Nottingham",
+];
+
+const values = [
+  {
+    icon: "verified",
+    label: "Square. Plumb. On Layout.",
+    body: "Our frames are built to the drawings rather than the eye, so the finish is inspection-ready and passes on the first walk through.",
+  },
+  {
+    icon: "groups",
+    label: "Coordinated With Every Trade",
+    body: "Our team stays on site alongside the GC, the MEPs, and the inspector through every phase of the build, so the schedule you signed is the schedule we hit.",
+  },
+  {
+    icon: "shield",
+    label: "QC & Safety First",
+    body: "A strict quality-control program and proven field leadership keep every commercial build on track from pre-construction through final punch.",
+  },
+];
+
+/* Placeholder team — swap with real names + headshots when ready.
+   Drop portraits into /public/images/team/<slug>.webp at 800px square
+   and reference them in `photo` below. */
+const team = [
+  {
+    slug: "president",
+    name: "Team Member",
+    role: "Principal & President",
+    photo: null,
+  },
+  {
+    slug: "operations",
+    name: "Team Member",
+    role: "Operations Manager",
+    photo: null,
+  },
+  {
+    slug: "estimator",
+    name: "Team Member",
+    role: "Senior Estimator",
+    photo: null,
+  },
+  {
+    slug: "field",
+    name: "Team Member",
+    role: "Field Superintendent",
+    photo: null,
+  },
+];
 ---
 
 <BaseLayout
   title="About"
-  description="Nirvana Construction is a commercial drywall and metal-stud framing subcontractor serving Maryland. DBE / MBE / SBE certified. Built to the line."
+  description="Nirvana Construction is a commercial drywall and metal-stud framing subcontractor serving Maryland and the Greater Baltimore region. DBE / MBE / SBE certified. Built to the line."
 >
-  <Hero
-    index="Page 02 / 05"
-    meta="N 39.371° · W 76.476°"
-    eyebrow="About"
-    title={`A commercial trade <em>partner.</em><br /><span class="stroke">Not a sales pitch.</span>`}
-    lead="Nirvana Construction is a commercial drywall and metal-stud framing subcontractor working with general contractors across Maryland and the Greater Baltimore region."
-  >
-    <HeroMotif slot="visual" section="Section · About" />
-  </Hero>
-
-  <!-- ============= WHO WE ARE ============= -->
-  <section class="about-who">
-    <div class="about-who__inner">
-      <div class="about-who__col">
-        <p class="label about-who__eyebrow" data-reveal>
-          <span class="about-who__bar"></span>The company
+  {/* ============ Hero ============ */}
+  <section class="relative h-[440px] md:h-[520px] w-full flex items-center overflow-hidden">
+    <div class="absolute inset-0" style="height:120%;top:-10%;">
+      <img
+        data-parallax="0.22"
+        class="w-full h-full object-cover object-center"
+        src="/images/projects/jobsite-04.webp"
+        srcset="/images/projects/jobsite-04-800.webp 800w, /images/projects/jobsite-04.webp 1600w"
+        sizes="100vw"
+        alt="A commercial Nirvana Construction interior nearing completion."
+        fetchpriority="high"
+      />
+    </div>
+    <div class="absolute inset-0 bg-on-background/60"></div>
+    <div class="relative max-w-container-max mx-auto px-lg w-full">
+      <div class="max-w-2xl text-surface">
+        <span
+          data-reveal
+          class="inline-block px-md py-xs bg-secondary text-on-secondary font-label-bold text-label-bold uppercase mb-md"
+        >
+          About Nirvana
+        </span>
+        <h1 data-words data-delay="0.1" class="font-headline-xl text-headline-xl mb-md">
+          A commercial trade partner. Not a sales pitch.
+        </h1>
+        <p data-reveal class="font-body-lg text-body-lg text-white/85">
+          Commercial drywall and metal-stud framing for general contractors
+          across Maryland.
         </p>
-        <h2 class="text-section" data-reveal>
-          We frame &amp; finish<br />commercial interiors.
+      </div>
+    </div>
+  </section>
+
+  {/* ============ Who we are ============ */}
+  <section class="py-xxl bg-surface-container-low">
+    <div class="max-w-container-max mx-auto px-lg grid grid-cols-1 lg:grid-cols-12 gap-xxl">
+      <div class="lg:col-span-5">
+        <div class="flex items-center gap-sm mb-lg">
+          <div class="w-12 h-1 bg-secondary"></div>
+          <p class="font-label-bold text-label-bold text-secondary uppercase tracking-widest">
+            The Company
+          </p>
+        </div>
+        <h2 data-words class="font-headline-lg text-headline-lg text-primary mb-lg max-w-[32rem]">
+          We frame &amp; finish commercial interiors.
         </h2>
       </div>
-      <div class="about-who__col">
-        <p data-reveal>
-          We deliver high-quality commercial drywall and metal-stud framing with
-          speed, precision and accountability — backed by experienced crews and
-          proven field leadership. From fast-track tenant improvements to
-          large-scale commercial builds, we handle projects of every size in the
-          Baltimore region.
+      <div class="lg:col-span-7 space-y-lg">
+        <p data-reveal class="font-body-lg text-body-lg text-on-surface-variant">
+          We frame and finish commercial interiors across the Baltimore region
+          — from fast-track tenant fit-outs to large new-build work — backed
+          by experienced crews and proven field leadership.
         </p>
-        <p data-reveal>
-          We work the way a good trade partner should: communicating clearly,
-          coordinating closely with every other trade, and executing exactly
-          what was drawn — square, plumb, on layout, and ready for inspection.
+        <p data-reveal class="font-body-md text-on-surface-variant">
+          We work the way a good trade partner should: clear communication,
+          tight coordination with every other trade, and exactly what was
+          drawn — square, plumb, on layout, and ready for inspection.
         </p>
-        <p data-reveal>
-          Quality and production come first. Strict QC and safety standards
-          mean clean installs, accurate layouts, and schedules that hold.
+        <p data-reveal class="font-body-md text-on-surface-variant">
+          Strict QC and safety standards mean clean installs, accurate
+          layouts, and schedules that hold.
         </p>
       </div>
     </div>
   </section>
 
-  <StatBand />
+  {/* ============ Stat counters ============ */}
+  <section class="py-xl bg-surface-container-lowest border-y border-outline-variant">
+    <div class="max-w-container-max mx-auto px-lg grid grid-cols-2 md:grid-cols-4 gap-gutter">
+      {figures.map((f, i) => (
+        <div data-reveal class="flex flex-col gap-xs" style={`transition-delay:${i * 60}ms`}>
+          <span
+            data-count={f.value}
+            data-suffix={i === 0 ? "+" : ""}
+            class="font-headline-lg text-headline-lg text-primary font-bold"
+          >
+            0
+          </span>
+          <span class="font-label-bold text-label-bold uppercase text-on-surface-variant">
+            {f.label}
+          </span>
+        </div>
+      ))}
+    </div>
+  </section>
 
-  <!-- ============= CERTIFICATION ============= -->
-  <section class="about-cert">
-    <div class="about-cert__inner">
-      <div class="about-cert__plaque" data-reveal>
-        <div class="about-cert__corner about-cert__corner--tl"></div>
-        <div class="about-cert__corner about-cert__corner--tr"></div>
-        <div class="about-cert__corner about-cert__corner--bl"></div>
-        <div class="about-cert__corner about-cert__corner--br"></div>
-        <p class="label about-cert__label">Certification</p>
-        <p class="about-cert__name">DBE&nbsp;·&nbsp;MBE&nbsp;·&nbsp;SBE</p>
-        <p class="label about-cert__num">Cert.&nbsp;No.&nbsp;22-204</p>
+  {/* ============ Values / Differentiators ============ */}
+  <section class="py-xxl bg-on-background text-white relative overflow-hidden">
+    <div class="absolute right-0 top-0 w-1/3 h-full opacity-10 pointer-events-none hidden md:block">
+      <span class="material-symbols-outlined text-[400px] leading-none">architecture</span>
+    </div>
+    <div class="max-w-container-max mx-auto px-lg">
+      <div class="max-w-2xl mb-xxl">
+        <span class="text-[#fd761a] font-label-bold text-label-bold uppercase tracking-widest mb-md block">
+          How we work
+        </span>
+        <h2 data-words class="font-headline-xl text-headline-xl mb-lg">
+          The Nirvana way.
+        </h2>
+        <p data-reveal class="font-body-lg text-body-lg text-surface-variant">
+          We coordinate with the GC, work to the drawings, and finish ready
+          for inspection.
+        </p>
       </div>
-      <div class="about-cert__copy">
-        <h2 class="text-section" data-reveal>Eligible for public &amp; institutional work.</h2>
-        <p data-reveal>
-          Nirvana Construction is a DBE / MBE / SBE certified business —
-          eligible for Disadvantaged, Minority and Small Business Enterprise
-          participation on public, institutional and federally-funded
-          construction projects in Maryland.
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+        {values.map((v, i) => (
+          <div
+            data-reveal
+            data-tilt
+            class="bg-on-background/50 border border-on-primary-container/40 p-lg flex flex-col gap-md hover:shadow-2xl transition-shadow duration-300"
+            style={`transition-delay:${i * 80}ms`}
+          >
+            <div class="w-12 h-12 rounded-lg bg-primary-container flex items-center justify-center border border-on-primary-container">
+              <span class="material-symbols-outlined text-primary-fixed">{v.icon}</span>
+            </div>
+            <h4 class="font-label-bold text-label-bold uppercase text-[#fd761a]">
+              {v.label}
+            </h4>
+            <p class="font-body-sm text-body-sm text-white/80">{v.body}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* ============ Certification ============ */}
+  <section class="py-xxl bg-surface-container-low">
+    <div class="max-w-container-max mx-auto px-lg grid grid-cols-1 lg:grid-cols-2 gap-xxl items-center">
+      <div data-reveal data-tilt class="relative">
+        <div class="bg-on-background text-surface p-xl border border-outline shadow-lg aspect-[5/4] flex flex-col justify-between">
+          <div class="absolute top-md left-md w-5 h-5 border-t-2 border-l-2 border-secondary-container"></div>
+          <div class="absolute top-md right-md w-5 h-5 border-t-2 border-r-2 border-secondary-container"></div>
+          <div class="absolute bottom-md left-md w-5 h-5 border-b-2 border-l-2 border-secondary-container"></div>
+          <div class="absolute bottom-md right-md w-5 h-5 border-b-2 border-r-2 border-secondary-container"></div>
+          <p class="font-label-bold text-label-bold uppercase text-[#fd761a]">
+            Certification
+          </p>
+          <p class="font-headline-xl text-headline-xl text-surface text-center">
+            DBE&nbsp;·&nbsp;MBE&nbsp;·&nbsp;SBE
+          </p>
+          <p class="font-label-bold text-label-bold uppercase text-on-surface-variant">
+            {company.certification.number}
+          </p>
+        </div>
+      </div>
+      <div class="space-y-lg">
+        <div class="flex items-center gap-sm mb-md">
+          <div class="w-12 h-1 bg-secondary"></div>
+          <p class="font-label-bold text-label-bold text-secondary uppercase tracking-widest">
+            Certified
+          </p>
+        </div>
+        <h2 data-words class="font-headline-lg text-headline-lg text-primary">
+          Eligible for public &amp; institutional work.
+        </h2>
+        <p data-reveal class="font-body-lg text-body-lg text-on-surface-variant">
+          Nirvana Construction is a DBE / MBE / SBE certified business,
+          eligible for Disadvantaged, Minority, and Small Business Enterprise
+          participation on public and federally-funded construction projects
+          in Maryland.
+        </p>
+        <p data-reveal class="font-body-md text-on-surface-variant">
+          {company.certification.full}
         </p>
       </div>
     </div>
   </section>
 
-  <!-- ============= SERVICE AREA ============= -->
-  <section class="about-area">
-    <div class="about-area__inner">
-      <div class="about-area__copy">
-        <p class="label" data-reveal>
-          <span class="about-who__bar"></span>Service area
+  {/* ============ Service area ============ */}
+  <section class="py-xxl bg-surface-container-lowest">
+    <div class="max-w-container-max mx-auto px-lg grid grid-cols-1 lg:grid-cols-12 gap-xxl items-start">
+      <div class="lg:col-span-7">
+        <div class="flex items-center gap-sm mb-lg">
+          <div class="w-12 h-1 bg-primary"></div>
+          <p class="font-label-bold text-label-bold text-primary uppercase tracking-widest">
+            Service Area
+          </p>
+        </div>
+        <h2 data-words class="font-headline-lg text-headline-lg text-primary mb-lg">
+          {company.serviceArea}.
+        </h2>
+        <p data-reveal class="font-body-lg text-body-lg text-on-surface-variant mb-xl">
+          Headquartered in Nottingham, MD, we work throughout the Baltimore
+          metropolitan area and across the state of Maryland — from Annapolis
+          to Aberdeen, Owings Mills to Forest Hill.
         </p>
-        <h2 class="text-section" data-reveal>{company.serviceArea}.</h2>
-        <p data-reveal>
-          Headquartered at 9546 Belair Rd in Nottingham, MD, we work
-          throughout the Baltimore metropolitan area and across the state of
-          Maryland — from Annapolis to Aberdeen, Owings Mills to Forest Hill.
-        </p>
-        <ul class="about-area__cities" data-reveal>
-          <li>Baltimore</li><li>Annapolis</li><li>Towson</li><li>Owings Mills</li>
-          <li>Bel Air</li><li>Forest Hill</li><li>Aberdeen</li><li>Glen Burnie</li>
-          <li>Dundalk</li><li>Middle River</li><li>Gaithersburg</li><li>Nottingham</li>
+        <ul data-reveal class="grid grid-cols-2 sm:grid-cols-3 gap-x-lg gap-y-sm">
+          {cities.map((c) => (
+            <li class="flex items-center gap-sm font-body-sm text-on-surface-variant">
+              <span class="w-2 h-px bg-secondary"></span>
+              {c}
+            </li>
+          ))}
         </ul>
       </div>
-      <div class="about-area__visual" data-reveal>
-        <HeroMotif section="Maryland · MD" coords="Greater Baltimore" />
-      </div>
+      <aside class="lg:col-span-5">
+        <div
+          data-reveal
+          data-tilt
+          class="bg-surface-container border border-outline-variant p-xl"
+        >
+          <div class="bg-secondary h-1 w-12 mb-md"></div>
+          <h3 class="font-headline-md text-headline-md mb-md text-primary">
+            Where we are
+          </h3>
+          <div class="space-y-md">
+            <div class="flex items-start gap-sm">
+              <span class="material-symbols-outlined text-secondary mt-px">location_on</span>
+              <p class="font-body-md text-on-surface-variant">
+                {company.address.street}<br />
+                {company.address.city}, {company.address.state} {company.address.zip}
+              </p>
+            </div>
+            <div class="flex items-start gap-sm">
+              <span class="material-symbols-outlined text-secondary mt-px">schedule</span>
+              <p class="font-body-md text-on-surface-variant">{company.hours}</p>
+            </div>
+            <div class="flex items-start gap-sm">
+              <span class="material-symbols-outlined text-secondary mt-px">call</span>
+              <a
+                href={company.phoneHref}
+                class="font-body-md text-primary hover:text-secondary transition-colors"
+              >
+                {company.phone}
+              </a>
+            </div>
+            <div class="flex items-start gap-sm">
+              <span class="material-symbols-outlined text-secondary mt-px">mail</span>
+              <a
+                href={company.emailHref}
+                class="font-body-md text-primary hover:text-secondary transition-colors break-all"
+              >
+                {company.email}
+              </a>
+            </div>
+          </div>
+        </div>
+      </aside>
     </div>
   </section>
 
-  <CTASection eyebrow="Start here" />
+  {/* ============ Team ============ */}
+  <section class="py-xxl bg-surface-container-low">
+    <div class="max-w-container-max mx-auto px-lg">
+      <div class="flex items-center gap-sm mb-lg">
+        <div class="w-12 h-1 bg-secondary"></div>
+        <p class="font-label-bold text-label-bold text-secondary uppercase tracking-widest">
+          The Team
+        </p>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-lg mb-xxl items-end">
+        <h2 data-words class="font-headline-lg text-headline-lg text-primary lg:col-span-7">
+          The people behind the work.
+        </h2>
+        <p data-reveal class="font-body-md text-on-surface-variant lg:col-span-5 max-w-[28rem]">
+          Experienced field leadership and a steady office crew — the people
+          who plan, price, and run every Nirvana build.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
+        {team.map((m, i) => (
+          <article
+            data-reveal
+            data-tilt
+            class="bg-surface-container-lowest border border-outline-variant shadow-sm hover:shadow-2xl transition-shadow duration-300 overflow-hidden"
+            style={`transition-delay:${i * 80}ms`}
+          >
+            <div class="relative aspect-square bg-surface-container-high overflow-hidden">
+              {m.photo ? (
+                <img
+                  src={`/images/team/${m.photo}`}
+                  alt={`${m.name} — ${m.role}`}
+                  loading="lazy"
+                  class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                />
+              ) : (
+                <div class="w-full h-full flex items-center justify-center bg-primary/5">
+                  <span
+                    class="material-symbols-outlined text-primary/40"
+                    style="font-size:120px;"
+                  >
+                    engineering
+                  </span>
+                </div>
+              )}
+              <div class="absolute top-0 right-0 bg-secondary text-on-primary px-md py-xs font-label-bold text-label-bold uppercase">
+                {String(i + 1).padStart(2, "0")}
+              </div>
+            </div>
+            <div class="p-lg">
+              <p class="font-label-bold text-label-bold uppercase text-secondary mb-xs">
+                {m.role}
+              </p>
+              <h3 class="font-headline-md text-headline-md text-primary">
+                {m.name}
+              </h3>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <p data-reveal class="mt-xl font-body-sm text-body-sm text-on-surface-variant italic max-w-2xl">
+        Names &amp; headshots coming soon — drop portraits in
+        <code class="font-mono text-primary not-italic">/public/images/team/</code>
+        and reference them in <code class="font-mono text-primary not-italic">src/pages/about.astro</code>.
+      </p>
+    </div>
+  </section>
+
+  {/* ============ CTA ============ */}
+  <section class="bg-primary text-on-primary py-xxl">
+    <div class="max-w-container-max mx-auto px-lg text-center">
+      <h2 data-words class="font-headline-lg text-headline-lg mb-md">
+        Want us on your next project?
+      </h2>
+      <p data-reveal class="font-body-lg text-body-lg text-on-primary-container max-w-[36rem] mx-auto mb-xl">
+        Send a set of drawings or just a few notes about the scope. We'll be in
+        touch within one business day.
+      </p>
+      <div class="flex flex-col md:flex-row justify-center items-center gap-lg">
+        <a
+          data-magnetic
+          href="/contact/"
+          class="inline-flex items-center gap-sm bg-secondary text-on-primary px-xxl py-md font-button text-button uppercase hover:bg-secondary-container transition-all shadow-lg"
+        >
+          <span class="material-symbols-outlined">mail</span>
+          Get in Touch
+        </a>
+        <a
+          href={company.phoneHref}
+          class="inline-flex items-center gap-sm border-2 border-on-primary text-on-primary px-xxl py-md font-button text-button uppercase hover:bg-on-primary hover:text-primary transition-all"
+        >
+          <span class="material-symbols-outlined">call</span>
+          {company.phone}
+        </a>
+      </div>
+    </div>
+  </section>
 </BaseLayout>
-
-<style>
-  /* shared eyebrow bar */
-  .about-who__bar {
-    display: inline-block;
-    width: 1.5rem;
-    height: 1px;
-    background: var(--color-emerald);
-    margin-right: 0.7rem;
-    vertical-align: middle;
-  }
-
-  /* WHO */
-  .about-who { padding: clamp(4rem, 9vw, 8rem) clamp(1.25rem, 4vw, 3.5rem); }
-  .about-who__inner {
-    max-width: 96rem;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 2.5rem;
-  }
-  .about-who__eyebrow { color: var(--color-emerald); margin-bottom: 1.25rem; }
-  .about-who__col p {
-    color: var(--color-ash);
-    line-height: 1.65;
-    margin-top: 1.25rem;
-    max-width: 36rem;
-  }
-  @media (min-width: 980px) {
-    .about-who__inner { grid-template-columns: 0.9fr 1.1fr; gap: 5rem; align-items: start; }
-  }
-
-  /* CERT */
-  .about-cert {
-    padding: clamp(4rem, 8vw, 7rem) clamp(1.25rem, 4vw, 3.5rem);
-    background: var(--color-graphite);
-  }
-  .about-cert__inner {
-    max-width: 96rem;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 3rem;
-    align-items: center;
-  }
-  .about-cert__plaque {
-    position: relative;
-    padding: 2.5rem;
-    aspect-ratio: 5 / 4;
-    background:
-      radial-gradient(ellipse 70% 50% at 50% 50%, color-mix(in oklab, var(--color-flare) 10%, transparent), transparent 70%),
-      var(--color-ink);
-    border: 1px solid color-mix(in oklab, var(--color-bone) 12%, transparent);
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-  }
-  .about-cert__corner {
-    position: absolute;
-    width: 18px;
-    height: 18px;
-    border-color: var(--color-emerald);
-    border-style: solid;
-    border-width: 0;
-  }
-  .about-cert__corner--tl { top: 12px; left: 12px; border-top-width: 1.5px; border-left-width: 1.5px; }
-  .about-cert__corner--tr { top: 12px; right: 12px; border-top-width: 1.5px; border-right-width: 1.5px; }
-  .about-cert__corner--bl { bottom: 12px; left: 12px; border-bottom-width: 1.5px; border-left-width: 1.5px; }
-  .about-cert__corner--br { bottom: 12px; right: 12px; border-bottom-width: 1.5px; border-right-width: 1.5px; }
-  .about-cert__label { color: var(--color-emerald); }
-  .about-cert__name {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: clamp(2.2rem, 5vw, 3.5rem);
-    letter-spacing: -0.02em;
-    align-self: center;
-    color: var(--color-bone);
-  }
-  .about-cert__num { color: var(--color-ash); align-self: end; }
-  .about-cert__copy p {
-    color: var(--color-ash);
-    line-height: 1.65;
-    margin-top: 1.25rem;
-    max-width: 32rem;
-  }
-  @media (min-width: 900px) {
-    .about-cert__inner { grid-template-columns: 0.85fr 1.15fr; gap: 5rem; }
-  }
-
-  /* AREA */
-  .about-area { padding: clamp(4rem, 8vw, 7rem) clamp(1.25rem, 4vw, 3.5rem); }
-  .about-area__inner {
-    max-width: 96rem;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 3rem;
-    align-items: center;
-  }
-  .about-area__copy p {
-    margin-top: 1.25rem;
-    color: var(--color-ash);
-    line-height: 1.65;
-    max-width: 34rem;
-  }
-  .about-area__cities {
-    margin-top: 2.25rem;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.5rem 1.5rem;
-    color: var(--color-ash);
-  }
-  .about-area__cities li {
-    position: relative;
-    padding-left: 1.1rem;
-    font-family: var(--font-mono);
-    font-size: 0.82rem;
-    letter-spacing: 0.04em;
-  }
-  .about-area__cities li::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0.55rem;
-    width: 0.42rem;
-    height: 1px;
-    background: var(--color-emerald);
-  }
-  @media (min-width: 600px) {
-    .about-area__cities { grid-template-columns: repeat(3, 1fr); }
-  }
-  @media (min-width: 980px) {
-    .about-area__inner { grid-template-columns: 1.1fr 0.9fr; gap: 5rem; }
-  }
-</style>

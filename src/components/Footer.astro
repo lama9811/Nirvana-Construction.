@@ -1,190 +1,161 @@
 ---
-/* Footer.astro — contact, sitemap, credentials, and an oversized signature. */
-import { company, nav } from "../data/company";
-import Logo from "./Logo.astro";
-const year = new Date().getFullYear();
+/* Footer.astro — Stitch-style 4-column footer with brand block, services,
+   quick links, and contact. */
+import { company } from "../data/company";
 ---
 
-<footer class="ft">
-  <div class="ft__inner">
-    <div class="ft__rule rule"></div>
-
-    <div class="ft__grid">
-      <!-- identity -->
-      <div class="ft__brand">
-        <Logo variant="stacked" asLink={false} />
-        <p class="ft__tag">{company.discipline}.<br />Serving {company.serviceArea}.</p>
-        <div class="ft__cert">
-          <span class="ft__cert-dot" aria-hidden="true"></span>
-          <span>
-            <span class="ft__cert-label">{company.certification.label}</span>
-            <span class="label">{company.certification.number}</span>
-          </span>
-        </div>
-      </div>
-
-      <!-- sitemap -->
-      <nav class="ft__col" aria-label="Footer">
-        <p class="label ft__heading">Index</p>
-        {nav.map((item) => <a href={item.href} class="ft__link">{item.label}</a>)}
-      </nav>
-
-      <!-- contact -->
-      <div class="ft__col">
-        <p class="label ft__heading">Contact</p>
-        <a href={company.phoneHref} class="ft__link ft__link--mono">{company.phone}</a>
-        <a href={company.emailHref} class="ft__link ft__link--mono">{company.email}</a>
-        <p class="ft__addr">{company.address.street}<br />{company.address.city}, {company.address.state} {company.address.zip}</p>
-        <p class="ft__hours">{company.hours}</p>
-      </div>
-
-      <!-- call to action -->
-      <div class="ft__col ft__cta">
-        <p class="label ft__heading">Start here</p>
-        <a href="/contact/" class="ft__big-link">
-          Request a quote
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M5 19L19 5M19 5H8M19 5v11" stroke="currentColor" stroke-width="2" />
-          </svg>
+<footer class="bg-on-background border-t-4 border-secondary">
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter w-full px-lg py-xxl max-w-container-max mx-auto">
+    <div class="md:col-span-1">
+      <picture>
+        <source type="image/webp" srcset="/logo.webp 1x, /logo@2x.webp 2x" />
+        <img
+          src="/logo.png"
+          alt="Nirvana Construction"
+          width="160"
+          height="156"
+          class="h-16 w-auto mb-lg bg-surface-container-lowest rounded-sm p-xs"
+          loading="lazy"
+        />
+      </picture>
+      <p class="font-body-sm text-body-sm text-surface-variant mb-lg max-w-[28rem]">
+        Commercial drywall and metal-stud framing across the Greater Baltimore
+        region.
+      </p>
+      <div class="flex gap-md">
+        <a
+          href={company.phoneHref}
+          class="text-surface hover:text-secondary-fixed transition-colors"
+          aria-label="Call"
+        >
+          <span class="material-symbols-outlined">call</span>
         </a>
-        <a href={company.social.facebook} target="_blank" rel="noopener noreferrer" class="ft__social">Facebook ↗</a>
+        <a
+          href={company.emailHref}
+          class="text-surface hover:text-secondary-fixed transition-colors"
+          aria-label="Email"
+        >
+          <span class="material-symbols-outlined">mail</span>
+        </a>
+        <a
+          href={company.social.facebook}
+          class="text-surface hover:text-secondary-fixed transition-colors"
+          aria-label="Facebook"
+          target="_blank"
+          rel="noopener"
+        >
+          <span class="material-symbols-outlined">public</span>
+        </a>
       </div>
     </div>
 
-    <div class="ft__bottom">
-      <p class="label">© {year} {company.legalName}</p>
-      <p class="label ft__coords">39.3713°N 76.4761°W · Nottingham, MD</p>
-      <p class="label">Built to the line</p>
+    <div>
+      <h4 class="font-label-bold text-label-bold uppercase text-surface mb-md">Our Services</h4>
+      <ul class="space-y-sm">
+        <li>
+          <a
+            href="/services/"
+            class="font-body-sm text-body-sm text-surface-variant hover:text-secondary-fixed transition-colors"
+          >
+            Metal-Stud Framing
+          </a>
+        </li>
+        <li>
+          <a
+            href="/services/"
+            class="font-body-sm text-body-sm text-surface-variant hover:text-secondary-fixed transition-colors"
+          >
+            Drywall Hang &amp; Finish
+          </a>
+        </li>
+        <li>
+          <a
+            href="/services/"
+            class="font-body-sm text-body-sm text-surface-variant hover:text-secondary-fixed transition-colors"
+          >
+            Acoustical Ceilings
+          </a>
+        </li>
+        <li>
+          <a
+            href="/services/"
+            class="font-body-sm text-body-sm text-surface-variant hover:text-secondary-fixed transition-colors"
+          >
+            Insulation &amp; Soundproofing
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div>
+      <h4 class="font-label-bold text-label-bold uppercase text-surface mb-md">Quick Links</h4>
+      <ul class="space-y-sm">
+        <li>
+          <a
+            href="/projects/"
+            class="font-body-sm text-body-sm text-surface-variant hover:text-secondary-fixed transition-colors"
+          >
+            Selected Projects
+          </a>
+        </li>
+        <li>
+          <a
+            href="/about/"
+            class="font-body-sm text-body-sm text-surface-variant hover:text-secondary-fixed transition-colors"
+          >
+            About the Firm
+          </a>
+        </li>
+        <li>
+          <a
+            href="/contact/"
+            class="font-body-sm text-body-sm text-surface-variant hover:text-secondary-fixed transition-colors"
+          >
+            Get in Touch
+          </a>
+        </li>
+        <li>
+          <span class="font-body-sm text-body-sm text-surface-variant">
+            {company.certification.full}
+          </span>
+        </li>
+      </ul>
+    </div>
+
+    <div>
+      <h4 class="font-label-bold text-label-bold uppercase text-surface mb-md">Contact</h4>
+      <ul class="space-y-sm">
+        <li>
+          <a
+            href={company.phoneHref}
+            class="font-body-sm text-body-sm text-surface-variant hover:text-secondary-fixed transition-colors"
+          >
+            {company.phone}
+          </a>
+        </li>
+        <li>
+          <a
+            href={company.emailHref}
+            class="font-body-sm text-body-sm text-surface-variant hover:text-secondary-fixed transition-colors"
+          >
+            {company.email}
+          </a>
+        </li>
+        <li>
+          <span class="font-body-sm text-body-sm text-surface-variant">
+            {company.address.full}
+          </span>
+        </li>
+        <li>
+          <span class="font-body-sm text-body-sm text-surface-variant">{company.hours}</span>
+        </li>
+      </ul>
     </div>
   </div>
 
-  <div class="ft__giant" aria-hidden="true">
-    <span class="text-stroke">NIRVANA</span>
+  <div class="border-t border-outline/20">
+    <div class="max-w-container-max mx-auto py-lg px-lg text-center font-body-sm text-body-sm text-surface-variant/60">
+      © {new Date().getFullYear()} {company.legalName}. Built to the line.
+    </div>
   </div>
 </footer>
-
-<style>
-  .ft {
-    position: relative;
-    background: var(--color-ink);
-    padding-top: 5rem;
-    overflow: hidden;
-  }
-  .ft__inner {
-    max-width: 96rem;
-    margin: 0 auto;
-    padding: 0 clamp(1.25rem, 4vw, 3.5rem);
-  }
-  .ft__rule { margin-bottom: 3.5rem; }
-
-  .ft__grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 3rem 2rem;
-  }
-
-  .ft__tag {
-    margin-top: 1.25rem;
-    color: var(--color-ash);
-    font-size: 0.92rem;
-    max-width: 22rem;
-  }
-  .ft__cert {
-    margin-top: 1.5rem;
-    display: flex;
-    align-items: flex-start;
-    gap: 0.7rem;
-  }
-  .ft__cert-dot {
-    width: 0.5rem;
-    height: 0.5rem;
-    margin-top: 0.3rem;
-    background: var(--color-emerald);
-    flex-shrink: 0;
-  }
-  .ft__cert-label {
-    display: block;
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: var(--color-bone);
-    margin-bottom: 0.2rem;
-  }
-
-  .ft__col { display: flex; flex-direction: column; align-items: flex-start; }
-  .ft__heading { margin-bottom: 1.25rem; color: var(--color-concrete); }
-
-  .ft__link {
-    padding: 0.32rem 0;
-    color: var(--color-ash);
-    font-size: 0.95rem;
-    transition: color 0.25s, transform 0.25s var(--ease-out-expo);
-  }
-  .ft__link:hover { color: var(--color-bone); transform: translateX(4px); }
-  .ft__link--mono { font-family: var(--font-mono); font-size: 0.82rem; }
-
-  .ft__addr,
-  .ft__hours {
-    margin-top: 0.9rem;
-    color: var(--color-ash);
-    font-size: 0.88rem;
-    line-height: 1.7;
-  }
-  .ft__hours { margin-top: 0.5rem; color: var(--color-concrete); }
-
-  .ft__big-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 1.5rem;
-    color: var(--color-bone);
-    transition: color 0.3s;
-  }
-  .ft__big-link svg {
-    width: 1.1rem;
-    height: 1.1rem;
-    color: var(--color-flare);
-    transition: transform 0.4s var(--ease-out-expo);
-  }
-  .ft__big-link:hover { color: var(--color-flare); }
-  .ft__big-link:hover svg { transform: translate(3px, -3px); }
-  .ft__social {
-    margin-top: 1.25rem;
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    color: var(--color-ash);
-    transition: color 0.25s;
-  }
-  .ft__social:hover { color: var(--color-bone); }
-
-  .ft__bottom {
-    margin-top: 4rem;
-    padding: 1.75rem 0;
-    border-top: 1px solid color-mix(in oklab, var(--color-bone) 9%, transparent);
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-  }
-
-  .ft__giant {
-    margin-top: 1rem;
-    line-height: 0.78;
-    text-align: center;
-    user-select: none;
-  }
-  .ft__giant span {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: clamp(5rem, 23vw, 22rem);
-    letter-spacing: -0.03em;
-  }
-
-  @media (min-width: 720px) {
-    .ft__grid { grid-template-columns: 1.4fr 1fr; }
-    .ft__bottom { flex-direction: row; justify-content: space-between; }
-  }
-  @media (min-width: 1040px) {
-    .ft__grid { grid-template-columns: 1.6fr 0.8fr 1.1fr 1.1fr; }
-  }
-</style>

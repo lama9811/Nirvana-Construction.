@@ -4,7 +4,6 @@ import { ClientRouter } from "astro:transitions";
 import SEO from "../components/SEO.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
-import GrainOverlay from "../components/GrainOverlay.astro";
 
 interface Props {
   title: string;
@@ -22,67 +21,63 @@ const {
 ---
 
 <!doctype html>
-<html lang="en" class="no-js">
+<html lang="en" class="no-js light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    {/* Stitch fonts — Montserrat (display) + Inter (body) + Material Symbols */}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      rel="preload"
-      href="/fonts/ClashDisplay-Bold.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
     />
     <link
-      rel="preload"
-      href="/fonts/Switzer-Regular.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
     />
-    <link
-      rel="preload"
-      href="/fonts/JetBrainsMono-Regular.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
+
     <SEO title={title} description={description} path={path} image={image} />
     <ClientRouter />
     <script is:inline>
       document.documentElement.classList.remove("no-js");
     </script>
   </head>
-  <body>
+  <body class="bg-surface text-on-surface font-body-md selection:bg-secondary-fixed selection:text-on-secondary-fixed">
     <a href="#main" class="skip-link">Skip to content</a>
     <Header />
     <main id="main">
       <slot />
     </main>
     <Footer />
-    <GrainOverlay />
 
     <style>
+      body {
+        font-family: var(--font-body-md);
+      }
       .skip-link {
         position: fixed;
         top: 0;
         left: 0;
         z-index: 100;
         padding: 0.75rem 1.25rem;
-        background: var(--color-flare);
-        color: var(--color-ink);
+        background: var(--color-secondary-container);
+        color: var(--color-on-primary);
         font-weight: 600;
         font-size: 0.85rem;
         transform: translateY(-120%);
-        transition: transform 0.25s var(--ease-out-expo);
+        transition: transform 0.25s ease-out;
       }
       .skip-link:focus { transform: translateY(0); }
     </style>
 
+    {/* Declarative motion backbone — runs initMotion on every navigation */}
     <script>
-      import { initMotion } from "../lib/motion";
+      import { initMotion, destroyMotion } from "../lib/motion";
       document.addEventListener("astro:page-load", initMotion);
+      document.addEventListener("astro:before-swap", destroyMotion);
     </script>
   </body>
 </html>

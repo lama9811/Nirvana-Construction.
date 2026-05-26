@@ -1,162 +1,286 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import Hero from "../components/Hero.astro";
-import HeroMotif from "../components/HeroMotif.astro";
-import CTASection from "../components/CTASection.astro";
+import { company } from "../data/company";
 import { services, scopeOfWork } from "../data/services";
+
+const process = [
+  {
+    step: "01",
+    phase: "Strategic Phase",
+    title: "Pre-Construction & Takeoff",
+    body: "We review the drawings, walk the site with the GC, and put together a clean number — quantities, scope, and schedule with no vague allowances.",
+  },
+  {
+    step: "02",
+    phase: "Execution Phase",
+    title: "Framing, Hanging, Finishing",
+    body: "Layout-perfect framing, clean drywall, and level-finish work, coordinated tightly with the GC, the MEPs, and the inspector through every phase of the build.",
+  },
+  {
+    step: "03",
+    phase: "Finalization Phase",
+    title: "Punch & Inspection",
+    body: "We walk the punch list with the GC and pass inspection on the first walk, with ceilings dropped, finishes ready for paint, and the schedule we signed kept.",
+  },
+];
+
+const clients = ["ALDI", "GOLF GALAXY", "JCC", "MACE MEDICAL", "HCPS", "FLAGSHIP", "CHIPOTLE", "DAVITA"];
 ---
 
 <BaseLayout
   title="Services"
-  description="Commercial drywall and metal-stud framing across six sectors — retail, hospitality, medical, education, office and renovation."
+  description="Commercial drywall, metal-stud framing, acoustical ceilings, insulation, and finishing — Nirvana Construction's full scope of work for Maryland's general contractors."
 >
-  <Hero
-    index="Page 03 / 05"
-    meta="Six sectors · One trade"
-    eyebrow="Services"
-    title={`Drywall &amp; framing.<br /><em>Six commercial sectors.</em>`}
-    lead="We frame and finish commercial interiors across retail, hospitality, medical, education, office and renovation work — all built on the same trade discipline."
-  >
-    <HeroMotif slot="visual" section="Services · S-01" coords="6 · Sectors" />
-  </Hero>
+  {/* ============ Hero ============ */}
+  <section class="relative h-[440px] md:h-[520px] w-full flex items-center overflow-hidden">
+    <div class="absolute inset-0" style="height:120%;top:-10%;">
+      <img
+        data-parallax="0.22"
+        class="w-full h-full object-cover object-center"
+        src="/images/projects/jobsite-07.webp"
+        srcset="/images/projects/jobsite-07-800.webp 800w, /images/projects/jobsite-07.webp 1600w"
+        sizes="100vw"
+        alt="Interior of a commercial Nirvana Construction project."
+        fetchpriority="high"
+      />
+    </div>
+    <div class="absolute inset-0 bg-on-background/55"></div>
+    <div class="relative max-w-container-max mx-auto px-lg w-full">
+      <div class="max-w-2xl text-surface">
+        <span data-reveal class="inline-block px-md py-xs bg-secondary text-on-secondary font-label-bold text-label-bold uppercase mb-md">
+          Our Services
+        </span>
+        <h1 data-words data-delay="0.1" class="font-headline-xl text-headline-xl mb-md">Commercial framing &amp; drywall, end to end.</h1>
+        <p data-reveal class="font-body-lg text-body-lg text-white/85">
+          From metal-stud framing and drywall through acoustical ceilings,
+          insulation, and the specialty trade scopes that finish a commercial
+          build.
+        </p>
+      </div>
+    </div>
+  </section>
 
-  <!-- ============= SERVICES LIST ============= -->
-  <section class="svc-list">
-    <div class="svc-list__inner">
-      {
-        services.map((s, i) => (
-          <article id={s.slug} class="svc-row" data-reveal>
-            <div class="svc-row__head">
-              <span class="label svc-row__idx">{s.index}</span>
-              <div class="svc-row__bar"></div>
+  <div class="max-w-container-max mx-auto px-lg py-xxl grid grid-cols-1 lg:grid-cols-12 gap-xxl">
+    {/* Main content */}
+    <div class="lg:col-span-8 space-y-xxl">
+      {/* Expertise */}
+      <section id="expertise">
+        <div class="flex items-center gap-sm mb-lg">
+          <div class="w-12 h-1 bg-secondary"></div>
+          <h2 class="font-headline-lg text-headline-lg uppercase tracking-tight text-primary">
+            Our Expertise
+          </h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+          <div data-reveal data-tilt class="bg-surface-container-lowest border border-outline-variant p-lg shadow-sm hover:shadow-xl hover:border-primary transition-all duration-300">
+            <span class="material-symbols-outlined text-secondary mb-md" style="font-size: 40px;">
+              construction
+            </span>
+            <h3 class="font-headline-md text-headline-md mb-sm text-primary">Metal-Stud Framing</h3>
+            <p class="font-body-sm text-body-sm text-on-surface-variant">
+              Layout-perfect framing for retail, medical, and tenant
+              build-outs — square, plumb, and on schedule.
+            </p>
+          </div>
+          <div data-reveal data-tilt class="bg-surface-container-lowest border border-outline-variant p-lg shadow-sm hover:shadow-xl hover:border-primary transition-all duration-300">
+            <span class="material-symbols-outlined text-secondary mb-md" style="font-size: 40px;">
+              format_paint
+            </span>
+            <h3 class="font-headline-md text-headline-md mb-sm text-primary">Drywall Hang &amp; Finish</h3>
+            <p class="font-body-sm text-body-sm text-on-surface-variant">
+              Clean drywall hanging and level-finish work — the kind of finish
+              that disappears under paint and passes inspection on the first
+              walk.
+            </p>
+          </div>
+          <div data-reveal data-tilt class="bg-surface-container-lowest border border-outline-variant p-lg shadow-sm hover:shadow-xl hover:border-primary transition-all duration-300">
+            <span class="material-symbols-outlined text-secondary mb-md" style="font-size: 40px;">
+              grid_view
+            </span>
+            <h3 class="font-headline-md text-headline-md mb-sm text-primary">Acoustical &amp; Specialty</h3>
+            <p class="font-body-sm text-body-sm text-on-surface-variant">
+              Suspended grid ceilings, fireproofing, insulation, FRP, and EIFS.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Sectors */}
+      <section id="sectors">
+        <div class="flex items-center gap-sm mb-lg">
+          <div class="w-12 h-1 bg-primary"></div>
+          <h2 class="font-headline-lg text-headline-lg uppercase tracking-tight text-primary">
+            Sectors We Frame
+          </h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+          {services.map((s) => (
+            <article class="border-l-4 border-secondary pl-lg py-md">
+              <div class="flex items-baseline gap-sm mb-xs">
+                <span class="font-label-bold text-label-bold uppercase text-secondary">
+                  {s.index}
+                </span>
+                <h3 class="font-headline-md text-headline-md text-primary">{s.title}</h3>
+              </div>
+              <p class="font-body-md text-on-surface-variant">{s.detail}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* Process (asymmetric) */}
+      <section class="blueprint-bg p-xl border border-outline-variant rounded-lg" id="process">
+        <div class="flex items-center gap-sm mb-xl">
+          <div class="w-12 h-1 bg-primary"></div>
+          <h2 class="font-headline-lg text-headline-lg uppercase tracking-tight text-primary">
+            The Process
+          </h2>
+        </div>
+        <div class="space-y-gutter">
+          {process.map((p, i) => (
+            <div data-reveal class:list={["flex flex-col md:flex-row gap-gutter items-start", i === 1 && "md:ml-xl", i === 2 && "md:ml-xxl"]}>
+              <div data-tilt class="flex-shrink-0 w-16 h-16 rounded-full bg-primary text-on-primary flex items-center justify-center font-headline-md text-headline-md">
+                {p.step}
+              </div>
+              <div class="flex-grow pt-xs">
+                <h4 class="font-label-bold text-label-bold text-secondary mb-xs uppercase">{p.phase}</h4>
+                <h3 class="font-headline-md text-headline-md mb-sm text-primary">{p.title}</h3>
+                <p class="text-on-surface-variant max-w-[36rem]">{p.body}</p>
+              </div>
             </div>
-            <h2 class="svc-row__title">{s.title}</h2>
-            <div class="svc-row__detail">
-              <p>{s.detail}</p>
-              {i === 0 && (
-                <p class="svc-row__note label">
-                  Each sector built on the shared scope of work below.
+          ))}
+        </div>
+      </section>
+
+      {/* Scope of Work — full list */}
+      <section id="scope">
+        <div class="flex items-center gap-sm mb-lg">
+          <div class="w-12 h-1 bg-secondary"></div>
+          <h2 class="font-headline-lg text-headline-lg uppercase tracking-tight text-primary">
+            Every Wall In The Building
+          </h2>
+        </div>
+        <ul class="grid grid-cols-2 md:grid-cols-3 gap-md">
+          {scopeOfWork.map((item, i) => (
+            <li class="flex items-baseline gap-sm font-body-md text-on-surface-variant border-b border-outline-variant py-md">
+              <span class="font-label-bold text-label-bold uppercase text-secondary">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* Clients */}
+      <section id="clients">
+        <div class="flex items-center gap-sm mb-lg">
+          <div class="w-12 h-1 bg-secondary"></div>
+          <h2 class="font-headline-lg text-headline-lg uppercase tracking-tight text-primary">
+            We've Framed For
+          </h2>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-gutter grayscale opacity-70">
+          {clients.map((c) => (
+            <div class="h-24 border border-outline-variant flex items-center justify-center p-md">
+              <span class="font-headline-md text-on-surface-variant font-bold tracking-tight">
+                {c}
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+
+    {/* Sidebar — contact info, no form */}
+    <aside class="lg:col-span-4">
+      <div class="sticky top-[100px] space-y-gutter">
+        <div
+          data-reveal
+          data-tilt
+          class="bg-surface-container-lowest border border-outline-variant p-xl shadow-sm"
+        >
+          <div class="bg-secondary h-1 w-12 mb-md"></div>
+          <h3 class="font-headline-md text-headline-md mb-md text-primary">
+            Get in Touch
+          </h3>
+          <p class="font-body-sm text-body-sm text-on-surface-variant mb-lg">
+            Send us drawings and a few notes about the job — we'll get back to
+            you the same week.
+          </p>
+
+          <div class="space-y-md">
+            <div class="flex items-start gap-sm">
+              <span class="material-symbols-outlined text-secondary mt-px">call</span>
+              <div>
+                <p class="font-label-bold text-label-bold uppercase text-on-surface-variant mb-xs">
+                  Phone
                 </p>
-              )}
+                <a
+                  href={company.phoneHref}
+                  class="font-body-md text-primary hover:text-secondary transition-colors"
+                >
+                  {company.phone}
+                </a>
+              </div>
             </div>
-          </article>
-        ))
-      }
-    </div>
-  </section>
+            <div class="flex items-start gap-sm">
+              <span class="material-symbols-outlined text-secondary mt-px">mail</span>
+              <div>
+                <p class="font-label-bold text-label-bold uppercase text-on-surface-variant mb-xs">
+                  Email
+                </p>
+                <a
+                  href={company.emailHref}
+                  class="font-body-md text-primary hover:text-secondary transition-colors break-all"
+                >
+                  {company.email}
+                </a>
+              </div>
+            </div>
+            <div class="flex items-start gap-sm">
+              <span class="material-symbols-outlined text-secondary mt-px">schedule</span>
+              <div>
+                <p class="font-label-bold text-label-bold uppercase text-on-surface-variant mb-xs">
+                  Hours
+                </p>
+                <p class="font-body-md text-on-surface-variant">{company.hours}</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-sm">
+              <span class="material-symbols-outlined text-secondary mt-px">location_on</span>
+              <div>
+                <p class="font-label-bold text-label-bold uppercase text-on-surface-variant mb-xs">
+                  Office
+                </p>
+                <p class="font-body-md text-on-surface-variant">
+                  {company.address.street}<br />
+                  {company.address.city}, {company.address.state} {company.address.zip}
+                </p>
+              </div>
+            </div>
+          </div>
 
-  <!-- ============= SCOPE BAND ============= -->
-  <section class="svc-scope">
-    <div class="svc-scope__inner">
-      <header class="svc-scope__head" data-reveal>
-        <p class="label svc-scope__eyebrow">
-          <span class="svc-scope__bar"></span>The full scope
-        </p>
-        <h2 class="text-section">
-          Every assembly,<br />every finish.
-        </h2>
-        <p class="svc-scope__lead">
-          The trade capabilities we deliver inside each of the sectors above.
-        </p>
-      </header>
-      <ul class="svc-scope__grid">
-        {scopeOfWork.map((item, i) => (
-          <li class="svc-scope__cell" data-reveal style={`transition-delay:${i * 40}ms`}>
-            <span class="label svc-scope__num">{String(i + 1).padStart(2, "0")}</span>
-            <span class="svc-scope__name">{item}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  </section>
+          <a
+            data-magnetic
+            href="/contact/"
+            class="mt-xl w-full bg-secondary-container text-on-primary py-md font-button text-button uppercase rounded inline-flex items-center justify-center gap-sm transition-all hover:bg-secondary shadow-sm"
+          >
+            <span class="material-symbols-outlined">mail</span>
+            Send a Message
+          </a>
+        </div>
 
-  <CTASection title="Need this scope on your next build? Let's talk." />
+        <div class="bg-primary text-on-primary p-xl shadow-sm">
+          <p class="font-label-bold text-label-bold uppercase text-secondary-fixed mb-xs">
+            Certification
+          </p>
+          <p class="font-headline-md text-headline-md mb-xs">DBE / MBE / SBE</p>
+          <p class="font-body-sm text-body-sm opacity-80">
+            {company.certification.number}
+          </p>
+        </div>
+      </div>
+    </aside>
+  </div>
 </BaseLayout>
-
-<style>
-  /* SERVICES LIST */
-  .svc-list { padding: clamp(3rem, 7vw, 7rem) clamp(1.25rem, 4vw, 3.5rem); }
-  .svc-list__inner { max-width: 96rem; margin: 0 auto; }
-  .svc-row {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.25rem;
-    padding: clamp(2.5rem, 5vw, 4rem) 0;
-    border-bottom: 1px solid color-mix(in oklab, var(--color-bone) 9%, transparent);
-  }
-  .svc-row:first-child { border-top: 1px solid color-mix(in oklab, var(--color-bone) 9%, transparent); }
-  .svc-row__head { display: flex; align-items: center; gap: 1rem; }
-  .svc-row__idx { color: var(--color-emerald); }
-  .svc-row__bar {
-    flex: 1;
-    height: 1px;
-    background: color-mix(in oklab, var(--color-bone) 12%, transparent);
-  }
-  .svc-row__title {
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: clamp(2.25rem, 6vw, 5rem);
-    line-height: 0.96;
-    letter-spacing: -0.025em;
-    text-wrap: balance;
-  }
-  .svc-row__detail p {
-    color: var(--color-ash);
-    line-height: 1.65;
-    max-width: 36rem;
-  }
-  .svc-row__note { margin-top: 0.8rem; color: var(--color-flare); }
-  @media (min-width: 900px) {
-    .svc-row {
-      grid-template-columns: 6rem 1fr 1fr;
-      gap: 3rem;
-      align-items: baseline;
-    }
-    .svc-row__head { display: contents; }
-    .svc-row__bar { display: none; }
-    .svc-row__idx { padding-top: 0.4rem; }
-  }
-
-  /* SCOPE */
-  .svc-scope {
-    padding: clamp(4rem, 8vw, 7rem) clamp(1.25rem, 4vw, 3.5rem);
-    background: var(--color-graphite);
-  }
-  .svc-scope__inner { max-width: 96rem; margin: 0 auto; }
-  .svc-scope__head { display: grid; gap: 1.25rem; max-width: 44rem; margin-bottom: 3.5rem; }
-  .svc-scope__bar {
-    display: inline-block;
-    width: 1.5rem;
-    height: 1px;
-    background: var(--color-emerald);
-    margin-right: 0.7rem;
-    vertical-align: middle;
-  }
-  .svc-scope__eyebrow { color: var(--color-emerald); }
-  .svc-scope__lead { color: var(--color-ash); }
-
-  .svc-scope__grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0;
-  }
-  .svc-scope__cell {
-    display: grid;
-    grid-template-columns: 4ch 1fr;
-    align-items: baseline;
-    gap: 1.5rem;
-    padding: 1rem 0;
-    border-bottom: 1px solid color-mix(in oklab, var(--color-bone) 9%, transparent);
-    transition: padding-left 0.4s var(--ease-out-expo), color 0.3s;
-  }
-  .svc-scope__cell:hover { padding-left: 0.8rem; color: var(--color-flare); }
-  .svc-scope__num { color: var(--color-concrete); }
-  .svc-scope__name {
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: clamp(1.15rem, 2.4vw, 1.65rem);
-  }
-  @media (min-width: 780px) {
-    .svc-scope__grid { grid-template-columns: 1fr 1fr; column-gap: 4rem; }
-  }
-</style>

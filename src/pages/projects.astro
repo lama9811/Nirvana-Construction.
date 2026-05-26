@@ -1,140 +1,176 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import Hero from "../components/Hero.astro";
-import HeroMotif from "../components/HeroMotif.astro";
-import ProjectCard from "../components/ProjectCard.astro";
-import CTASection from "../components/CTASection.astro";
 import { projects, projectCategories } from "../data/projects";
+
+/* Pair photo slugs (or null → placeholder type-card) and lowercase category
+   keys for the JS filter. */
+const cardData = projects.map((p) => ({
+  ...p,
+  filter: p.category.toLowerCase(),
+}));
 ---
 
 <BaseLayout
   title="Projects"
   description="Selected commercial projects framed and finished by Nirvana Construction across Maryland — ALDI, Chipotle, DaVita, Golf Galaxy, JCC, MACE Medical and more."
 >
-  <Hero
-    index="Page 04 / 05"
-    meta="10 · Selected projects"
-    eyebrow="Projects"
-    title={`Ten commercial builds.<br /><em>One state.</em>`}
-    lead="Selected work delivered across Maryland — national-brand retail, healthcare, education, hospitality and community projects."
-  >
-    <HeroMotif slot="visual" section="Projects · P-01" coords="10 · Builds" />
-  </Hero>
-
-  <!-- ============= FILTER BAR ============= -->
-  <section class="prj-filter">
-    <div class="prj-filter__inner">
-      <p class="label prj-filter__lbl">Filter</p>
-      <div class="prj-filter__btns" role="tablist" data-prj-filter>
-        <button class="prj-filter__btn is-active" data-cat="all">
-          <span>All</span><span class="prj-filter__count">{projects.length}</span>
-        </button>
-        {
-          projectCategories.map((cat) => {
-            const count = projects.filter((p) => p.category === cat).length;
-            return (
-              <button class="prj-filter__btn" data-cat={cat}>
-                <span>{cat}</span><span class="prj-filter__count">{count}</span>
-              </button>
-            );
-          })
-        }
+  <main class="blueprint-bg min-h-screen">
+    {/* ============ Hero ============ */}
+    <header class="max-w-container-max mx-auto px-lg py-xxl">
+      <div class="border-l-4 border-secondary pl-lg">
+        <p data-reveal class="font-label-bold text-label-bold text-secondary uppercase tracking-widest mb-sm">
+          Structural Integrity &amp; Precision
+        </p>
+        <h1 data-words class="font-headline-xl text-headline-xl text-primary max-w-3xl">
+          Selected Projects
+        </h1>
+        <p data-reveal class="font-body-lg text-body-lg text-on-surface-variant mt-md max-w-2xl">
+          Commercial drywall and framing delivered across Maryland — retail,
+          medical, education, community, and office interiors, built to the
+          line and finished on time.
+        </p>
       </div>
-    </div>
-  </section>
+    </header>
 
-  <!-- ============= GRID ============= -->
-  <section class="prj-grid-wrap">
-    <div class="prj-grid" data-prj-grid>
-      {projects.map((p) => (
-        <div class="prj-grid__cell" data-cat={p.category}>
-          <ProjectCard project={p} />
+    {/* ============ Filter ============ */}
+    <section class="max-w-container-max mx-auto px-lg mb-xl">
+      <div class="flex flex-wrap gap-md items-center">
+        <span class="font-label-bold text-label-bold text-on-surface-variant uppercase mr-sm">
+          Filter Projects:
+        </span>
+        <button
+          class="filter-btn active px-lg py-sm font-button text-button uppercase border-2 border-primary bg-primary text-on-primary transition-all duration-200"
+          data-filter="all"
+        >
+          All
+        </button>
+        {projectCategories.map((cat) => (
+          <button
+            class="filter-btn px-lg py-sm font-button text-button uppercase border-2 border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-all duration-200"
+            data-filter={cat.toLowerCase()}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+    </section>
+
+    {/* ============ Project grid ============ */}
+    <section class="max-w-container-max mx-auto px-lg pb-xxl">
+      <div id="project-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+        {cardData.map((p, i) => (
+          <article
+            data-reveal
+            data-tilt
+            class:list={[
+              "project-card group bg-surface-container-lowest border border-outline-variant overflow-hidden shadow-sm hover:shadow-2xl transition-shadow duration-300",
+              i === 1 && "border-t-4 border-t-secondary",
+            ]}
+            data-category={p.filter}
+          >
+            <div class="relative overflow-hidden h-64">
+              {p.photo ? (
+                <img
+                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  src={`/images/projects/${p.photo}.webp`}
+                  srcset={`/images/projects/${p.photo}-800.webp 800w, /images/projects/${p.photo}.webp 1600w`}
+                  sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                  alt={`${p.name} — ${p.location}`}
+                  loading="lazy"
+                />
+              ) : (
+                <div class="w-full h-full bg-surface-container-high flex items-center justify-center blueprint-bg">
+                  <div class="text-center">
+                    <span class="material-symbols-outlined text-on-surface-variant" style="font-size: 56px;">
+                      apartment
+                    </span>
+                    <p class="mt-sm font-label-bold text-label-bold uppercase text-on-surface-variant">
+                      {p.category}
+                    </p>
+                  </div>
+                </div>
+              )}
+              <div class="absolute top-0 right-0 bg-secondary text-on-primary px-md py-xs font-label-bold text-label-bold uppercase">
+                {p.category}
+              </div>
+            </div>
+            <div class="p-lg">
+              <h3 class="font-headline-md text-headline-md text-primary mb-xs">{p.name}</h3>
+              <div class="flex items-center gap-xs text-on-surface-variant font-body-sm">
+                <span class="material-symbols-outlined" style="font-size: 18px;">location_on</span>
+                <span>{p.location}</span>
+              </div>
+              <p class="mt-sm font-body-sm text-body-sm text-on-surface-variant">{p.descriptor}</p>
+              <div class="mt-md pt-md border-t border-outline-variant flex justify-between items-center">
+                <span class="font-label-bold text-label-bold text-primary uppercase">View Details</span>
+                <span class="material-symbols-outlined text-secondary">arrow_forward</span>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    {/* ============ CTA ============ */}
+    <section class="bg-primary text-on-primary py-xxl">
+      <div class="max-w-container-max mx-auto px-lg text-center">
+        <h2 class="font-headline-lg text-headline-lg mb-md">Have a project on the boards?</h2>
+        <p class="font-body-lg text-body-lg text-on-primary-container max-w-[36rem] mx-auto mb-xl">
+          Send drawings, a few notes about the scope, and a target start date —
+          we'll be in touch.
+        </p>
+        <div class="flex flex-col md:flex-row justify-center items-center gap-lg">
+          <a
+            data-magnetic
+            href="/contact/"
+            class="inline-flex items-center gap-sm bg-secondary text-on-primary px-xxl py-md font-button text-button uppercase hover:bg-secondary-container transition-all shadow-lg"
+          >
+            <span class="material-symbols-outlined">mail</span>
+            Get in Touch
+          </a>
+          <a
+            href="/services/"
+            class="inline-flex items-center gap-sm border-2 border-on-primary text-on-primary px-xxl py-md font-button text-button uppercase hover:bg-on-primary hover:text-primary transition-all"
+          >
+            View Services
+          </a>
         </div>
-      ))}
-    </div>
-  </section>
-
-  <CTASection title="Want this kind of work on your next project?" />
+      </div>
+    </section>
+  </main>
 </BaseLayout>
-
-<style>
-  .prj-filter {
-    padding: 2.5rem clamp(1.25rem, 4vw, 3.5rem) 0;
-  }
-  .prj-filter__inner {
-    max-width: 96rem;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-  }
-  .prj-filter__lbl { color: var(--color-concrete); }
-  .prj-filter__btns {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-  .prj-filter__btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.55rem;
-    padding: 0.55rem 0.9rem;
-    background: var(--color-graphite);
-    border: 1px solid color-mix(in oklab, var(--color-bone) 8%, transparent);
-    color: var(--color-ash);
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    letter-spacing: 0.06em;
-    transition: color 0.25s, background-color 0.25s, border-color 0.25s;
-  }
-  .prj-filter__btn:hover { color: var(--color-bone); border-color: color-mix(in oklab, var(--color-flare) 35%, transparent); }
-  .prj-filter__btn.is-active {
-    background: var(--color-flare);
-    color: var(--color-ink);
-    border-color: var(--color-flare);
-  }
-  .prj-filter__count { color: var(--color-concrete); }
-  .prj-filter__btn.is-active .prj-filter__count { color: color-mix(in oklab, var(--color-ink) 60%, transparent); }
-  .prj-filter__btn:hover .prj-filter__count { color: var(--color-ash); }
-
-  .prj-grid-wrap { padding: 3rem clamp(1.25rem, 4vw, 3.5rem) clamp(3rem, 6vw, 5rem); }
-  .prj-grid {
-    max-width: 96rem;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-  .prj-grid__cell {
-    transition: opacity 0.4s var(--ease-out-expo), transform 0.4s var(--ease-out-expo);
-  }
-  .prj-grid__cell.is-hidden {
-    display: none;
-  }
-  @media (min-width: 700px) { .prj-grid { grid-template-columns: 1fr 1fr; } }
-  @media (min-width: 1100px) { .prj-grid { grid-template-columns: repeat(3, 1fr); } }
-</style>
 
 <script>
   function setupFilter() {
-    const wrap = document.querySelector<HTMLElement>("[data-prj-filter]");
-    const grid = document.querySelector<HTMLElement>("[data-prj-grid]");
-    if (!wrap || !grid) return;
+    const filterBtns = document.querySelectorAll<HTMLButtonElement>(".filter-btn");
+    const projectCards = document.querySelectorAll<HTMLElement>(".project-card");
+    if (!filterBtns.length) return;
 
-    const buttons = wrap.querySelectorAll<HTMLButtonElement>(".prj-filter__btn");
-    const cells = grid.querySelectorAll<HTMLElement>(".prj-grid__cell");
-
-    buttons.forEach((btn) => {
+    filterBtns.forEach((btn) => {
       btn.addEventListener("click", () => {
-        const cat = btn.dataset.cat ?? "all";
-        buttons.forEach((b) => b.classList.toggle("is-active", b === btn));
-        cells.forEach((c) => {
-          const ok = cat === "all" || c.dataset.cat === cat;
-          c.classList.toggle("is-hidden", !ok);
+        const f = btn.getAttribute("data-filter") || "all";
+
+        filterBtns.forEach((b) => {
+          b.classList.remove("active", "bg-primary", "text-on-primary", "border-primary");
+          b.classList.add("border-outline-variant", "text-on-surface-variant");
+        });
+        btn.classList.remove("border-outline-variant", "text-on-surface-variant");
+        btn.classList.add("active", "bg-primary", "text-on-primary", "border-primary");
+
+        projectCards.forEach((card) => {
+          const match = f === "all" || card.getAttribute("data-category") === f;
+          card.style.transition = "opacity 0.3s ease";
+          if (match) {
+            card.style.display = "block";
+            requestAnimationFrame(() => (card.style.opacity = "1"));
+          } else {
+            card.style.opacity = "0";
+            setTimeout(() => (card.style.display = "none"), 300);
+          }
         });
       });
     });
   }
+  setupFilter();
   document.addEventListener("astro:page-load", setupFilter);
 </script>

@@ -1,306 +1,139 @@
 ---
-/* Header.astro — sticky cinematic nav with a full-screen mobile menu. */
-import { company, nav } from "../data/company";
-import Logo from "./Logo.astro";
+/* Header.astro — Frosted-glass sticky top nav. Uses backdrop-filter so the
+   nav literally takes on the color of whatever section is behind it as you
+   scroll. Brand wordmark, 5 nav links, and a click-to-call phone link on
+   desktop. Active link gets a secondary-color underline. */
+import { nav, company } from "../data/company";
 
 const current = Astro.url.pathname;
 const isActive = (href: string) =>
   href === "/" ? current === "/" : current.startsWith(href);
 ---
 
-<header data-header class="hdr">
-  <div class="hdr__inner">
-    <Logo variant="compact" class="hdr__logo" />
+<header class="frost-nav sticky top-0 z-50 w-full">
+  <div class="flex justify-between items-center w-full px-lg py-md max-w-container-max mx-auto">
+    <a
+      href="/"
+      class="flex items-center gap-sm shrink-0"
+      aria-label="Nirvana Construction — home"
+    >
+      <picture>
+        <source type="image/webp" srcset="/logo.webp 1x, /logo@2x.webp 2x" />
+        <img
+          src="/logo.png"
+          alt="Nirvana Construction"
+          width="200"
+          height="195"
+          class="h-12 md:h-14 w-auto"
+          fetchpriority="high"
+        />
+      </picture>
+      <span class="sr-only">Nirvana Construction</span>
+    </a>
 
-    <!-- desktop nav -->
-    <nav class="nav" aria-label="Primary">
+    <nav class="hidden md:flex items-center gap-gutter" aria-label="Primary">
       {
-        nav.map((item, i) => (
+        nav.map((item) => (
           <a
             href={item.href}
-            class:list={["nav__link", { "is-active": isActive(item.href) }]}
+            class:list={[
+              "font-button text-button uppercase transition-colors duration-200",
+              isActive(item.href)
+                ? "text-secondary border-b-2 border-secondary pb-1"
+                : "text-on-surface-variant hover:text-primary",
+            ]}
             aria-current={isActive(item.href) ? "page" : undefined}
           >
-            <span class="nav__idx">{String(i + 1).padStart(2, "0")}</span>
-            <span class="nav__label">{item.label}</span>
+            {item.label}
           </a>
         ))
       }
     </nav>
 
-    <div class="hdr__cta">
-      <a href={company.phoneHref} class="hdr__phone">{company.phone}</a>
-      <a href="/contact/" class="btn-quote">
-        <span>Get a Quote</span>
+    <div class="flex items-center gap-md">
+      <a
+        href={company.phoneHref}
+        class="hidden lg:inline-flex items-center gap-xs font-body-md text-on-surface-variant hover:text-primary transition-colors"
+        aria-label={`Call ${company.name}`}
+      >
+        <span class="material-symbols-outlined" style="font-size:18px;">call</span>
+        <span class="font-label-bold text-label-bold">{company.phone}</span>
       </a>
-      <button data-menu-toggle class="burger" aria-label="Open menu" aria-expanded="false">
-        <span></span><span></span>
+      <button
+        data-menu-toggle
+        class="md:hidden flex flex-col gap-1 w-10 h-10 items-center justify-center border border-outline-variant"
+        aria-label="Open menu"
+        aria-expanded="false"
+      >
+        <span class="block w-5 h-px bg-on-surface"></span>
+        <span class="block w-5 h-px bg-on-surface"></span>
+        <span class="block w-5 h-px bg-on-surface"></span>
       </button>
     </div>
   </div>
 
-  <!-- full-screen mobile menu -->
-  <div data-menu class="menu" aria-hidden="true">
-    <div class="menu__grid bg-blueprint"></div>
-    <nav class="menu__nav" aria-label="Mobile">
+  {/* Mobile menu — slides down on toggle */}
+  <div
+    data-menu
+    class="md:hidden hidden bg-surface-container-lowest border-t border-outline-variant"
+  >
+    <nav class="flex flex-col px-lg py-md" aria-label="Mobile">
       {
-        nav.map((item, i) => (
-          <a href={item.href} class:list={["menu__link", { "is-active": isActive(item.href) }]}>
-            <span class="menu__idx">{String(i + 1).padStart(2, "0")}</span>
-            <span class="menu__word">{item.label}</span>
+        nav.map((item) => (
+          <a
+            href={item.href}
+            class:list={[
+              "font-button text-button uppercase py-md border-b border-outline-variant/40",
+              isActive(item.href) ? "text-secondary" : "text-on-surface-variant",
+            ]}
+          >
+            {item.label}
           </a>
         ))
       }
+      <a
+        href="/contact/"
+        class="mt-md bg-secondary-container text-on-primary font-button text-button uppercase px-lg py-md text-center"
+      >
+        Get in Touch
+      </a>
     </nav>
-    <div class="menu__foot">
-      <a href={company.phoneHref} class="menu__contact">{company.phone}</a>
-      <a href={company.emailHref} class="menu__contact menu__contact--dim">{company.email}</a>
-      <p class="label menu__addr">{company.address.full}</p>
-    </div>
   </div>
 </header>
 
 <style>
-  .hdr {
-    position: fixed;
-    inset: 0 0 auto;
-    z-index: 50;
-    transition: background-color 0.4s, backdrop-filter 0.4s, border-color 0.4s;
-    border-bottom: 1px solid transparent;
+  /* Frosted-glass nav — the backdrop-filter samples + blurs + saturates
+     whatever section is currently scrolled behind the header, so the nav
+     literally tints itself based on the page color underneath. Translucent
+     white tint keeps text readable at every position. */
+  .frost-nav {
+    background-color: rgba(255, 255, 255, 0.65);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(24px) saturate(180%);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    transition: background-color 0.4s ease, border-color 0.4s ease;
   }
-  .hdr.is-scrolled {
-    background-color: color-mix(in oklab, var(--color-ink) 78%, transparent);
-    backdrop-filter: blur(14px) saturate(1.4);
-    border-bottom-color: color-mix(in oklab, var(--color-bone) 9%, transparent);
-  }
-
-  .hdr__inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 2rem;
-    max-width: 96rem;
-    margin: 0 auto;
-    padding: 1.15rem clamp(1.25rem, 4vw, 3.5rem);
-    transition: padding 0.4s var(--ease-out-expo);
-  }
-  .hdr.is-scrolled .hdr__inner {
-    padding-top: 0.7rem;
-    padding-bottom: 0.7rem;
-  }
-
-  /* logo color tweaks for header context */
-  .hdr__logo { flex-shrink: 0; }
-
-  /* desktop nav */
-  .nav { display: none; gap: 0.35rem; }
-  .nav__link {
-    position: relative;
-    display: flex;
-    align-items: baseline;
-    gap: 0.4rem;
-    padding: 0.5rem 0.85rem;
-    color: var(--color-ash);
-    transition: color 0.3s;
-  }
-  .nav__idx {
-    font-family: var(--font-mono);
-    font-size: 0.6rem;
-    color: var(--color-concrete);
-    transition: color 0.3s;
-  }
-  .nav__label {
-    font-size: 0.86rem;
-    font-weight: 500;
-    letter-spacing: 0.01em;
-  }
-  .nav__link::after {
-    content: "";
-    position: absolute;
-    left: 0.85rem;
-    right: 0.85rem;
-    bottom: 0.28rem;
-    height: 1px;
-    background: var(--color-flare);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.4s var(--ease-out-expo);
-  }
-  .nav__link:hover { color: var(--color-bone); }
-  .nav__link:hover .nav__idx { color: var(--color-emerald); }
-  .nav__link:hover::after { transform: scaleX(1); }
-  .nav__link.is-active { color: var(--color-bone); }
-  .nav__link.is-active .nav__idx { color: var(--color-emerald); }
-  .nav__link.is-active::after { transform: scaleX(1); }
-
-  /* cta cluster */
-  .hdr__cta { display: flex; align-items: center; gap: 1.1rem; }
-  .hdr__phone {
-    display: none;
-    font-family: var(--font-mono);
-    font-size: 0.74rem;
-    letter-spacing: 0.04em;
-    color: var(--color-ash);
-    transition: color 0.3s;
-  }
-  .hdr__phone:hover { color: var(--color-bone); }
-
-  .btn-quote {
-    display: none;
-    position: relative;
-    padding: 0.62rem 1.25rem;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--color-ink);
-    background: var(--color-flare);
-    overflow: hidden;
-    isolation: isolate;
-  }
-  .btn-quote span { position: relative; z-index: 1; }
-  .btn-quote::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: var(--color-bone);
-    transform: translateY(101%);
-    transition: transform 0.45s var(--ease-out-expo);
-    z-index: 0;
-  }
-  .btn-quote:hover::before { transform: translateY(0); }
-
-  /* burger */
-  .burger {
-    display: grid;
-    gap: 6px;
-    width: 2.4rem;
-    height: 2.4rem;
-    place-content: center;
-    border: 1px solid color-mix(in oklab, var(--color-bone) 16%, transparent);
-  }
-  .burger span {
-    display: block;
-    width: 17px;
-    height: 1.6px;
-    background: var(--color-bone);
-    transition: transform 0.35s var(--ease-out-expo), opacity 0.2s;
-  }
-  .hdr.is-menu-open .burger span:first-child { transform: translateY(3.8px) rotate(45deg); }
-  .hdr.is-menu-open .burger span:last-child { transform: translateY(-3.8px) rotate(-45deg); }
-
-  /* mobile menu */
-  .menu {
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 6rem clamp(1.5rem, 7vw, 4rem) 2.5rem;
-    background: var(--color-ink);
-    clip-path: inset(0 0 100% 0);
-    transition: clip-path 0.7s var(--ease-in-out-quint);
-    pointer-events: none;
-  }
-  .menu__grid { position: absolute; inset: 0; opacity: 0.5; }
-  .hdr.is-menu-open .menu {
-    clip-path: inset(0 0 0 0);
-    pointer-events: auto;
-  }
-
-  .menu__nav { position: relative; display: flex; flex-direction: column; }
-  .menu__link {
-    display: flex;
-    align-items: baseline;
-    gap: 1rem;
-    padding: 0.55rem 0;
-    border-bottom: 1px solid color-mix(in oklab, var(--color-bone) 8%, transparent);
-    color: var(--color-bone);
-    opacity: 0;
-    transform: translateY(24px);
-  }
-  .hdr.is-menu-open .menu__link {
-    animation: menu-in 0.6s var(--ease-out-expo) forwards;
-  }
-  .hdr.is-menu-open .menu__link:nth-child(1) { animation-delay: 0.14s; }
-  .hdr.is-menu-open .menu__link:nth-child(2) { animation-delay: 0.20s; }
-  .hdr.is-menu-open .menu__link:nth-child(3) { animation-delay: 0.26s; }
-  .hdr.is-menu-open .menu__link:nth-child(4) { animation-delay: 0.32s; }
-  .hdr.is-menu-open .menu__link:nth-child(5) { animation-delay: 0.38s; }
-  @keyframes menu-in {
-    to { opacity: 1; transform: none; }
-  }
-  .menu__idx {
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    color: var(--color-emerald);
-  }
-  .menu__word {
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: clamp(2.4rem, 11vw, 4rem);
-    line-height: 1;
-    letter-spacing: -0.02em;
-  }
-  .menu__link.is-active .menu__word { color: var(--color-flare); }
-
-  .menu__foot {
-    position: relative;
-    margin-top: 2.75rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-  }
-  .menu__contact {
-    font-family: var(--font-mono);
-    font-size: 0.95rem;
-    color: var(--color-bone);
-  }
-  .menu__contact--dim { color: var(--color-ash); font-size: 0.82rem; }
-  .menu__addr { margin-top: 0.5rem; }
-
-  @media (min-width: 960px) {
-    .nav { display: flex; }
-    .hdr__phone { display: block; }
-    .btn-quote { display: inline-flex; }
-    .burger { display: none; }
+  /* Browsers without backdrop-filter fall back to a slightly more opaque
+     white so the nav stays readable instead of see-through. */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .frost-nav { background-color: rgba(255, 255, 255, 0.92); }
   }
 </style>
 
 <script>
   function setupHeader() {
-    const header = document.querySelector<HTMLElement>("[data-header]");
     const toggle = document.querySelector<HTMLButtonElement>("[data-menu-toggle]");
-    if (!header || !toggle) return;
-
+    const menu = document.querySelector<HTMLElement>("[data-menu]");
+    if (!toggle || !menu) return;
     let open = false;
-    const setMenu = (next: boolean) => {
-      open = next;
-      header.classList.toggle("is-menu-open", open);
+    toggle.addEventListener("click", () => {
+      open = !open;
       toggle.setAttribute("aria-expanded", String(open));
       toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
-      const lenis = (window as any).__lenis;
-      if (open) lenis?.stop();
-      else lenis?.start();
-      document.body.style.overflow = open ? "hidden" : "";
-    };
-
-    toggle.addEventListener("click", () => setMenu(!open));
-    header.querySelectorAll("[data-menu] a").forEach((a) =>
-      a.addEventListener("click", () => setMenu(false)),
-    );
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && open) setMenu(false);
+      menu.classList.toggle("hidden", !open);
     });
   }
-
-  function onScroll() {
-    const header = document.querySelector<HTMLElement>("[data-header]");
-    if (header) header.classList.toggle("is-scrolled", window.scrollY > 24);
-  }
-
-  window.addEventListener("scroll", onScroll, { passive: true });
-  document.addEventListener("astro:page-load", () => {
-    setupHeader();
-    onScroll();
-  });
+  setupHeader();
+  document.addEventListener("astro:page-load", setupHeader);
 </script>

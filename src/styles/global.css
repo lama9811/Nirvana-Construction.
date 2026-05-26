@@ -89,6 +89,139 @@
 
   /* container */
   --breakpoint-xs: 30rem;
+
+  /* ----------- Stitch design tokens (Material-style) ----------- */
+  /* Surfaces */
+  --color-surface-container-lowest: #ffffff;
+  --color-surface: #f8f9ff;
+  --color-surface-bright: #f8f9ff;
+  --color-background: #f8f9ff;
+  --color-surface-container-low: #eff4ff;
+  --color-surface-container: #e5eeff;
+  --color-surface-container-high: #dce9ff;
+  --color-surface-container-highest: #d3e4fe;
+  --color-surface-variant: #d3e4fe;
+  --color-surface-dim: #cbdbf5;
+  --color-surface-tint: #2b6954;
+  --color-inverse-surface: #213145;
+  --color-inverse-on-surface: #eaf1ff;
+
+  /* Outlines */
+  --color-outline: #707974;
+  --color-outline-variant: #bfc9c3;
+
+  /* On-* foregrounds */
+  --color-on-background: #0b1c30;
+  --color-on-surface: #0b1c30;
+  --color-on-surface-variant: #404944;
+
+  /* Primary (deep forest green) */
+  --color-primary: #003527;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #064e3b;
+  --color-on-primary-container: #80bea6;
+  --color-primary-fixed: #b0f0d6;
+  --color-primary-fixed-dim: #95d3ba;
+  --color-on-primary-fixed: #002117;
+  --color-on-primary-fixed-variant: #0b513d;
+  --color-inverse-primary: #95d3ba;
+
+  /* Secondary (burnt / safety orange) */
+  --color-secondary: #9d4300;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #fd761a;
+  --color-on-secondary-container: #5c2400;
+  --color-secondary-fixed: #ffdbca;
+  --color-secondary-fixed-dim: #ffb690;
+  --color-on-secondary-fixed: #341100;
+  --color-on-secondary-fixed-variant: #783200;
+
+  /* Tertiary (cool blue accent) */
+  --color-tertiary: #003343;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #104a5f;
+  --color-on-tertiary-container: #87b9d1;
+  --color-tertiary-fixed: #bee9ff;
+  --color-tertiary-fixed-dim: #9ccee6;
+  --color-on-tertiary-fixed: #001f2a;
+  --color-on-tertiary-fixed-variant: #144c61;
+
+  /* Error */
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+
+  /* Stitch spacing (Material-style names) */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-base: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-gutter: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 64px;
+  --spacing-container-max: 1280px;
+
+  /* Restore Tailwind v4's default container tokens — without these the
+     custom --spacing-{xs,sm,md,lg,xl} above were leaking into max-w-*
+     utilities and collapsing paragraphs to 4–32 px wide. */
+  --container-3xs: 16rem;
+  --container-2xs: 18rem;
+  --container-xs: 20rem;
+  --container-sm: 24rem;
+  --container-md: 28rem;
+  --container-lg: 32rem;
+  --container-xl: 36rem;
+  --container-2xl: 42rem;
+  --container-3xl: 48rem;
+  --container-4xl: 56rem;
+  --container-5xl: 64rem;
+  --container-6xl: 72rem;
+  --container-7xl: 80rem;
+
+  /* Typography — display = Space Grotesk (modern, characterful), body = Inter */
+  --font-headline-xl: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-headline-lg: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-headline-lg-mobile: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-headline-md: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-button: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-body-lg: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-body-md: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-body-sm: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-label-bold: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  /* Stitch font sizes (size / line-height / weight / tracking) */
+  --text-headline-xl: 48px;
+  --text-headline-xl--line-height: 56px;
+  --text-headline-xl--font-weight: 700;
+  --text-headline-xl--letter-spacing: -0.02em;
+  --text-headline-lg: 32px;
+  --text-headline-lg--line-height: 40px;
+  --text-headline-lg--font-weight: 700;
+  --text-headline-lg--letter-spacing: -0.01em;
+  --text-headline-lg-mobile: 28px;
+  --text-headline-lg-mobile--line-height: 36px;
+  --text-headline-lg-mobile--font-weight: 700;
+  --text-headline-md: 24px;
+  --text-headline-md--line-height: 32px;
+  --text-headline-md--font-weight: 600;
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 28px;
+  --text-body-lg--font-weight: 400;
+  --text-body-md: 16px;
+  --text-body-md--line-height: 24px;
+  --text-body-md--font-weight: 400;
+  --text-body-sm: 14px;
+  --text-body-sm--line-height: 20px;
+  --text-body-sm--font-weight: 400;
+  --text-label-bold: 14px;
+  --text-label-bold--line-height: 16px;
+  --text-label-bold--font-weight: 600;
+  --text-label-bold--letter-spacing: 0.05em;
+  --text-button: 14px;
+  --text-button--line-height: 16px;
+  --text-button--font-weight: 700;
 }
 
 /* ---------- Base ------------------------------------------- */
@@ -147,6 +280,30 @@
   html.lenis, html.lenis body { height: auto; }
   .lenis.lenis-smooth { scroll-behavior: auto !important; }
   .lenis.lenis-stopped { overflow: hidden; }
+}
+
+/* ---------- Stitch utilities ------------------------------- */
+@layer components {
+  /* Faint dot-grid backdrop used on hero overlay + CTA section */
+  .blueprint-bg {
+    background-image: radial-gradient(circle, #e2e8f0 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  /* Material Symbols sizing rule */
+  .material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+  }
+  /* Stitch "reveal" — IntersectionObserver-driven entrance fade */
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  }
+  .reveal.is-in,
+  .reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ---------- Reusable atoms --------------------------------- */

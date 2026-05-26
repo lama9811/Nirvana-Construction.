@@ -11,7 +11,7 @@ const {
 } = Astro.props;
 ---
 
-<section class="cta">
+<section class="cta" data-section="Let's frame it">
   <div class="cta__rule rule"></div>
   <div class="cta__inner">
     <div class="cta__copy">
@@ -21,13 +21,13 @@ const {
       <h2 class="cta__title" data-reveal>{title}</h2>
     </div>
     <div class="cta__actions" data-reveal>
-      <a href="/contact/" class="cta__primary">
+      <a href="/contact/" class="cta__primary" data-cursor="Get a quote">
         Request a quote
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M5 19L19 5M19 5H8M19 5v11" stroke="currentColor" stroke-width="2" />
         </svg>
       </a>
-      <a href={company.phoneHref} class="cta__phone">
+      <a href={company.phoneHref} class="cta__phone" data-cursor="Call">
         <span class="label">Call</span>
         <span>{company.phone}</span>
       </a>

@@ -12,10 +12,15 @@ drywall and metal-stud framing **subcontractor** in the Greater Baltimore
 region (Nottingham, MD). Replaces the half-finished WordPress site at
 <https://nirvanaconstruction.net>.
 
-The site is a 5-page Astro static build with React islands for interactive
-motion, a Material-Design-inspired token palette (Google Stitch handoff
-re-implemented in Tailwind v4), and Lenis + GSAP-driven scroll motion layered
-on top via a declarative data-attribute system.
+The site is a 5-page Astro static build. Every page opens on a live 3D
+hero (vanilla three.js, loaded only by dynamic import), followed by content
+sections that move in CSS 3D through a declarative data-attribute layer
+(`lib/motion.ts` + `lib/depth.ts`). Palette and type are derived from the
+client's logo on a Material-style token set (Tailwind v4). No React is
+rendered anywhere.
+
+Repository: <https://github.com/lama9811/Nirvana-Construction.> (branch
+`main`). Last pushed 2026-09-28 (`51f58ba`). Not yet hosted.
 
 ## Stack & commands
 
@@ -26,10 +31,12 @@ ScrollTrigger · Lenis smooth scroll · sharp (image pipeline) · TypeScript.
 are self-hosted from `/public/fonts`, and the 17 icons are inline SVG via
 `src/components/Icon.astro`.
 
-React 19 / three.js are still in `package.json` but **no rendered page imports
-them** — they exist only for the parked components in `src/components/scroll/`.
-The build still emits an orphaned `dist/_astro/client.*.js` (~189 KB) that no
-HTML references, so visitors never download it.
+**three.js is live on all five pages, by dynamic `import()` only** (see
+Gotchas). React 19 / R3F / drei are still in `package.json` but **no rendered
+page imports them** — they exist only for the parked components in
+`src/components/scroll/`. The build still emits an orphaned
+`dist/_astro/client.*.js` that no HTML references, so visitors never
+download it.
 
 ```bash
 npm install              # deps
@@ -40,6 +47,9 @@ npm run fetch-images -- --manifest-only   # rebuild src/data/image-manifest.json
 npm run dev              # http://localhost:4321  (or 4322 if 4321 is in use)
 npm run build            # static output → ./dist
 npm run preview          # preview the production build
+npm test                 # 45 unit tests (node --test, .ts run natively on Node 24)
+npm run verify:3d        # post-build: no eager three.js, eager JS ≤ 70 KB gz per page
+npm run verify-images    # post-build: every srcset width matches a real file
 ```
 
 Vite is pinned to `^7` via `package.json` → `overrides` (Astro 6 doesn't
@@ -73,18 +83,27 @@ src/
   layouts/BaseLayout.astro     shell, SEO, ClientRouter, Header, Footer, motion
                                init, font preloads (NO Google Fonts)
   components/
-    Header.astro                frosted-glass nav, logo, click-to-call
+    Header.astro                floating capsule nav, click-to-call (no logo)
     Footer.astro                4-col; services column is driven by trades[]
-    Icon.astro                  NEW - 17 inline-SVG icons, em-sized, currentColor
-    Marquee.astro               NEW - running strip; renders nothing when empty
-    ProjectImage.astro          NEW - <picture> with srcset from the manifest
+    Icon.astro                  17 inline-SVG icons, em-sized, currentColor
+    Marquee.astro               running strip; renders nothing when empty
+    ProjectImage.astro          <picture> with srcset from the manifest
+    CertSeal.astro              the client's Maryland MBE seal (never upscaled)
+    services/                   the /services/ motion sections (CSS 3D, no three)
+      TradeDeck.astro             pinned scroll-scrubbed coverflow of the 6 trades
+      SectorDrift.astro           two rows of sector cards drifting on a tilted plane
+      ProcessPath.astro           a line draws with scroll, phase cards swing up
+      ScopeDrum.astro             the 11 scope items rolling on a 3D drum
+    parked/SectorCards.astro    the homepage sector cards, removed 2026-09-27
     immersive/                  LIVE 3D (vanilla three.js, dynamic import only)
       FlythroughHero.astro        homepage hero: copy, overlays, scroll loop
       flythrough-scene.ts         its three.js scene (light budget: ≤8 / ≤3 lite)
       flythrough-timeline.ts      PURE: camera keys, anchors, stage windows — the
                                   ONE source of homepage timing (unit-tested)
       ProjectCorridor.astro       /projects/ hero: copy, labels, loop, fallbacks
-      corridor-scene.ts           its three.js scene (instanced stud field)
+      corridor-scene.ts           its three.js scene: slab, ceiling grid, instanced
+                                  studs (pile → stand-up wave → walls), wallboard/batts
+      loop-clock.ts               PURE: ping-pong clock for the background-video heroes
       XrayWall.astro              /services/ hero (+ xray-scene.ts, xray-textures.ts)
       xray-timeline.ts            PURE: its copy windows + HUD chapters
       LogoBuild.astro             /about/ hero (+ logo-build-scene.ts)
@@ -101,10 +120,14 @@ src/
     scroll/                     PARKED cinematic components (not rendered)
   lib/
     motion.ts                   Lenis + GSAP backbone + declarative hooks
-    depth.ts                    depth layer: data-depth-in / data-flip / data-glow
-    images.ts                   NEW - srcsetFor / dimensions / isLowRes
+    depth.ts                    depth layer: data-depth-in / -stagger / -fan, data-flip,
+                                data-glow, data-stack, data-scrub, data-rise
+    card-deck.ts                PURE: TradeDeck pose maths (tested)
+    drum.ts                     PURE: drumPose / stackTilt / scrubLit / risePose (tested)
+    images.ts                   srcsetFor / srcFor / dimensions / isLowRes
     corridor.ts                 PURE corridor logic: resolveStations,
                                 honestPanelWidth, stationProgress, phases
+    quality.ts                  device tiering helper (used by the parked scroll/ set)
   data/
     company.ts                  contact, address, cert, nav, figures,
                                 + certifications[] and generalContractors[] (EMPTY)
@@ -120,7 +143,9 @@ src/
   pages/  index about services projects contact 404 .astro
   styles/global.css             Tailwind import + @theme tokens + utilities
 
-assets/source-photos/           NEW - the 17 client originals (pipeline input)
+assets/source-photos/           the 16 client photographs + the MBE seal (pipeline
+                                input). The client's A101 drawing was sent by
+                                mistake and is NOT here or anywhere in git history.
 
 public/
   logo.png logo.webp logo@2x.webp
@@ -132,7 +157,8 @@ public/
   favicon.svg  robots.txt
 scripts/fetch-images.mjs        pipeline; also writes src/data/image-manifest.json
 scripts/verify-3d-bundles.mjs   post-build guard: no eager three, JS budget
-tests/                          node --test unit tests (Node 24 runs .ts natively)
+scripts/verify-srcsets.mjs      post-build guard: every srcset width is a real file
+tests/                          45 node --test unit tests (Node 24 runs .ts natively)
 docs/superpowers/               design spec + reference teardown
 ```
 
@@ -249,11 +275,11 @@ brand now lives on the homepage's 3D building sign, painted from
 `public/logo.png`), links whose label **rolls up** on hover with a dash under the hovered / current
 page (orange = current), and a round click-to-call button (the "Let's talk"
 pill was removed at the client's request). The capsule tightens after 40px of scroll. Mobile: the
-pill shrinks to a round burger docked right → dark rounded panel with
-numbered links.
+pill shrinks to a round burger docked right → dark rounded panel with the
+links (no numbering; the client finds numbering "looks very AI").
 
-- **The header box keeps its height: 5rem mobile / 5.5rem desktop.** Both 3D
-  heroes slide up under it by exactly that (`margin-top: calc(var(--hdr) * -1)`,
+- **The header box keeps its height: 5rem mobile / 5.5rem desktop.** All five
+  3D heroes slide up under it by exactly that (`margin-top: calc(var(--hdr) * -1)`,
   sticky `top: 0`, `100svh`) so the pill floats over the 3D; their static /
   reduced-motion layouts stay in normal flow. Other pages show the page
   background behind the pill.
@@ -276,7 +302,12 @@ numbered links.
   team" / "Our frames" and ends with the outcome.
 - **Real services + real projects only**: no Apex Plaza Frankfurt nonsense.
   See `src/data/services.ts` and `src/data/projects.ts`.
-- **Brand tagline**: "The Nirvana Way — Excellence Without Compromise."
+- **No dashes, no numbering.** The client asked for every dash to go
+  ("so many unnecessary dashes") and for section/card numbering to go ("looks
+  very AI"). Use commas, colons or "to" (hours: "Mon to Fri · 8:00 AM to 4:00
+  PM"); never `—`, `–` or `--` in copy or data; never "01 / 02 / 03" labels.
+  `dist/` is scanned for stray dashes when copy changes.
+- **Brand tagline**: "The Nirvana Way: Excellence Without Compromise."
   (`company.slogan` + `company.sloganPayoff` + combined `company.tagline`.)
   The retired tagline was "Built to the line." — it survives only in the parked
   `src/components/scroll/Preloader.tsx`, which is not rendered.
@@ -367,6 +398,24 @@ This session iterated through several visual directions:
    no jump cut) behind a static headline, one viewport tall, no scroll track.
    The homepage fly-through and the projects corridor stay scroll-driven.
 
+10. **Motion sections + corridor rebuild + removals (CURRENT, 2026-09-28,
+    later the same day)** — the client found the content sections "very
+    simple" and asked for "very 3D motion animation, moving cards, tidy,
+    professional". Built: the Services trade deck / sector drift / process
+    path / scope drum (`components/services/`), the homepage "Nirvana
+    Difference" wall and About photo stack (`data-stack`), word light-up
+    (`data-scrub`), rising slabs and the filter flip on the project cards
+    (`data-rise`), the Contact form that turns over on send. The projects
+    corridor was rebuilt after "it looks like a green background and rods
+    sticking up": slab, chalk layout, studs delivered in piles that stand
+    up in a wave, ceiling grid with troffers, wallboard and batts hung as
+    you walk. Removed at the client's request: the homepage CTA band, the
+    orange 19+ block, the Contact certification card, the Services sidebar
+    card, and the client's A101 drawing (sent by mistake) from everything,
+    including git history: the Contact hero now uses a plan drawn for the
+    site (`data/plan-walls.ts`) and the corridor starts on the first
+    photograph. Everything was committed and pushed as `51f58ba`.
+
 If user wants the cinematic experience back, the parked components in
 `src/components/scroll/` can be re-imported on a per-page basis. The motion
 backbone in `src/lib/motion.ts` already supports both styles.
@@ -385,12 +434,13 @@ backbone in `src/lib/motion.ts` already supports both styles.
 3. **Contact form endpoint** — `FORM_ENDPOINT` at the top of
    `src/pages/contact.astro` is still `""` (demo mode). Drop in a Formspree ID
    or add `data-netlify="true"` on deploy.
-4. **Every project has a photo** — 7-Eleven, Mill Station and DaVita were
-   REMOVED 2026-09-28 by the owner (show only projects with client-supplied
-   photos). Old note, kept for how to add one: they rendered as
-   `apartment`-icon placeholder cards. Drop a file in `assets/source-photos/`,
-   add it to `LOCAL` in `scripts/fetch-images.mjs`, run the pipeline, then set
-   `photo` in `src/data/projects.ts`.
+4. **Three projects have no photograph** — 7-Eleven, Mill Station and DaVita
+   are on the list but no picture of them was supplied, so their cards show
+   the dark blueprint panel ("Photographs to follow") and they are not in
+   the corridor. The client has been asked to send photos or drop them. To
+   add one: drop the file in `assets/source-photos/`, add it to `LOCAL` in
+   `scripts/fetch-images.mjs`, run the pipeline, set `photo` in
+   `src/data/projects.ts`, then add a station in `src/data/corridor.ts`.
 5. **Locations unknown for 7 of the new projects** — `location` is now
    **optional** on `Project` and the card omits the line rather than printing a
    guess. AutoZone, Burlington, F45, First Watch, Five Below, O'Reilly and
@@ -405,13 +455,20 @@ backbone in `src/lib/motion.ts` already supports both styles.
    `/contact/` still carry the older copy.
 8. **Project detail pages (Pass 3)** — `/projects/` cards say "View Details" but
    link nowhere. Needs GC / size / year / scope data first.
-9. **Deployment** — not yet hosted. Netlify recommended. Bring the
+9. **Deployment** — the code is on GitHub (`lama9811/Nirvana-Construction.`,
+   `main`) but not hosted. Netlify recommended. Bring the
    `nirvanaconstruction.net` domain.
+11. **Commit hygiene** — the client asks for commits explicitly ("commit this
+    rn", "commit and push"). Don't commit or push unasked.
 10. **Logos + more photography** promised by the client "next week" — keep the
     image slots swappable.
 
 ## Gotchas / things to know
 
+- **⚠ The client's A101 floor plan must never come back.** It was sent by
+  mistake and removed from the site, the pipeline, `assets/` and git history
+  (the first commit was re-created without it before the first push). If a
+  file named like `A101- NVA.png` / `plan-a101.*` reappears, delete it.
 - **⚠ NEVER run `npm run fetch-images -- --refetch-remote`.** The old WordPress
   origin has been **downgraded at source** and now serves far smaller files than
   the versions committed here — `flagship-carwash` comes back 225×225 and
@@ -555,6 +612,12 @@ backbone in `src/lib/motion.ts` already supports both styles.
   normal flow, so a `min-h-screen` hero overflows the viewport by exactly the
   header's height and buries whatever sits at the hero's bottom. The hero
   uses `min-h-[calc(100svh-5.5rem)]` for this reason.
+- **Never put `perspective` on a tall parent of `data-rise` elements.** The
+  vanishing point sits at the parent's centre, so in a one-column phone grid
+  (~7600px tall) a card rising near the fold was projected toward a point
+  thousands of pixels away and squashed to a line. The projects grid now gives
+  each `.project-card` its own `perspective: 1200px` (for the filter flip);
+  the rise transform carries its own `perspective()` function.
 - **Wallboard geometry: a 10ft wall takes 4x10 sheets in ONE row.** Tiling two
   rows of 4x8 (an earlier attempt) left a misaligned band across the top.
 - **Do not raise the warm fill light in StudWall3D above ~0.2.** Higher and it
@@ -566,10 +629,11 @@ backbone in `src/lib/motion.ts` already supports both styles.
 
 ```bash
 cd "Niravana Construction"
-npm test                      # 28 unit tests: timelines, corridor, map, walls, depth
+npm test                      # 45 unit tests: timelines, corridor, map, walls, depth, card deck, drum
 npm run build && echo "build OK"
 # expects: 6 page(s) built - sitemap-index.xml emitted - no errors
-npm run verify:3d             # no eager three, eager JS ≤ 70KB gz
+npm run verify:3d             # no eager three, eager JS ≤ 70KB gz (all five pages sit at 60–62)
+npm run verify-images         # every srcset width is a real file
 ```
 
 After ANY image change, verify no srcset lies about its width — this is the
@@ -586,9 +650,11 @@ In the dev server, the site should:
   breaking layout, and the marquees should **stop**, not jump to their end
 - Render Space Grotesk on headlines and Inter on body, with **zero** requests
   to fonts.googleapis.com or fonts.gstatic.com
-- Show the frosted-glass nav tinting to match each section as you scroll
-- Animate the hero headline word-by-word
-- 3D-tilt the sector cards on hover (desktop only)
-- Show the orange REQUEST A BID button with a **dark** label, never white
+- Float the dark capsule nav over every hero, with no logo and no CTA pill
+- Open every page on its 3D hero: `/` and `/projects/` scroll-driven, About /
+  Services / Contact playing on their own like background video
+- Pin the Services trade deck while the six cards turn past, one at a time
+- Show orange fills with a **dark** label, never white
 - Show the certifications strip running the **full width** of the dark band
 - Show **no** GC band at all — it is empty by design until names are supplied
+- Show **no** dashes and **no** "01 / 02" numbering anywhere in the copy

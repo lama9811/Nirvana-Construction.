@@ -197,7 +197,11 @@ const cardData = projects.map((p) => ({
   /* a corridor click lands here: a brief orange frame that fades. It lives
      on ::after so the card's own [data-reveal] opacity/transform transition
      (and the filter's inline transition) are left untouched. */
-  .project-card { position: relative; }
+  /* each card carries its own perspective. It used to sit on the grid, whose
+     vanishing point is the grid's centre: in one column the grid is ~7600px
+     tall, so a card rising near the fold was projected toward a point
+     thousands of pixels away and squashed to a line on phones. */
+  .project-card { position: relative; perspective: 1200px; }
   .project-card::after {
     content: "";
     position: absolute;
@@ -211,7 +215,6 @@ const cardData = projects.map((p) => ({
   .project-card:global(.nv-flash)::after { opacity: 1; transition: opacity 0.2s ease; }
 
   /* ---- the card face ---- */
-  .pj-grid { perspective: 1600px; }
   .pj-face {
     height: 100%;
     overflow: hidden;

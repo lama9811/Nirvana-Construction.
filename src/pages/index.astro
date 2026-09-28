@@ -1,202 +1,75 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { company, figures } from "../data/company";
+import {
+  company,
+  figures,
+  certifications,
+  generalContractors,
+} from "../data/company";
+import Icon from "../components/Icon.astro";
+import Marquee from "../components/Marquee.astro";
+import ProjectImage from "../components/ProjectImage.astro";
+import FlythroughHero from "../components/immersive/FlythroughHero.astro";
+
+/* Four certifications is a short loop, so the strip is fed each label
+   twice — the marquee still reads as a continuous run rather than a
+   visibly short list snapping back. */
+const certLabels =
+  certifications.length < 6
+    ? [...certifications, ...certifications].map((c) => c.label)
+    : certifications.map((c) => c.label);
 ---
 
 <BaseLayout
   title="Commercial Drywall & Metal-Stud Framing"
-  description="Nirvana Construction Inc. — commercial drywall and metal-stud framing subcontractor serving the Greater Baltimore region. DBE / MBE / SBE certified."
+  description="Nirvana Construction Inc., commercial drywall and metal-stud framing subcontractor serving the Greater Baltimore region. DBE / MBE / SBE certified."
 >
-  {/* ============ Hero ============ */}
-  <section class="relative h-[600px] md:h-[720px] lg:h-[820px] min-h-[600px] flex items-center overflow-hidden">
-    {/* parallax container — image is oversized so translate doesn't reveal edges */}
-    <div class="absolute inset-0 z-0" style="height:120%;top:-10%;">
-      <picture>
-        <source
-          type="image/avif"
-          srcset="/images/projects/jobsite-08.avif"
-        />
-        <img
-          data-parallax="0.25"
-          class="w-full h-full object-cover"
-          src="/images/projects/jobsite-08.webp"
-          srcset="/images/projects/jobsite-08-800.webp 800w, /images/projects/jobsite-08.webp 2000w, /images/projects/jobsite-08-3840.webp 3840w"
-          sizes="100vw"
-          alt="A commercial Nirvana Construction job site with metal-stud framing in progress."
-          fetchpriority="high"
-          width="2000"
-          height="1333"
-        />
-      </picture>
-      <div class="absolute inset-0 bg-gradient-to-r from-on-background/85 via-on-background/55 to-transparent"></div>
-    </div>
-    <div class="absolute inset-0 pointer-events-none opacity-10 blueprint-bg"></div>
+  {/* ============ Immersive hero: fly through a finished building ============
+      Replaces the photographic hero AND the StudWall3D section. The
+      cut-away partition inside the building now carries the "how a
+      wall goes up" story. See src/components/immersive/. */}
+  <FlythroughHero />
 
-    <div class="relative z-10 max-w-container-max mx-auto px-lg w-full">
-      <div class="max-w-3xl">
-        <span
-          data-reveal
-          class="inline-block bg-secondary-container text-on-primary font-label-bold text-label-bold uppercase px-md py-xs mb-md"
-        >
-          {company.certification.label}
-        </span>
-        <h1
-          data-words
-          data-delay="0.1"
-          class="font-headline-xl text-headline-xl text-white mb-lg"
-        >
-          Commercial drywall &amp; metal-stud framing, built to the line.
-        </h1>
-        <p data-reveal class="font-body-lg text-body-lg text-white/85 mb-xl max-w-2xl">
-          We deliver commercial drywall and metal-stud framing across the
-          Greater Baltimore region, working on retail, medical, education,
-          and office interiors that open on schedule and pass inspection on
-          the first walk.
-        </p>
-        <div data-reveal class="flex flex-col sm:flex-row gap-gutter">
-          <a
-            data-magnetic
-            href="/projects/"
-            class="bg-primary text-white font-button text-button uppercase px-xl py-md rounded-lg inline-flex items-center justify-center gap-sm transition-all hover:bg-primary-container shadow-lg"
-          >
-            See the Work
-            <span class="material-symbols-outlined">arrow_forward</span>
-          </a>
-          <a
-            href="/contact/"
-            class="border-2 border-white text-white font-button text-button uppercase px-xl py-md rounded-lg inline-flex items-center justify-center gap-sm transition-all hover:bg-white/10"
-          >
-            Talk to Us
-          </a>
+  {/* ============ General contractors we work with ============
+      The whole band is conditional, not just the strip — otherwise an
+      empty GC list would leave a bordered, padded gap on the page. */}
+  {
+    generalContractors.length > 0 && (
+      <section class="py-xl bg-surface-container-low border-b border-outline-variant">
+        <div class="max-w-container-max mx-auto px-lg">
+          <Marquee
+            label="General contractors we work with"
+            items={generalContractors.map((g) => g.name)}
+            tone="light"
+          />
         </div>
-      </div>
-    </div>
-  </section>
-
-  {/* ============ Sector cards ============ */}
-  <section class="py-xxl bg-surface-container-low">
-    <div class="max-w-container-max mx-auto px-lg">
-      <div class="text-center mb-xxl">
-        <h2 class="font-headline-lg text-headline-lg text-primary mb-sm">
-          Commercial Sectors We Frame
-        </h2>
-        <div class="w-16 h-1 bg-secondary mx-auto"></div>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
-        {/* Retail */}
-        <div data-reveal data-tilt class="bg-white border border-outline-variant p-lg flex flex-col group hover:shadow-2xl transition-shadow duration-300">
-          <div class="w-full h-64 mb-lg overflow-hidden relative">
-            <img
-              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              src="/images/projects/golf-galaxy.webp"
-              srcset="/images/projects/golf-galaxy-800.webp 800w, /images/projects/golf-galaxy.webp 1600w"
-              sizes="(min-width: 768px) 33vw, 100vw"
-              alt="Golf Galaxy retail fit-out in Towson, MD."
-              loading="lazy"
-            />
-          </div>
-          <h3 class="font-headline-md text-headline-md text-primary mb-md">
-            Retail &amp; Restaurant
-          </h3>
-          <p class="font-body-md text-on-surface-variant mb-lg flex-grow">
-            We frame and finish storefronts, big-box fit-outs, and
-            quick-service restaurants on tight schedules so the doors open on
-            the date that was promised.
-          </p>
-          <a
-            href="/services/"
-            class="text-secondary font-label-bold text-label-bold uppercase inline-flex items-center gap-xs hover:gap-sm transition-all"
-          >
-            Learn More <span class="material-symbols-outlined">chevron_right</span>
-          </a>
-        </div>
-
-        {/* Medical */}
-        <div class="reveal bg-white border border-outline-variant p-lg flex flex-col group hover:shadow-xl transition-all duration-300 relative">
-          <div class="absolute top-0 right-0 w-12 h-12 bg-secondary-container flex items-center justify-center text-white font-bold">
-            ★
-          </div>
-          <div class="w-full h-64 mb-lg overflow-hidden relative">
-            <img
-              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              src="/images/projects/mace-medical.webp"
-              srcset="/images/projects/mace-medical-800.webp 800w, /images/projects/mace-medical.webp 1600w"
-              sizes="(min-width: 768px) 33vw, 100vw"
-              alt="MACE Medical healthcare facility in Dundalk, MD."
-              loading="lazy"
-            />
-          </div>
-          <h3 class="font-headline-md text-headline-md text-primary mb-md">
-            Medical &amp; Healthcare
-          </h3>
-          <p class="font-body-md text-on-surface-variant mb-lg flex-grow">
-            We deliver infection-control framing and lead-lined assemblies
-            for clinics, dialysis centers, and medical offices that pass
-            healthcare inspection the first time.
-          </p>
-          <a
-            href="/services/"
-            class="text-secondary font-label-bold text-label-bold uppercase inline-flex items-center gap-xs hover:gap-sm transition-all"
-          >
-            Learn More <span class="material-symbols-outlined">chevron_right</span>
-          </a>
-        </div>
-
-        {/* Education / Community */}
-        <div data-reveal data-tilt class="bg-white border border-outline-variant p-lg flex flex-col group hover:shadow-2xl transition-shadow duration-300">
-          <div class="w-full h-64 mb-lg overflow-hidden relative">
-            <img
-              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              src="/images/projects/hcps-forest-hill.webp"
-              srcset="/images/projects/hcps-forest-hill-800.webp 800w, /images/projects/hcps-forest-hill.webp 1600w"
-              sizes="(min-width: 768px) 33vw, 100vw"
-              alt="HCPS Forest Hill Annex in Forest Hill, MD."
-              loading="lazy"
-            />
-          </div>
-          <h3 class="font-headline-md text-headline-md text-primary mb-md">
-            Education &amp; Community
-          </h3>
-          <p class="font-body-md text-on-surface-variant mb-lg flex-grow">
-            We build metal-stud framing and drywall for schools and community
-            facilities with durable, fire-rated assemblies engineered to hold
-            up under decades of daily use.
-          </p>
-          <a
-            href="/services/"
-            class="text-secondary font-label-bold text-label-bold uppercase inline-flex items-center gap-xs hover:gap-sm transition-all"
-          >
-            Learn More <span class="material-symbols-outlined">chevron_right</span>
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
+      </section>
+    )
+  }
 
   {/* ============ The Nirvana Difference ============ */}
-  <section class="py-xxl bg-on-background text-white relative overflow-hidden">
-    <div class="absolute right-0 top-0 w-1/3 h-full opacity-10 pointer-events-none hidden md:block">
-      <span class="material-symbols-outlined text-[400px] leading-none">architecture</span>
-    </div>
-    <div class="max-w-container-max mx-auto px-lg grid grid-cols-1 lg:grid-cols-2 gap-xxl items-center">
+  <section class="nv-diff py-xxl bg-on-background text-white relative overflow-hidden">
+    {/* a stud layout at 16" o.c. drifting slowly behind the band */}
+    <div class="nv-studs" aria-hidden="true"></div>
+    <div class="relative max-w-container-max mx-auto px-lg grid grid-cols-1 lg:grid-cols-2 gap-xxl items-center">
       <div class="reveal">
-        <span class="text-[#fd761a] font-label-bold text-label-bold uppercase tracking-widest mb-md block">
+        <span class="text-secondary-fixed font-label-bold text-label-bold uppercase tracking-widest mb-md block">
           Why Choose Us
         </span>
         <h2 class="font-headline-xl text-headline-xl mb-lg">The Nirvana Difference</h2>
-        <p class="font-body-lg text-body-lg text-surface-variant mb-xl">
+        <p data-scrub class="font-body-lg text-body-lg text-surface-variant mb-xl">
           We coordinate closely with the general contractor, work straight to
           the drawings, and finish ready for inspection so every plate is
           plumb, every stud is on layout, and the drywall is clean enough to
           disappear under paint.
         </p>
-        <div class="space-y-lg">
-          <div class="flex gap-md">
+        <div data-depth-in data-depth-stagger class="space-y-lg">
+          <div data-glow class="nv-point flex gap-md">
             <div class="w-12 h-12 rounded-lg bg-primary-container flex items-center justify-center shrink-0 border border-on-primary-container">
-              <span class="material-symbols-outlined text-primary-fixed">verified</span>
+              <Icon name="verified" class="text-primary-fixed" />
             </div>
             <div>
-              <h4 class="font-label-bold text-label-bold uppercase text-[#fd761a] mb-xs">
+              <h4 class="font-label-bold text-label-bold uppercase text-secondary-fixed mb-xs">
                 Square. Plumb. On Layout.
               </h4>
               <p class="text-white/80 font-body-sm">
@@ -206,12 +79,12 @@ import { company, figures } from "../data/company";
               </p>
             </div>
           </div>
-          <div class="flex gap-md">
+          <div data-glow class="nv-point flex gap-md">
             <div class="w-12 h-12 rounded-lg bg-primary-container flex items-center justify-center shrink-0 border border-on-primary-container">
-              <span class="material-symbols-outlined text-primary-fixed">groups</span>
+              <Icon name="groups" class="text-primary-fixed" />
             </div>
             <div>
-              <h4 class="font-label-bold text-label-bold uppercase text-[#fd761a] mb-xs">
+              <h4 class="font-label-bold text-label-bold uppercase text-secondary-fixed mb-xs">
                 Coordinated With Every Trade
               </h4>
               <p class="text-white/80 font-body-sm">
@@ -221,12 +94,12 @@ import { company, figures } from "../data/company";
               </p>
             </div>
           </div>
-          <div class="flex gap-md">
+          <div data-glow class="nv-point flex gap-md">
             <div class="w-12 h-12 rounded-lg bg-primary-container flex items-center justify-center shrink-0 border border-on-primary-container">
-              <span class="material-symbols-outlined text-primary-fixed">shield</span>
+              <Icon name="shield" class="text-primary-fixed" />
             </div>
             <div>
-              <h4 class="font-label-bold text-label-bold uppercase text-[#fd761a] mb-xs">
+              <h4 class="font-label-bold text-label-bold uppercase text-secondary-fixed mb-xs">
                 {company.certification.label}
               </h4>
               <p class="text-white/80 font-body-sm">
@@ -238,91 +111,133 @@ import { company, figures } from "../data/company";
         </div>
       </div>
 
-      <div data-reveal class="grid grid-cols-2 gap-md">
-        <div class="space-y-md">
-          <div data-tilt class="h-64 rounded-xl overflow-hidden border border-outline">
-            <img
-              class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
-              src="/images/projects/jobsite-05.webp"
-              srcset="/images/projects/jobsite-05-800.webp 800w, /images/projects/jobsite-05.webp 1600w"
-              sizes="(min-width: 1024px) 22vw, 45vw"
-              alt="Commercial Nirvana Construction jobsite nearing completion."
-              loading="lazy"
-            />
-          </div>
-          <div data-tilt class="h-48 rounded-xl bg-secondary-container flex items-center justify-center text-center p-md">
-            <div>
-              <div
-                data-count={figures[0].value}
-                data-suffix="+"
-                class="text-headline-xl font-bold mb-xs text-white"
-              >
-                0+
-              </div>
-              <div class="font-label-bold uppercase text-white">
-                {figures[0].label}
-              </div>
+      {/* the wall: three site boards hung on a framed wall, the count as a
+          solid block in front; the whole assembly turns as it scrolls by and
+          leans toward the cursor (data-stack), each piece at its own depth */}
+      <div data-reveal>
+        <div data-stack class="nv-wall">
+          <div data-z style="--z:-150" class="nv-wall-frame" aria-hidden="true"></div>
+          <div data-z style="--z:-130" class="nv-wall-laser" aria-hidden="true"></div>
+          <figure data-z style="--z:0" class="nv-board nv-board-a nv-solid">
+            <div class="nv-board-img">
+              <img
+                class="w-full h-full object-cover"
+                src="/images/projects/jobsite-05.webp"
+                srcset="/images/projects/jobsite-05-800.webp 800w, /images/projects/jobsite-05.webp 1600w"
+                sizes="(min-width: 1024px) 26vw, 55vw"
+                alt="Commercial Nirvana Construction jobsite nearing completion."
+                loading="lazy"
+              />
             </div>
-          </div>
-        </div>
-        <div class="space-y-md pt-xl">
-          <div data-tilt class="h-48 rounded-xl bg-primary flex items-center justify-center text-center p-md border border-outline">
-            <div>
-              <div
-                data-count={figures[1].value}
-                class="text-headline-xl font-bold mb-xs text-white"
-              >
-                0
-              </div>
-              <div class="font-label-bold uppercase text-white">
-                {figures[1].label}
-              </div>
+            <figcaption class="nv-board-tag">On site</figcaption>
+          </figure>
+          <figure data-z style="--z:70" class="nv-board nv-board-b nv-solid">
+            <div class="nv-board-img">
+              <ProjectImage
+                slug="panda-express"
+                class="w-full h-full object-cover"
+                sizes="(min-width: 1024px) 20vw, 45vw"
+                alt="A completed Panda Express restaurant at dusk, with finished cladding, soffits and a lit entrance canopy."
+              />
             </div>
-          </div>
-          <div data-tilt class="h-64 rounded-xl overflow-hidden border border-outline">
-            <img
-              class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
-              src="/images/projects/jcc.webp"
-              srcset="/images/projects/jcc-800.webp 800w, /images/projects/jcc.webp 1600w"
-              sizes="(min-width: 1024px) 22vw, 45vw"
-              alt="Jewish Community Center in Park Heights, MD."
-              loading="lazy"
-            />
-          </div>
+            <figcaption class="nv-board-tag">Panda Express</figcaption>
+          </figure>
+          <figure data-z style="--z:120" class="nv-board nv-board-c nv-solid">
+            <div class="nv-board-img">
+              <ProjectImage
+                slug="golf-galaxy-night"
+                class="w-full h-full object-cover"
+                sizes="(min-width: 1024px) 20vw, 45vw"
+                alt="A finished Golf Galaxy store lit at night."
+              />
+            </div>
+            <figcaption class="nv-board-tag">Golf Galaxy</figcaption>
+          </figure>
         </div>
       </div>
+
     </div>
+
+      {/* ---- running certification strip ----
+           Sits OUTSIDE the two-column grid above; as a direct grid
+           child it became a 584px cell instead of spanning the band. */}
+      <div data-reveal class="relative max-w-container-max mx-auto px-lg mt-xxl pt-xl border-t border-white/15">
+        <Marquee label="Certifications" items={certLabels} tone="dark" />
+      </div>
   </section>
 
-  {/* ============ CTA ============ */}
-  <section class="py-xxl bg-surface-container-highest blueprint-bg">
-    <div class="max-w-container-max mx-auto px-lg text-center">
-      <div data-reveal class="max-w-2xl mx-auto">
-        <h2 data-words class="font-headline-lg text-headline-lg text-primary mb-lg">
-          Have a project on the boards? Let's frame it.
-        </h2>
-        <p class="font-body-md text-on-surface-variant mb-xl">
-          Send us a little about your scope, schedule, and location, and
-          we'll get back to you within one business day.
-        </p>
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-lg">
-          <a
-            data-magnetic
-            href="/contact/"
-            class="inline-flex items-center gap-sm bg-secondary-container text-white font-button text-button uppercase px-xl py-md rounded transition-all hover:bg-secondary shadow-lg active:scale-95"
-          >
-            <span class="material-symbols-outlined">mail</span>
-            Get in Touch
-          </a>
-          <a
-            href={company.phoneHref}
-            class="inline-flex items-center gap-sm font-body-md text-primary hover:text-secondary transition-colors"
-          >
-            <span class="material-symbols-outlined">call</span>
-            {company.phone}
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
 </BaseLayout>
+
+<style>
+  /* ---- "The Nirvana Difference": the wall ---- */
+  .nv-wall {
+    position: relative;
+    height: clamp(22rem, 38vw, 34rem);
+    margin-inline: 4%;
+  }
+  .nv-wall-frame {
+    position: absolute;
+    inset: -8% -14%;
+    border-top: 5px solid rgba(185, 205, 191, 0.55);
+    border-bottom: 5px solid rgba(185, 205, 191, 0.55);
+    background: repeating-linear-gradient(90deg, rgba(185, 205, 191, 0.42) 0 3px, transparent 3px 36px);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent);
+  }
+  .nv-wall-laser {
+    position: absolute;
+    left: -16%;
+    right: -16%;
+    top: 56%;
+    height: 2px;
+    background: #ff6600;
+    box-shadow: 0 0 16px 3px rgba(255, 102, 0, 0.55);
+  }
+  /* a solid: two side faces so the piece has thickness whichever way the wall turns */
+  .nv-solid { --t: 18px; transform-style: preserve-3d; }
+  .nv-solid::before,
+  .nv-solid::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: var(--t);
+    background: var(--side, #17301f);
+  }
+  .nv-solid::before { left: 100%; transform-origin: 0 50%; transform: rotateY(90deg); }
+  .nv-solid::after { right: 100%; transform-origin: 100% 50%; transform: rotateY(-90deg); }
+  .nv-board {
+    position: absolute;
+    margin: 0;
+    background: #17301f;
+    box-shadow: 0 40px 70px -30px rgba(0, 0, 0, 0.7);
+  }
+  .nv-board-img { position: absolute; inset: 0; overflow: hidden; }
+  .nv-board-img img {
+    filter: grayscale(1);
+    transition: filter 0.7s, transform 1.2s cubic-bezier(0.2, 0.7, 0, 1);
+  }
+  .nv-board:hover .nv-board-img img { filter: none; transform: scale(1.06); }
+  .nv-board-tag {
+    position: absolute;
+    left: 0.9rem;
+    bottom: 0.8rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #fff;
+    background: rgba(5, 26, 12, 0.7);
+    padding: 0.3rem 0.55rem;
+  }
+  .nv-board-a { left: 0; top: 0; width: 58%; height: 52%; }
+  .nv-board-b { right: 0; top: 14%; width: 44%; height: 68%; }
+  .nv-board-c { left: 22%; bottom: 0; width: 46%; height: 42%; }
+  /* the three points, as glass cards the cursor lights */
+  .nv-point {
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 0.5rem;
+  }
+</style>

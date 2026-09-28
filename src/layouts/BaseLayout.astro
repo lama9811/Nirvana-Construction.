@@ -10,6 +10,10 @@ interface Props {
   description: string;
   path?: string;
   image?: string;
+  /* where "Skip to content" lands — a page whose job is one thing
+     (the contact form) can point it straight there */
+  skipTo?: string;
+  skipLabel?: string;
 }
 
 const {
@@ -17,6 +21,8 @@ const {
   description,
   path = Astro.url.pathname,
   image,
+  skipTo = "#main",
+  skipLabel = "Skip to content",
 } = Astro.props;
 ---
 
@@ -27,17 +33,15 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
-    {/* Stitch fonts — Montserrat (display) + Inter (body) + Material Symbols */}
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
-    />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-    />
+    {/*
+      Typefaces are self-hosted from /public/fonts and declared in
+      global.css — no Google Fonts requests, and no Material Symbols
+      variable font (icons are inline SVG via components/Icon.astro).
+      Only the three faces needed for first paint are preloaded.
+    */}
+    <link rel="preload" href="/fonts/space-grotesk-700.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/inter-400.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/JetBrainsMono-Regular.woff2" as="font" type="font/woff2" crossorigin />
 
     <SEO title={title} description={description} path={path} image={image} />
     <ClientRouter />
@@ -46,7 +50,7 @@ const {
     </script>
   </head>
   <body class="bg-surface text-on-surface font-body-md selection:bg-secondary-fixed selection:text-on-secondary-fixed">
-    <a href="#main" class="skip-link">Skip to content</a>
+    <a href={skipTo} class="skip-link">{skipLabel}</a>
     <Header />
     <main id="main">
       <slot />
@@ -64,7 +68,8 @@ const {
         z-index: 100;
         padding: 0.75rem 1.25rem;
         background: var(--color-secondary-container);
-        color: var(--color-on-primary);
+        /* dark label: white on the logo orange is 2.94:1 and fails */
+        color: var(--color-on-secondary-container);
         font-weight: 600;
         font-size: 0.85rem;
         transform: translateY(-120%);
@@ -78,6 +83,20 @@ const {
       import { initMotion, destroyMotion } from "../lib/motion";
       document.addEventListener("astro:page-load", initMotion);
       document.addEventListener("astro:before-swap", destroyMotion);
+    </script>
+
+    {/* Depth layer — perspective tilt-ins, flip counters, cursor glow (lib/depth.ts) */}
+    <script>
+      import { initDepth } from "../lib/depth";
+      let depthCleanup: (() => void) | null = null;
+      document.addEventListener("astro:page-load", () => {
+        depthCleanup?.();
+        depthCleanup = initDepth();
+      });
+      document.addEventListener("astro:before-swap", () => {
+        depthCleanup?.();
+        depthCleanup = null;
+      });
     </script>
   </body>
 </html>

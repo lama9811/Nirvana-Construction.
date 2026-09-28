@@ -1,0 +1,282 @@
+---
+/* ============================================================
+   LogoBuild — the /about/ hero: "built from the ground up".
+
+   The Nirvana mark goes up in 3D the way the company builds a wall:
+   chalk layout on the slab, steel studs on layout bar by bar, green
+   cladding, and the swoosh snapping round the base. It plays on its
+   own, like a background video (./loop-clock.ts: build, hold, reverse,
+   hold), behind a static headline — no scroll track. It pauses when
+   off screen or when the tab is hidden. Scene: ./logo-build-scene.ts
+   (dynamic import only).
+
+   Reduced motion: one finished still + the copy in flow.
+   No WebGL / failure: the same copy over a dark panel with the logo.
+   ============================================================ */
+import { company } from "../../data/company";
+import Icon from "../Icon.astro";
+---
+
+<section class="lb" data-lb aria-label="About Nirvana Construction">
+  <div class="lb-track">
+    <div class="lb-sticky">
+      <div class="lb-bg" aria-hidden="true"></div>
+      <img class="lb-fallback" src="/logo.png" alt="" width="800" height="780" loading="lazy" decoding="async" aria-hidden="true" />
+      <canvas class="lb-canvas" data-lb-canvas aria-hidden="true"></canvas>
+      <div class="lb-scrim" aria-hidden="true"></div>
+
+      <div class="lb-stages">
+        {/* 00 — intro: the page h1 */}
+        <div class="lb-stage lb-stage-intro" data-stage="0">
+          <p class="lb-mono lb-eyebrow"><span class="lb-dot" aria-hidden="true"></span>About Nirvana</p>
+          <h1 class="lb-h1">
+            <span class="lb-line"><span>A commercial trade partner.</span></span>
+            <span class="lb-line lb-line-b"><span>Not a sales pitch.</span></span>
+          </h1>
+          <p class="lb-lede">
+            Commercial drywall and metal-stud framing for general contractors
+            across Maryland.
+          </p>
+          <div class="lb-actions">
+            <a href="/contact/" class="btn-primary">Get in Touch <Icon name="arrow_forward" /></a>
+            <a href="/projects/" class="btn-ghost text-white">See the Work <Icon name="chevron_right" /></a>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<style>
+  .lb {
+    --hdr: 5rem;
+    --g: max(1.5rem, calc((100vw - 1280px) / 2 + 1.5rem));
+    position: relative;
+    background: #051a0c;
+    color: #fff;
+  }
+  @media (min-width: 768px) {
+    .lb { --hdr: 5.5rem; }
+  }
+  /* live: slide up under the transparent header; full-viewport stage */
+  .lb:not([data-static]) { margin-top: calc(var(--hdr) * -1); }
+  .lb-track { position: relative; }
+  .lb-sticky { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+
+  .lb-bg {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(80% 60% at 65% 55%, #0c3a1d 0%, #051a0c 70%);
+  }
+  .lb-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    opacity: 0;
+    transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .lb[data-ready] .lb-canvas { opacity: 1; }
+  .lb-fallback { display: none; }
+  .lb-scrim {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(90deg, rgba(5, 26, 12, 0.82) 0%, rgba(5, 26, 12, 0.4) 40%, transparent 62%),
+      linear-gradient(0deg, rgba(5, 26, 12, 0.6) 0%, transparent 35%);
+  }
+
+  .lb-stages {
+    position: absolute;
+    inset: 0;
+    max-width: 80rem;
+    margin-inline: auto;
+    pointer-events: none;
+  }
+  .lb-stage {
+    position: absolute;
+    left: 1.5rem;
+    right: 1.5rem;
+    bottom: clamp(3.5rem, 11vh, 7rem);
+    max-width: 36rem;
+    opacity: 0;
+    visibility: hidden;
+    will-change: opacity, transform;
+  }
+  .lb-stage[data-on] { pointer-events: auto; }
+  .lb-stage-intro { opacity: 1; visibility: visible; max-width: 44rem; pointer-events: auto; }
+
+  .lb-mono {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.62);
+  }
+  .lb-eyebrow { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1.25rem; }
+  .lb-dot { width: 0.4rem; height: 0.4rem; border-radius: 999px; background: #ff6600; box-shadow: 0 0 12px 2px rgba(255, 102, 0, 0.55); }
+  .lb-h1 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.5rem, 5.8vw, 5.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+    margin: 0 0 1.5rem;
+  }
+  .lb-h2 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.9rem, 3.8vw, 3.4rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    margin-top: 1rem;
+  }
+  .lb-line-b { color: rgba(255, 255, 255, 0.6); }
+  .lb-lede { font-family: var(--font-body); color: rgba(255, 255, 255, 0.8); max-width: 32rem; line-height: 1.6; margin-bottom: 1.75rem; }
+  .lb-actions { display: flex; flex-wrap: wrap; gap: 1rem; }
+
+  /* masked line-rise as each stage turns on */
+  .lb-line { display: block; overflow: hidden; padding-bottom: 0.06em; }
+  .lb-line > span { display: block; transform: translateY(105%); transition: transform 0.8s cubic-bezier(0.2, 0.7, 0, 1); }
+  .lb-line:nth-child(2) > span { transition-delay: 0.07s; }
+  .lb-line:nth-child(3) > span { transition-delay: 0.14s; }
+  [data-on] .lb-line > span,
+  .lb-stage-intro .lb-line > span { transform: none; }
+
+
+  /* ---- static: reduced motion / no WebGL — the copy in normal flow ---- */
+  .lb[data-static] .lb-track { height: auto; }
+  .lb[data-static] .lb-sticky { position: relative; height: auto; min-height: calc(100svh - var(--hdr)); display: flex; align-items: flex-end; }
+  .lb[data-static] .lb-stages { position: relative; inset: auto; width: 100%; padding: 6rem 0 4rem; pointer-events: auto; }
+  .lb[data-static] .lb-stage { position: relative; left: auto; right: auto; bottom: auto; opacity: 1; visibility: visible; margin: 0 1.5rem 2.5rem; }
+  .lb[data-static] .lb-line > span { transform: none; }
+  .lb[data-static][data-nogl] .lb-fallback {
+    display: block;
+    position: absolute;
+    right: 6%;
+    top: 50%;
+    width: min(34vw, 26rem);
+    height: auto;
+    transform: translateY(-50%);
+    opacity: 0.9;
+    filter: drop-shadow(0 20px 50px rgba(0, 0, 0, 0.5));
+  }
+  @media (max-width: 767px) {
+    .lb[data-static][data-nogl] .lb-fallback { width: 55vw; top: 8rem; transform: none; opacity: 0.35; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lb-line > span { transform: none; transition: none; }
+  }
+</style>
+
+<script>
+  import { pingPong, type Loop } from "./loop-clock";
+  import type { LogoBuildHandle } from "./logo-build-scene";
+
+  /* build 11 s → hold the finished mark 4 s → take it down 5 s → rest 1.5 s */
+  const LOOP: Loop = { from: 0, to: 1, up: 11, holdHi: 4, down: 5, holdLo: 1.5 };
+  type Root = HTMLElement & { __lbCleanup?: () => void };
+
+  function webglAvailable() {
+    try {
+      const c = document.createElement("canvas");
+      const gl = c.getContext("webgl2") || c.getContext("webgl");
+      gl?.getExtension("WEBGL_lose_context")?.loseContext();
+      return !!gl;
+    } catch {
+      return false;
+    }
+  }
+
+  function initLogoBuild() {
+    document.querySelectorAll<Root>("[data-lb]").forEach((root) => {
+      root.__lbCleanup?.();
+      const sticky = root.querySelector<HTMLElement>(".lb-sticky")!;
+      const canvas = root.querySelector<HTMLCanvasElement>("[data-lb-canvas]")!;
+
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const hasGL = webglAvailable();
+      if (!hasGL) {
+        root.setAttribute("data-nogl", "");
+        root.setAttribute("data-static", "");
+        return;
+      }
+      if (reduced) root.setAttribute("data-static", "");
+
+      /* the clock only runs while the hero is on screen and the tab is visible */
+      let playT = 0;
+      let lastNow = performance.now();
+      let visible = true;
+      let raf = 0;
+      let ctl: LogoBuildHandle | null = null;
+      let disposed = false;
+      const target = () => pingPong(playT, LOOP);
+      const frame = (now: number) => {
+        raf = 0;
+        if (disposed || !visible || document.hidden) return;
+        playT += Math.min(0.1, (now - lastNow) / 1000);
+        lastNow = now;
+        ctl?.kick();
+        raf = requestAnimationFrame(frame);
+      };
+      const play = () => {
+        if (raf || disposed || reduced || !visible || document.hidden) return;
+        lastNow = performance.now();
+        raf = requestAnimationFrame(frame);
+      };
+      const io = new IntersectionObserver((e) => {
+        visible = e.some((x) => x.isIntersecting);
+        play();
+      });
+      io.observe(root);
+      const onVis = () => play();
+      document.addEventListener("visibilitychange", onVis);
+      const onResize = () => ctl?.resize();
+      window.addEventListener("resize", onResize);
+
+      const goStatic = () => {
+        root.setAttribute("data-nogl", "");
+        root.setAttribute("data-static", "");
+        if (raf) cancelAnimationFrame(raf);
+        raf = 0;
+        io.disconnect();
+      };
+
+      const lite = window.matchMedia("(max-width: 767px), (pointer: coarse)").matches;
+      import("./logo-build-scene")
+        .then(({ createLogoBuild }) =>
+          createLogoBuild({ canvas, host: sticky, lite, getTarget: target, onFrame: () => {}, still: reduced ? 1 : undefined }),
+        )
+        .then((c) => {
+          if (disposed) return c?.dispose();
+          if (!c) return goStatic();
+          ctl = c;
+          if (import.meta.env.DEV) (window as unknown as { __nvLogo?: LogoBuildHandle }).__nvLogo = c;
+          root.setAttribute("data-ready", "");
+          play();
+        })
+        .catch(goStatic);
+
+      root.__lbCleanup = () => {
+        disposed = true;
+        if (raf) cancelAnimationFrame(raf);
+        io.disconnect();
+        document.removeEventListener("visibilitychange", onVis);
+        window.removeEventListener("resize", onResize);
+        ctl?.dispose();
+        ctl = null;
+        root.removeAttribute("data-ready");
+        delete root.__lbCleanup;
+      };
+    });
+  }
+
+  document.addEventListener("astro:page-load", initLogoBuild);
+  document.addEventListener("astro:before-swap", () => {
+    document.querySelectorAll<Root>("[data-lb]").forEach((r) => r.__lbCleanup?.());
+  });
+</script>

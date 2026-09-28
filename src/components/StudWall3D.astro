@@ -1,0 +1,435 @@
+---
+/* ============================================================
+   StudWall3D — a metal-stud wall that assembles itself as you scroll.
+
+   This is the one place on the site where 3D earns its keep: it shows
+   the actual product, in the actual build order, which no photograph
+   of a finished wall can do. Track and layout, studs at 16" on centre,
+   insulation, board, then a Level 5 finish.
+
+   Engineering notes:
+     · three.js is loaded by DYNAMIC IMPORT on approach, so the initial
+       page payload is unchanged (~50KB gz) and the ~150KB three bundle
+       is only fetched by visitors who actually scroll this far.
+     · No React and no @react-three/fiber — raw three.js only.
+     · Scroll progress is read from the section's own rect, so this does
+       not contend with the Lenis/ScrollTrigger bridge in lib/motion.ts.
+     · Under prefers-reduced-motion, or with no WebGL, the canvas never
+       initialises and the captioned stage list below remains as the
+       full, readable explanation.
+
+   World units are feet: a 24ft x 10ft wall, studs at 16in = 1.333ft.
+   ============================================================ */
+
+const stages = [
+  { index: "01", title: "Track & layout", body: "We snap the line and set top and bottom track to the drawings, because every wall above this is only as square as the layout under it." },
+  { index: "02", title: "Studs at 16\" o.c.", body: "We set light- or heavy-gauge studs on centre and plumb each one, so the board has a flat, true plane to land on." },
+  { index: "03", title: "Insulation", body: "We pack thermal and acoustic batts into every cavity before anything closes up, so the assembly performs the way it was specified." },
+  { index: "04", title: "Board", body: "We hang the rock tight to the framing with joints staggered and fasteners set, ready for tape." },
+  { index: "05", title: "Level 5 finish", body: "We tape, coat and sand to a Level 5 finish — the surface everyone sees, and the one the job gets judged on." },
+];
+---
+
+<section class="nv-wall relative bg-green-950 text-white" data-studwall>
+  {/* the scroll track: tall, so the sticky canvas has room to scrub */}
+  <div class="relative" style="height:300vh">
+    <div class="sticky top-0 h-screen overflow-hidden">
+      {/* 3D layer */}
+      <canvas class="nv-wall-canvas" data-studwall-canvas aria-hidden="true"></canvas>
+      <div class="absolute inset-0 pointer-events-none column-rules opacity-[0.16]"></div>
+
+      {/* caption rail — also the no-WebGL / reduced-motion explanation */}
+      <div class="relative z-10 h-full w-full max-w-container-max mx-auto px-lg flex flex-col justify-between py-xxl">
+        <div>
+          <p class="label-mono-light mb-md">How a wall goes up</p>
+          <h2 class="font-display text-display-lg max-w-[30rem]">
+            We build it in five passes.
+          </h2>
+        </div>
+
+        <ol class="nv-wall-stages grid gap-md max-w-[26rem]">
+          {
+            stages.map((s, i) => (
+              <li class="nv-wall-stage" data-stage={i}>
+                <div class="flex gap-md items-baseline">
+                  <span class="label-mono-light shrink-0">{s.index}</span>
+                  <div>
+                    <h3 class="font-display text-display-md">{s.title}</h3>
+                    <p class="font-body text-body-md text-white/70 mt-xs">{s.body}</p>
+                  </div>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .nv-wall-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    opacity: 0;
+    transition: opacity 0.8s ease-out;
+  }
+  .nv-wall[data-ready] .nv-wall-canvas {
+    opacity: 1;
+  }
+
+  /* Without the 3D layer every stage simply reads as a list. With it,
+     only the active stage is emphasised. */
+  .nv-wall-stage {
+    transition: opacity 0.45s ease, transform 0.45s ease;
+  }
+  .nv-wall[data-ready] .nv-wall-stage {
+    opacity: 0.32;
+    transform: translateY(0);
+  }
+  .nv-wall[data-ready] .nv-wall-stage[data-active] {
+    opacity: 1;
+  }
+  .nv-wall[data-ready] .nv-wall-stage:not([data-active]) p {
+    /* keep the rail compact while inactive, but never hide content from
+       assistive tech or from anyone without the 3D layer */
+    max-height: 0;
+    overflow: hidden;
+    margin-top: 0;
+    opacity: 0;
+    transition: all 0.45s ease;
+  }
+  .nv-wall[data-ready] .nv-wall-stage p {
+    max-height: 12rem;
+    transition: all 0.45s ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nv-wall-canvas { display: none; }
+    .nv-wall-stage,
+    .nv-wall[data-ready] .nv-wall-stage { opacity: 1 !important; }
+    .nv-wall[data-ready] .nv-wall-stage:not([data-active]) p {
+      max-height: none;
+      overflow: visible;
+      opacity: 1;
+    }
+  }
+</style>
+
+<script>
+  type Section = HTMLElement & { __wallCleanup?: () => void };
+
+  const STAGE_BOUNDS = [0.0, 0.2, 0.42, 0.6, 0.8]; // start of each stage
+
+  function initStudWall() {
+    document.querySelectorAll<Section>("[data-studwall]").forEach((section) => {
+      section.__wallCleanup?.();
+
+      const canvas = section.querySelector<HTMLCanvasElement>("[data-studwall-canvas]");
+      const stageEls = [...section.querySelectorAll<HTMLElement>(".nv-wall-stage")];
+      if (!canvas) return;
+
+      /* the caption rail is the source of truth; highlight it even if the
+         3D layer never loads */
+      const progressOf = () => {
+        const track = section.firstElementChild as HTMLElement | null;
+        if (!track) return 0;
+        const r = track.getBoundingClientRect();
+        const travel = r.height - window.innerHeight;
+        if (travel <= 0) return 0;
+        return Math.min(1, Math.max(0, -r.top / travel));
+      };
+      const markStage = (p: number) => {
+        let active = 0;
+        STAGE_BOUNDS.forEach((b, i) => {
+          if (p >= b) active = i;
+        });
+        stageEls.forEach((el, i) =>
+          i === active ? el.setAttribute("data-active", "") : el.removeAttribute("data-active"),
+        );
+        return active;
+      };
+
+      let rafCaption = 0;
+      const captionTick = () => {
+        rafCaption = 0;
+        markStage(progressOf());
+      };
+      const onScrollCaption = () => {
+        if (!rafCaption) rafCaption = requestAnimationFrame(captionTick);
+      };
+      window.addEventListener("scroll", onScrollCaption, { passive: true });
+      markStage(progressOf());
+
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+      let disposed = false;
+      let cleanup3D: (() => void) | null = null;
+
+      /* ---- lazy-load three.js only when this section approaches ---- */
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (!entries.some((e) => e.isIntersecting)) return;
+          io.disconnect();
+          if (reduced.matches) return;
+
+          import("three")
+            .then((THREE) => {
+              if (disposed) return;
+              cleanup3D = buildScene(THREE, canvas, section, progressOf);
+            })
+            .catch(() => {
+              /* three failed to load — the caption rail is already the
+                 complete fallback, so there is nothing to do */
+            });
+        },
+        { rootMargin: "150% 0px" },
+      );
+      io.observe(section);
+
+      section.__wallCleanup = () => {
+        disposed = true;
+        io.disconnect();
+        if (rafCaption) cancelAnimationFrame(rafCaption);
+        window.removeEventListener("scroll", onScrollCaption);
+        cleanup3D?.();
+        section.removeAttribute("data-ready");
+        delete section.__wallCleanup;
+      };
+    });
+  }
+
+  function buildScene(
+    THREE: typeof import("three"),
+    canvas: HTMLCanvasElement,
+    section: HTMLElement,
+    progressOf: () => number,
+  ) {
+    let renderer: import("three").WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "low-power" });
+    } catch {
+      return () => {}; // no WebGL — caption rail stands alone
+    }
+
+    const WALL_W = 24;      // feet
+    const WALL_H = 10;
+    const SPACING = 16 / 12; // 16" on centre
+    const DEPTH = 0.46;      // ~5.5" stud depth, in feet
+    const studCount = Math.floor(WALL_W / SPACING) + 1;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 200);
+
+    renderer.setClearColor(0x000000, 0);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+    /* ---- lighting ----
+       The warm fill is kept low deliberately: at higher intensity it
+       tints the galvanised steel brown and the studs stop reading as
+       metal at all. */
+    scene.add(new THREE.HemisphereLight(0xe8f3ec, 0x0a1f14, 1.05));
+    const key = new THREE.DirectionalLight(0xffffff, 1.8);
+    key.position.set(-10, 16, 18);
+    scene.add(key);
+    const warm = new THREE.DirectionalLight(0xff8c3a, 0.2);
+    warm.position.set(14, 3, 8);
+    scene.add(warm);
+
+    /* A raking side light. Without it the finished (Level 5) face is a
+       dead flat rectangle — a monolithic surface has nothing to catch
+       light unless something rakes across it. */
+    const rake = new THREE.PointLight(0xffffff, 140, 60, 2);
+    rake.position.set(-16, 7, 14);
+    scene.add(rake);
+
+    const steel = new THREE.MeshStandardMaterial({ color: 0xccd8d2, metalness: 0.55, roughness: 0.42 });
+    const batt = new THREE.MeshStandardMaterial({ color: 0xe4a649, metalness: 0.0, roughness: 0.95 });
+    const rock = new THREE.MeshStandardMaterial({ color: 0xcfd8d0, metalness: 0.0, roughness: 0.8 });
+    const finish = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.0, roughness: 0.58 });
+
+    const group = new THREE.Group();
+    scene.add(group);
+
+    /* ---- track (top + bottom runners) ---- */
+    const trackGeo = new THREE.BoxGeometry(WALL_W, 0.28, DEPTH);
+    const bottomTrack = new THREE.Mesh(trackGeo, steel);
+    bottomTrack.position.set(0, 0.14, 0);
+    const topTrack = new THREE.Mesh(trackGeo, steel);
+    topTrack.position.set(0, WALL_H - 0.14, 0);
+    group.add(bottomTrack, topTrack);
+
+    /* ---- studs ---- */
+    const studGeo = new THREE.BoxGeometry(0.16, WALL_H - 0.56, DEPTH);
+    const studs: import("three").Mesh[] = [];
+    for (let i = 0; i < studCount; i++) {
+      const s = new THREE.Mesh(studGeo, steel);
+      s.position.set(-WALL_W / 2 + i * SPACING, WALL_H / 2, 0);
+      studs.push(s);
+      group.add(s);
+    }
+
+    /* ---- insulation: one batt per cavity ---- */
+    const battGeo = new THREE.BoxGeometry(SPACING - 0.2, WALL_H - 0.7, DEPTH * 0.72);
+    const batts: import("three").Mesh[] = [];
+    for (let i = 0; i < studCount - 1; i++) {
+      const b = new THREE.Mesh(battGeo, batt);
+      b.position.set(-WALL_W / 2 + i * SPACING + SPACING / 2, WALL_H / 2, 0);
+      batts.push(b);
+      group.add(b);
+    }
+
+    /* ---- board on the near face ----
+       A 10ft wall takes 4x10 sheets standing on end, one row of six
+       across 24ft. Tiling two rows of 4x8 onto a 10ft wall (an earlier
+       attempt) left a misaligned band across the top. */
+    const sheetW = 4;
+    const cols = Math.round(WALL_W / sheetW);
+    const boardGeo = new THREE.BoxGeometry(sheetW - 0.04, WALL_H - 0.08, 0.05);
+    const sheets: import("three").Mesh[] = [];
+    for (let c = 0; c < cols; c++) {
+      const sh = new THREE.Mesh(boardGeo, rock);
+      sh.position.set(-WALL_W / 2 + sheetW / 2 + c * sheetW, WALL_H / 2, DEPTH / 2 + 0.03);
+      sheets.push(sh);
+      group.add(sh);
+    }
+
+    /* everything starts hidden; scroll reveals it in build order */
+    [...studs, ...batts, ...sheets].forEach((m) => (m.visible = false));
+    bottomTrack.scale.x = 0.001;
+    topTrack.scale.x = 0.001;
+
+    const ease = (t: number) => 1 - Math.pow(1 - t, 3);
+    const seg = (p: number, a: number, b: number) => Math.min(1, Math.max(0, (p - a) / (b - a)));
+
+    /* The caption rail occupies the left of the viewport on wide screens,
+       so the wall is pushed right of centre rather than being covered.
+       On narrow screens it re-centres and the captions sit over it. */
+    function frame(w: number, h: number) {
+      const narrow = w < 900;
+      group.position.x = narrow ? 0 : 5.5;
+      /* lifted on narrow screens so the wall clears the caption rail,
+         which stacks beneath it rather than beside it */
+      group.position.y = narrow ? 2.4 : 0;
+
+      /* Fit 24ft of wall in view: at fov 30 the half-angle is 15deg, so
+         the distance needed is (WALL_W/2) / tan(hFov/2) plus headroom. */
+      const vFov = 30;
+      const hHalf = Math.atan(Math.tan((vFov / 2) * (Math.PI / 180)) * (w / h));
+      const needed = (WALL_W / 2 + (narrow ? 2 : 7)) / Math.tan(hHalf);
+      const dist = Math.max(28, needed);
+
+      /* Eye height near the middle of the wall. Looking down from above
+         sheared the elevation and made the top track read as a receding
+         line rather than a level run. */
+      camera.fov = vFov;
+      camera.position.set(dist * 0.1, WALL_H * 0.52, dist);
+      camera.lookAt(group.position.x * 0.5, WALL_H * 0.46, 0);
+      camera.updateProjectionMatrix();
+    }
+
+    function resize() {
+      const r = canvas.getBoundingClientRect();
+      const w = Math.max(1, r.width);
+      const h = Math.max(1, r.height);
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      frame(w, h);
+    }
+
+    function apply(p: number) {
+      /* 01 — track slides out from the centre */
+      const t0 = ease(seg(p, STAGE_BOUNDS[0], STAGE_BOUNDS[1]));
+      bottomTrack.scale.x = Math.max(0.001, t0);
+      topTrack.scale.x = Math.max(0.001, t0);
+
+      /* 02 — studs drop in left to right */
+      const t1 = seg(p, STAGE_BOUNDS[1], STAGE_BOUNDS[2]);
+      studs.forEach((s, i) => {
+        const local = ease(Math.min(1, Math.max(0, t1 * studCount - i)));
+        s.visible = local > 0.001;
+        s.scale.y = Math.max(0.001, local);
+        s.position.y = WALL_H / 2;
+      });
+
+      /* 03 — batts press into the cavities */
+      const t2 = seg(p, STAGE_BOUNDS[2], STAGE_BOUNDS[3]);
+      batts.forEach((b, i) => {
+        const local = ease(Math.min(1, Math.max(0, t2 * batts.length - i)));
+        b.visible = local > 0.001;
+        b.scale.set(local, 1, local);
+      });
+
+      /* 04 — board is hung sheet by sheet, rising into place */
+      const t3 = seg(p, STAGE_BOUNDS[3], STAGE_BOUNDS[4]);
+      const t4 = seg(p, STAGE_BOUNDS[4], 1);
+      sheets.forEach((sh, i) => {
+        const local = ease(Math.min(1, Math.max(0, t3 * sheets.length - i)));
+        sh.visible = local > 0.001;
+        sh.scale.y = Math.max(0.001, local);
+
+        /* 05 — taped, coated and sanded: the sheet goes to a clean
+           finish and the joints between sheets close up */
+        const finished = t4 > 0.08;
+        sh.material = finished ? finish : rock;
+        sh.scale.x = finished ? 1.012 : 1;
+      });
+
+      /* A gentle swing only. A wide rotation made the wall read as a
+         fence receding into the distance instead of an elevation. */
+      /* Ends further round than it starts, so the finished wall shows a
+         little of its own edge and reads as an object with thickness
+         rather than a flat grey panel. */
+      group.rotation.y = -0.14 + p * 0.34;
+    }
+
+    let raf = 0;
+    let last = -1;
+    let alive = true;
+
+    function tick() {
+      raf = 0;
+      if (!alive) return;
+      const p = progressOf();
+      if (Math.abs(p - last) > 0.0006) {
+        last = p;
+        apply(p);
+        renderer.render(scene, camera);
+      }
+    }
+    const schedule = () => {
+      if (alive && !raf) raf = requestAnimationFrame(tick);
+    };
+
+    resize();
+    apply(progressOf());
+    renderer.render(scene, camera);
+    section.setAttribute("data-ready", "");
+
+    const onScroll = () => schedule();
+    const onResize = () => {
+      resize();
+      last = -1;
+      schedule();
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize);
+
+    return () => {
+      alive = false;
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
+      [trackGeo, studGeo, battGeo, boardGeo].forEach((g) => g.dispose());
+      [steel, batt, rock, finish].forEach((m) => m.dispose());
+      renderer.dispose();
+    };
+  }
+
+  document.addEventListener("astro:page-load", initStudWall);
+  document.addEventListener("astro:before-swap", () => {
+    document.querySelectorAll<Section>("[data-studwall]").forEach((s) => s.__wallCleanup?.());
+  });
+</script>

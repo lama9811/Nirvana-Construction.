@@ -1,139 +1,379 @@
 ---
-/* Header.astro — Frosted-glass sticky top nav. Uses backdrop-filter so the
-   nav literally takes on the color of whatever section is behind it as you
-   scroll. Brand wordmark, 5 nav links, and a click-to-call phone link on
-   desktop. Active link gets a secondary-color underline. */
+/* Header.astro — the floating capsule nav.
+
+   A dark gunmetal pill that floats inside a transparent sticky header:
+   chrome rim, a soft spotlight that follows the cursor across the pill,
+   no logo (the brand lives on the 3D building sign on the homepage), links whose
+   label rolls up on hover (the copy slides out as a twin slides in),
+   a small dash marking the hovered / current page, and an outlined
+   a round click-to-call button on the right (the "Let's talk" pill was
+   removed at the client's request; Contact is in the links).
+
+   The header box keeps its old height (5rem mobile / 5.5rem desktop):
+   both 3D heroes slide up under it by exactly that much, and every other
+   page's first section starts below it. The header itself is
+   transparent and click-through; only the pill takes the pointer. */
 import { nav, company } from "../data/company";
+import Icon from "./Icon.astro";
 
 const current = Astro.url.pathname;
 const isActive = (href: string) =>
   href === "/" ? current === "/" : current.startsWith(href);
 ---
 
-<header class="frost-nav sticky top-0 z-50 w-full">
-  <div class="flex justify-between items-center w-full px-lg py-md max-w-container-max mx-auto">
-    <a
-      href="/"
-      class="flex items-center gap-sm shrink-0"
-      aria-label="Nirvana Construction — home"
-    >
-      <picture>
-        <source type="image/webp" srcset="/logo.webp 1x, /logo@2x.webp 2x" />
-        <img
-          src="/logo.png"
-          alt="Nirvana Construction"
-          width="200"
-          height="195"
-          class="h-12 md:h-14 w-auto"
-          fetchpriority="high"
-        />
-      </picture>
-      <span class="sr-only">Nirvana Construction</span>
-    </a>
+<header class="nv-head sticky top-0 z-50 w-full" data-nav>
+  <div class="nv-pill" data-pill>
+    <span class="nv-spot" aria-hidden="true"></span>
 
-    <nav class="hidden md:flex items-center gap-gutter" aria-label="Primary">
+
+    <nav class="nv-links" aria-label="Primary">
       {
         nav.map((item) => (
           <a
             href={item.href}
-            class:list={[
-              "font-button text-button uppercase transition-colors duration-200",
-              isActive(item.href)
-                ? "text-secondary border-b-2 border-secondary pb-1"
-                : "text-on-surface-variant hover:text-primary",
-            ]}
+            class="nv-link"
+            data-active={isActive(item.href) ? "" : undefined}
+            aria-current={isActive(item.href) ? "page" : undefined}
+          >
+            <span class="nv-roll">
+              <span>{item.label}</span>
+              <span aria-hidden="true">{item.label}</span>
+            </span>
+            <span class="nv-dash" aria-hidden="true"></span>
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="nv-actions">
+      <a href={company.phoneHref} class="nv-call" aria-label={`Call ${company.name} at ${company.phone}`}>
+        <Icon name="call" />
+      </a>
+      <button
+        type="button"
+        data-menu-toggle
+        class="nv-burger"
+        aria-label="Open menu"
+        aria-expanded="false"
+        aria-controls="nv-menu"
+      >
+        <span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  {/* mobile menu — a dark panel that drops from the pill */}
+  <div id="nv-menu" class="nv-menu" data-menu hidden>
+    <nav aria-label="Mobile">
+      {
+        nav.map((item, i) => (
+          <a
+            href={item.href}
+            class="nv-menu-link"
+            style={`--i:${i}`}
             aria-current={isActive(item.href) ? "page" : undefined}
           >
             {item.label}
           </a>
         ))
       }
-    </nav>
-
-    <div class="flex items-center gap-md">
-      <a
-        href={company.phoneHref}
-        class="hidden lg:inline-flex items-center gap-xs font-body-md text-on-surface-variant hover:text-primary transition-colors"
-        aria-label={`Call ${company.name}`}
-      >
-        <span class="material-symbols-outlined" style="font-size:18px;">call</span>
-        <span class="font-label-bold text-label-bold">{company.phone}</span>
-      </a>
-      <button
-        data-menu-toggle
-        class="md:hidden flex flex-col gap-1 w-10 h-10 items-center justify-center border border-outline-variant"
-        aria-label="Open menu"
-        aria-expanded="false"
-      >
-        <span class="block w-5 h-px bg-on-surface"></span>
-        <span class="block w-5 h-px bg-on-surface"></span>
-        <span class="block w-5 h-px bg-on-surface"></span>
-      </button>
-    </div>
-  </div>
-
-  {/* Mobile menu — slides down on toggle */}
-  <div
-    data-menu
-    class="md:hidden hidden bg-surface-container-lowest border-t border-outline-variant"
-  >
-    <nav class="flex flex-col px-lg py-md" aria-label="Mobile">
-      {
-        nav.map((item) => (
-          <a
-            href={item.href}
-            class:list={[
-              "font-button text-button uppercase py-md border-b border-outline-variant/40",
-              isActive(item.href) ? "text-secondary" : "text-on-surface-variant",
-            ]}
-          >
-            {item.label}
-          </a>
-        ))
-      }
-      <a
-        href="/contact/"
-        class="mt-md bg-secondary-container text-on-primary font-button text-button uppercase px-lg py-md text-center"
-      >
-        Get in Touch
-      </a>
+      <div class="nv-menu-foot">
+        <a href={company.phoneHref} class="nv-menu-phone"><Icon name="call" /> {company.phone}</a>
+      </div>
     </nav>
   </div>
 </header>
 
 <style>
-  /* Frosted-glass nav — the backdrop-filter samples + blurs + saturates
-     whatever section is currently scrolled behind the header, so the nav
-     literally tints itself based on the page color underneath. Translucent
-     white tint keeps text readable at every position. */
-  .frost-nav {
-    background-color: rgba(255, 255, 255, 0.65);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
-    backdrop-filter: blur(24px) saturate(180%);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-    transition: background-color 0.4s ease, border-color 0.4s ease;
+  .nv-head {
+    height: 5rem;
+    padding: 0.75rem 1rem 0;
+    pointer-events: none; /* only the pill and menu take the pointer */
+    --pill-h: 3.5rem;
   }
-  /* Browsers without backdrop-filter fall back to a slightly more opaque
-     white so the nav stays readable instead of see-through. */
-  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    .frost-nav { background-color: rgba(255, 255, 255, 0.92); }
+  @media (min-width: 768px) {
+    .nv-head { height: 5.5rem; padding-top: 1rem; --pill-h: 3.75rem; }
+  }
+
+  /* ---------------- the capsule ---------------- */
+  .nv-pill {
+    --mx: 50%;
+    --my: 50%;
+    --spot: 0;
+    pointer-events: auto;
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    height: var(--pill-h);
+    max-width: 72rem;
+    margin-inline: auto;
+    padding: 0 0.4rem 0 0.4rem;
+    border-radius: 999px;
+    color: #e7ece9;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0) 42%),
+      linear-gradient(180deg, #232b28 0%, #161c1a 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(10, 16, 13, 0.9),
+      0 10px 30px -8px rgba(5, 26, 12, 0.45),
+      0 2px 6px rgba(0, 0, 0, 0.18);
+    transition: max-width 0.6s cubic-bezier(0.2, 0.7, 0, 1), box-shadow 0.4s ease;
+  }
+  /* chrome rim: a thin gradient ring drawn with a masked border */
+  .nv-pill::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      100deg,
+      rgba(255, 255, 255, 0.55),
+      rgba(255, 255, 255, 0.08) 22%,
+      rgba(180, 200, 190, 0.35) 48%,
+      rgba(255, 255, 255, 0.06) 70%,
+      rgba(255, 255, 255, 0.5)
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 2;
+  }
+  @media (max-width: 767px) {
+    .nv-pill { width: max-content; margin-right: 0; padding: 0 0.4rem; }
+  }
+  /* once the page has scrolled, the capsule tightens */
+  .nv-head[data-scrolled] .nv-pill { max-width: 64rem; }
+
+  /* the cursor spotlight */
+  .nv-spot {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: -1;
+    opacity: var(--spot);
+    transition: opacity 0.35s ease;
+    background: radial-gradient(
+      220px 120px at var(--mx) var(--my),
+      rgba(190, 230, 205, 0.16),
+      rgba(190, 230, 205, 0.05) 45%,
+      transparent 70%
+    );
+  }
+
+  /* ---------------- links ---------------- */
+  .nv-links {
+    display: none;
+    align-items: center;
+    gap: 0.25rem;
+    margin-inline: auto;
+  }
+  @media (min-width: 768px) {
+    .nv-links { display: flex; }
+  }
+  .nv-link {
+    position: relative;
+    padding: 0.55rem 0.9rem;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: rgba(231, 236, 233, 0.62);
+    border-radius: 999px;
+    transition: color 0.3s ease;
+  }
+  .nv-link:hover,
+  .nv-link:focus-visible,
+  .nv-link[data-active] { color: #fff; }
+
+  /* label roll: the visible copy slides up, its twin rises into place */
+  .nv-roll {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    height: 1.25em;
+    line-height: 1.25em;
+    overflow: hidden;
+    vertical-align: top;
+  }
+  .nv-roll > span {
+    display: block;
+    transition: transform 0.45s cubic-bezier(0.2, 0.7, 0, 1);
+  }
+  .nv-link:hover .nv-roll > span,
+  .nv-link:focus-visible .nv-roll > span { transform: translateY(-100%); }
+
+  .nv-dash {
+    position: absolute;
+    left: 50%;
+    bottom: 0.2rem;
+    width: 0.9rem;
+    height: 2px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.55);
+    transform: translateX(-50%) scaleX(0);
+    transition: transform 0.35s cubic-bezier(0.2, 0.7, 0, 1), background-color 0.3s;
+  }
+  .nv-link:hover .nv-dash,
+  .nv-link:focus-visible .nv-dash { transform: translateX(-50%) scaleX(1); }
+  .nv-link[data-active] .nv-dash { transform: translateX(-50%) scaleX(1); background: #ff6600; }
+
+  /* ---------------- right side ---------------- */
+  .nv-actions { display: flex; align-items: center; gap: 0.5rem; margin-left: auto; }
+  @media (min-width: 768px) {
+    .nv-actions { margin-left: 0; }
+  }
+  .nv-call,
+  .nv-burger {
+    display: grid;
+    place-items: center;
+    width: calc(var(--pill-h) - 0.9rem);
+    height: calc(var(--pill-h) - 0.9rem);
+    border-radius: 999px;
+    color: rgba(231, 236, 233, 0.8);
+    background: rgba(255, 255, 255, 0.03);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: color 0.25s, background-color 0.25s, box-shadow 0.25s;
+  }
+  .nv-call { display: none; font-size: 1.05rem; }
+  @media (min-width: 1024px) {
+    .nv-call { display: grid; }
+  }
+  .nv-call:hover,
+  .nv-call:focus-visible { color: #fff; background: rgba(255, 255, 255, 0.08); }
+
+
+  /* ---------------- burger (mobile) ---------------- */
+  .nv-burger { gap: 0; }
+  .nv-burger span {
+    grid-area: 1 / 1;
+    width: 1.05rem;
+    height: 1.5px;
+    border-radius: 2px;
+    background: currentColor;
+    transition: transform 0.4s cubic-bezier(0.2, 0.7, 0, 1);
+  }
+  .nv-burger span:first-child { transform: translateY(-3.5px); }
+  .nv-burger span:last-child { transform: translateY(3.5px); }
+  .nv-burger[aria-expanded="true"] span:first-child { transform: rotate(45deg); }
+  .nv-burger[aria-expanded="true"] span:last-child { transform: rotate(-45deg); }
+  @media (min-width: 768px) {
+    .nv-burger { display: none; }
+  }
+
+  /* ---------------- mobile menu ---------------- */
+  .nv-menu {
+    pointer-events: auto;
+    margin: 0.5rem auto 0;
+    max-width: 72rem;
+    border-radius: 1.5rem;
+    padding: 0.75rem 1.25rem 1.25rem;
+    color: #e7ece9;
+    background: linear-gradient(180deg, #232b28, #141a17);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 0 0 1px rgba(10, 16, 13, 0.9), 0 24px 50px -12px rgba(5, 26, 12, 0.6);
+    transform-origin: top center;
+    animation: nv-drop 0.45s cubic-bezier(0.2, 0.7, 0, 1);
+  }
+  @keyframes nv-drop {
+    from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+    to { opacity: 1; transform: none; }
+  }
+  .nv-menu-link {
+    display: flex;
+    align-items: baseline;
+    gap: 0.9rem;
+    padding: 0.85rem 0.25rem;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    animation: nv-rise 0.5s cubic-bezier(0.2, 0.7, 0, 1) both;
+    animation-delay: calc(var(--i) * 45ms + 60ms);
+  }
+  .nv-menu-link[aria-current="page"] { color: #ff6600; }
+  @keyframes nv-rise {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: none; }
+  }
+  .nv-menu-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.25rem; padding-top: 1.25rem; }
+  .nv-menu-phone { display: inline-flex; align-items: center; gap: 0.5rem; color: rgba(231, 236, 233, 0.8); }
+  @media (min-width: 768px) {
+    .nv-menu { display: none !important; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nv-pill, .nv-roll > span, .nv-dash, .nv-burger span { transition: none !important; }
+    .nv-menu, .nv-menu-link { animation: none !important; }
   }
 </style>
 
 <script>
+  /* the header is swapped on every ClientRouter navigation, so the window /
+     document listeners are released before each swap */
+  let teardown: (() => void) | null = null;
+
   function setupHeader() {
+    const head = document.querySelector<HTMLElement>("[data-nav]");
+    const pill = document.querySelector<HTMLElement>("[data-pill]");
     const toggle = document.querySelector<HTMLButtonElement>("[data-menu-toggle]");
     const menu = document.querySelector<HTMLElement>("[data-menu]");
-    if (!toggle || !menu) return;
+    if (!head || !pill || !toggle || !menu) return;
+    if (head.dataset.bound) return;
+    head.dataset.bound = "1";
+    teardown?.();
+
+    /* mobile menu */
     let open = false;
-    toggle.addEventListener("click", () => {
-      open = !open;
+    const setOpen = (v: boolean) => {
+      open = v;
       toggle.setAttribute("aria-expanded", String(open));
       toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
-      menu.classList.toggle("hidden", !open);
-    });
+      menu.hidden = !open;
+    };
+    toggle.addEventListener("click", () => setOpen(!open));
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && open) {
+        setOpen(false);
+        toggle.focus();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+
+    /* the cursor spotlight — mouse only, one rAF per move */
+    if (window.matchMedia("(pointer: fine)").matches) {
+      let raf = 0;
+      pill.addEventListener("pointermove", (e) => {
+        if (raf) return;
+        raf = requestAnimationFrame(() => {
+          raf = 0;
+          const r = pill.getBoundingClientRect();
+          pill.style.setProperty("--mx", `${(((e.clientX - r.left) / r.width) * 100).toFixed(1)}%`);
+          pill.style.setProperty("--my", `${(((e.clientY - r.top) / r.height) * 100).toFixed(1)}%`);
+          pill.style.setProperty("--spot", "1");
+        });
+      });
+      pill.addEventListener("pointerleave", () => pill.style.setProperty("--spot", "0"));
+    }
+
+    /* the capsule tightens once the page has scrolled */
+    const onScroll = () => head.toggleAttribute("data-scrolled", window.scrollY > 40);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    teardown = () => {
+      document.removeEventListener("keydown", onKey);
+      window.removeEventListener("scroll", onScroll);
+      teardown = null;
+    };
   }
   setupHeader();
   document.addEventListener("astro:page-load", setupHeader);
+  document.addEventListener("astro:before-swap", () => teardown?.());
 </script>

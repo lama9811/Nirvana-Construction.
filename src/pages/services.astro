@@ -1,286 +1,52 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+
+
+import XrayWall from "../components/immersive/XrayWall.astro";
+import TradeDeck from "../components/services/TradeDeck.astro";
+import SectorDrift from "../components/services/SectorDrift.astro";
+import ProcessPath from "../components/services/ProcessPath.astro";
+import ScopeDrum from "../components/services/ScopeDrum.astro";
 import { company } from "../data/company";
-import { services, scopeOfWork } from "../data/services";
-
-const process = [
-  {
-    step: "01",
-    phase: "Strategic Phase",
-    title: "Pre-Construction & Takeoff",
-    body: "We review the drawings, walk the site with the GC, and put together a clean number — quantities, scope, and schedule with no vague allowances.",
-  },
-  {
-    step: "02",
-    phase: "Execution Phase",
-    title: "Framing, Hanging, Finishing",
-    body: "Layout-perfect framing, clean drywall, and level-finish work, coordinated tightly with the GC, the MEPs, and the inspector through every phase of the build.",
-  },
-  {
-    step: "03",
-    phase: "Finalization Phase",
-    title: "Punch & Inspection",
-    body: "We walk the punch list with the GC and pass inspection on the first walk, with ceilings dropped, finishes ready for paint, and the schedule we signed kept.",
-  },
-];
-
-const clients = ["ALDI", "GOLF GALAXY", "JCC", "MACE MEDICAL", "HCPS", "FLAGSHIP", "CHIPOTLE", "DAVITA"];
+import CertSeal from "../components/CertSeal.astro";
 ---
 
 <BaseLayout
   title="Services"
-  description="Commercial drywall, metal-stud framing, acoustical ceilings, insulation, and finishing — Nirvana Construction's full scope of work for Maryland's general contractors."
+  description="Commercial drywall, metal-stud framing, acoustical ceilings, insulation and finishing: Nirvana Construction's full scope of work for Maryland's general contractors."
 >
-  {/* ============ Hero ============ */}
-  <section class="relative h-[440px] md:h-[520px] w-full flex items-center overflow-hidden">
-    <div class="absolute inset-0" style="height:120%;top:-10%;">
-      <img
-        data-parallax="0.22"
-        class="w-full h-full object-cover object-center"
-        src="/images/projects/jobsite-07.webp"
-        srcset="/images/projects/jobsite-07-800.webp 800w, /images/projects/jobsite-07.webp 1600w"
-        sizes="100vw"
-        alt="Interior of a commercial Nirvana Construction project."
-        fetchpriority="high"
-      />
-    </div>
-    <div class="absolute inset-0 bg-on-background/55"></div>
-    <div class="relative max-w-container-max mx-auto px-lg w-full">
-      <div class="max-w-2xl text-surface">
-        <span data-reveal class="inline-block px-md py-xs bg-secondary text-on-secondary font-label-bold text-label-bold uppercase mb-md">
-          Our Services
-        </span>
-        <h1 data-words data-delay="0.1" class="font-headline-xl text-headline-xl mb-md">Commercial framing &amp; drywall, end to end.</h1>
-        <p data-reveal class="font-body-lg text-body-lg text-white/85">
-          From metal-stud framing and drywall through acoustical ceilings,
-          insulation, and the specialty trade scopes that finish a commercial
-          build.
-        </p>
-      </div>
-    </div>
-  </section>
+  {/* ============ Hero: the exploded wall — six trades, layer by layer ============ */}
+  <XrayWall />
 
   <div class="max-w-container-max mx-auto px-lg py-xxl grid grid-cols-1 lg:grid-cols-12 gap-xxl">
     {/* Main content */}
-    <div class="lg:col-span-8 space-y-xxl">
-      {/* Expertise */}
-      <section id="expertise">
-        <div class="flex items-center gap-sm mb-lg">
-          <div class="w-12 h-1 bg-secondary"></div>
-          <h2 class="font-headline-lg text-headline-lg uppercase tracking-tight text-primary">
-            Our Expertise
-          </h2>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
-          <div data-reveal data-tilt class="bg-surface-container-lowest border border-outline-variant p-lg shadow-sm hover:shadow-xl hover:border-primary transition-all duration-300">
-            <span class="material-symbols-outlined text-secondary mb-md" style="font-size: 40px;">
-              construction
-            </span>
-            <h3 class="font-headline-md text-headline-md mb-sm text-primary">Metal-Stud Framing</h3>
-            <p class="font-body-sm text-body-sm text-on-surface-variant">
-              Layout-perfect framing for retail, medical, and tenant
-              build-outs — square, plumb, and on schedule.
+    <div class="lg:col-span-12 space-y-xxl">
+      {/* Trades, sectors and process: 3D motion sections (components/services/) */}
+      <TradeDeck />
+      <SectorDrift />
+      <ProcessPath />
+
+      <ScopeDrum />
+
+      {/* Certification — the client's Maryland MBE seal */}
+      <section id="certification">
+        <div data-depth-in data-glow="light" class="flex flex-col sm:flex-row items-center gap-xl bg-surface-container-lowest border border-outline-variant p-xl">
+          <CertSeal size={132} />
+          <div class="text-center sm:text-left">
+            <p class="font-label-bold text-label-bold uppercase text-secondary tracking-widest mb-xs">
+              Certified
             </p>
-          </div>
-          <div data-reveal data-tilt class="bg-surface-container-lowest border border-outline-variant p-lg shadow-sm hover:shadow-xl hover:border-primary transition-all duration-300">
-            <span class="material-symbols-outlined text-secondary mb-md" style="font-size: 40px;">
-              format_paint
-            </span>
-            <h3 class="font-headline-md text-headline-md mb-sm text-primary">Drywall Hang &amp; Finish</h3>
-            <p class="font-body-sm text-body-sm text-on-surface-variant">
-              Clean drywall hanging and level-finish work — the kind of finish
-              that disappears under paint and passes inspection on the first
-              walk.
+            <h2 class="font-headline-lg text-headline-lg text-primary mb-sm">DBE · MBE · SBE</h2>
+            <p class="font-body-md text-on-surface-variant max-w-[36rem]">
+              We're certified through Maryland's Office of Minority Business Enterprise,
+              so our work counts toward Disadvantaged, Minority and Small Business
+              participation goals on public and institutional projects.
             </p>
+            <p class="label-mono text-green-600 mt-md">{company.certification.number}</p>
           </div>
-          <div data-reveal data-tilt class="bg-surface-container-lowest border border-outline-variant p-lg shadow-sm hover:shadow-xl hover:border-primary transition-all duration-300">
-            <span class="material-symbols-outlined text-secondary mb-md" style="font-size: 40px;">
-              grid_view
-            </span>
-            <h3 class="font-headline-md text-headline-md mb-sm text-primary">Acoustical &amp; Specialty</h3>
-            <p class="font-body-sm text-body-sm text-on-surface-variant">
-              Suspended grid ceilings, fireproofing, insulation, FRP, and EIFS.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Sectors */}
-      <section id="sectors">
-        <div class="flex items-center gap-sm mb-lg">
-          <div class="w-12 h-1 bg-primary"></div>
-          <h2 class="font-headline-lg text-headline-lg uppercase tracking-tight text-primary">
-            Sectors We Frame
-          </h2>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
-          {services.map((s) => (
-            <article class="border-l-4 border-secondary pl-lg py-md">
-              <div class="flex items-baseline gap-sm mb-xs">
-                <span class="font-label-bold text-label-bold uppercase text-secondary">
-                  {s.index}
-                </span>
-                <h3 class="font-headline-md text-headline-md text-primary">{s.title}</h3>
-              </div>
-              <p class="font-body-md text-on-surface-variant">{s.detail}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      {/* Process (asymmetric) */}
-      <section class="blueprint-bg p-xl border border-outline-variant rounded-lg" id="process">
-        <div class="flex items-center gap-sm mb-xl">
-          <div class="w-12 h-1 bg-primary"></div>
-          <h2 class="font-headline-lg text-headline-lg uppercase tracking-tight text-primary">
-            The Process
-          </h2>
-        </div>
-        <div class="space-y-gutter">
-          {process.map((p, i) => (
-            <div data-reveal class:list={["flex flex-col md:flex-row gap-gutter items-start", i === 1 && "md:ml-xl", i === 2 && "md:ml-xxl"]}>
-              <div data-tilt class="flex-shrink-0 w-16 h-16 rounded-full bg-primary text-on-primary flex items-center justify-center font-headline-md text-headline-md">
-                {p.step}
-              </div>
-              <div class="flex-grow pt-xs">
-                <h4 class="font-label-bold text-label-bold text-secondary mb-xs uppercase">{p.phase}</h4>
-                <h3 class="font-headline-md text-headline-md mb-sm text-primary">{p.title}</h3>
-                <p class="text-on-surface-variant max-w-[36rem]">{p.body}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Scope of Work — full list */}
-      <section id="scope">
-        <div class="flex items-center gap-sm mb-lg">
-          <div class="w-12 h-1 bg-secondary"></div>
-          <h2 class="font-headline-lg text-headline-lg uppercase tracking-tight text-primary">
-            Every Wall In The Building
-          </h2>
-        </div>
-        <ul class="grid grid-cols-2 md:grid-cols-3 gap-md">
-          {scopeOfWork.map((item, i) => (
-            <li class="flex items-baseline gap-sm font-body-md text-on-surface-variant border-b border-outline-variant py-md">
-              <span class="font-label-bold text-label-bold uppercase text-secondary">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* Clients */}
-      <section id="clients">
-        <div class="flex items-center gap-sm mb-lg">
-          <div class="w-12 h-1 bg-secondary"></div>
-          <h2 class="font-headline-lg text-headline-lg uppercase tracking-tight text-primary">
-            We've Framed For
-          </h2>
-        </div>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-gutter grayscale opacity-70">
-          {clients.map((c) => (
-            <div class="h-24 border border-outline-variant flex items-center justify-center p-md">
-              <span class="font-headline-md text-on-surface-variant font-bold tracking-tight">
-                {c}
-              </span>
-            </div>
-          ))}
         </div>
       </section>
     </div>
 
-    {/* Sidebar — contact info, no form */}
-    <aside class="lg:col-span-4">
-      <div class="sticky top-[100px] space-y-gutter">
-        <div
-          data-reveal
-          data-tilt
-          class="bg-surface-container-lowest border border-outline-variant p-xl shadow-sm"
-        >
-          <div class="bg-secondary h-1 w-12 mb-md"></div>
-          <h3 class="font-headline-md text-headline-md mb-md text-primary">
-            Get in Touch
-          </h3>
-          <p class="font-body-sm text-body-sm text-on-surface-variant mb-lg">
-            Send us drawings and a few notes about the job — we'll get back to
-            you the same week.
-          </p>
-
-          <div class="space-y-md">
-            <div class="flex items-start gap-sm">
-              <span class="material-symbols-outlined text-secondary mt-px">call</span>
-              <div>
-                <p class="font-label-bold text-label-bold uppercase text-on-surface-variant mb-xs">
-                  Phone
-                </p>
-                <a
-                  href={company.phoneHref}
-                  class="font-body-md text-primary hover:text-secondary transition-colors"
-                >
-                  {company.phone}
-                </a>
-              </div>
-            </div>
-            <div class="flex items-start gap-sm">
-              <span class="material-symbols-outlined text-secondary mt-px">mail</span>
-              <div>
-                <p class="font-label-bold text-label-bold uppercase text-on-surface-variant mb-xs">
-                  Email
-                </p>
-                <a
-                  href={company.emailHref}
-                  class="font-body-md text-primary hover:text-secondary transition-colors break-all"
-                >
-                  {company.email}
-                </a>
-              </div>
-            </div>
-            <div class="flex items-start gap-sm">
-              <span class="material-symbols-outlined text-secondary mt-px">schedule</span>
-              <div>
-                <p class="font-label-bold text-label-bold uppercase text-on-surface-variant mb-xs">
-                  Hours
-                </p>
-                <p class="font-body-md text-on-surface-variant">{company.hours}</p>
-              </div>
-            </div>
-            <div class="flex items-start gap-sm">
-              <span class="material-symbols-outlined text-secondary mt-px">location_on</span>
-              <div>
-                <p class="font-label-bold text-label-bold uppercase text-on-surface-variant mb-xs">
-                  Office
-                </p>
-                <p class="font-body-md text-on-surface-variant">
-                  {company.address.street}<br />
-                  {company.address.city}, {company.address.state} {company.address.zip}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <a
-            data-magnetic
-            href="/contact/"
-            class="mt-xl w-full bg-secondary-container text-on-primary py-md font-button text-button uppercase rounded inline-flex items-center justify-center gap-sm transition-all hover:bg-secondary shadow-sm"
-          >
-            <span class="material-symbols-outlined">mail</span>
-            Send a Message
-          </a>
-        </div>
-
-        <div class="bg-primary text-on-primary p-xl shadow-sm">
-          <p class="font-label-bold text-label-bold uppercase text-secondary-fixed mb-xs">
-            Certification
-          </p>
-          <p class="font-headline-md text-headline-md mb-xs">DBE / MBE / SBE</p>
-          <p class="font-body-sm text-body-sm opacity-80">
-            {company.certification.number}
-          </p>
-        </div>
-      </div>
-    </aside>
   </div>
 </BaseLayout>

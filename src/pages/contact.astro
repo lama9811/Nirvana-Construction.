@@ -2,58 +2,31 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { company } from "../data/company";
 import { services } from "../data/services";
+import Icon from "../components/Icon.astro";
 
 /* Pluggable endpoint — drop in a Formspree form ID or switch to Netlify
    Forms by setting this value. Until then the form submits in "demo" mode
    and shows the success state without delivering. */
 const FORM_ENDPOINT = ""; // e.g. "https://formspree.io/f/xxxxxxxx"
+import PlanExtrude from "../components/immersive/PlanExtrude.astro";
 ---
 
 <BaseLayout
+  skipTo="#contact-form"
+  skipLabel="Skip to the contact form"
   title="Contact"
-  description="Send a message, ask a question, or call Nirvana Construction directly. Mon–Fri 8–4. Nottingham, MD."
+  description="Send a message, ask a question, or call Nirvana Construction directly. Mon to Fri, 8 to 4. Nottingham, MD."
 >
-  {/* ============ Hero ============ */}
-  <section class="relative h-[440px] md:h-[520px] w-full flex items-center overflow-hidden">
-    <div class="absolute inset-0" style="height:120%;top:-10%;">
-      <img
-        data-parallax="0.22"
-        class="w-full h-full object-cover object-center"
-        src="/images/projects/jobsite-02.webp"
-        srcset="/images/projects/jobsite-02-800.webp 800w, /images/projects/jobsite-02.webp 1600w"
-        sizes="100vw"
-        alt="A commercial Nirvana Construction project under way."
-        fetchpriority="high"
-      />
-    </div>
-    <div class="absolute inset-0 bg-on-background/60"></div>
-    <div class="relative max-w-container-max mx-auto px-lg w-full">
-      <div class="max-w-2xl text-surface">
-        <span
-          data-reveal
-          class="inline-block px-md py-xs bg-secondary text-on-secondary font-label-bold text-label-bold uppercase mb-md"
-        >
-          Contact
-        </span>
-        <h1 data-words data-delay="0.1" class="font-headline-xl text-headline-xl mb-md">
-          Start a project. Get a callback.
-        </h1>
-        <p data-reveal class="font-body-lg text-body-lg text-white/85">
-          Tell us about the job — scope, schedule, location — and we'll be in
-          touch quickly. Or just call.
-        </p>
-      </div>
-    </div>
-  </section>
+  {/* ============ Hero: the plan's walls rise out of the drawing ============ */}
+  <PlanExtrude />
 
   {/* ============ Body ============ */}
   <section class="py-xxl bg-surface-container-low">
     <div class="max-w-container-max mx-auto px-lg grid grid-cols-1 lg:grid-cols-12 gap-xxl">
       {/* Info column */}
       <aside class="lg:col-span-4 space-y-gutter">
-        <div data-reveal>
+        <div data-depth-in>
           <div class="flex items-center gap-sm mb-md">
-            <div class="w-12 h-1 bg-secondary"></div>
             <p class="font-label-bold text-label-bold text-secondary uppercase tracking-widest">
               Direct Lines
             </p>
@@ -62,14 +35,14 @@ const FORM_ENDPOINT = ""; // e.g. "https://formspree.io/f/xxxxxxxx"
             Quickest way to reach us.
           </h2>
           <p class="font-body-md text-on-surface-variant">
-            Hit the phone or email below — we answer fast during business
+            Hit the phone or email below. We answer fast during business
             hours.
           </p>
         </div>
 
+        <div data-rise class="ct-slab">
         <div
-          data-reveal
-          data-tilt
+          data-glow="light"
           class="bg-surface-container-lowest border border-outline-variant p-xl shadow-sm"
         >
           <p class="font-label-bold text-label-bold uppercase text-on-surface-variant mb-xs">
@@ -82,10 +55,11 @@ const FORM_ENDPOINT = ""; // e.g. "https://formspree.io/f/xxxxxxxx"
             {company.phone}
           </a>
         </div>
+        </div>
 
+        <div data-rise class="ct-slab">
         <div
-          data-reveal
-          data-tilt
+          data-glow="light"
           class="bg-surface-container-lowest border border-outline-variant p-xl shadow-sm"
         >
           <p class="font-label-bold text-label-bold uppercase text-on-surface-variant mb-xs">
@@ -98,10 +72,11 @@ const FORM_ENDPOINT = ""; // e.g. "https://formspree.io/f/xxxxxxxx"
             {company.email}
           </a>
         </div>
+        </div>
 
+        <div data-rise class="ct-slab">
         <div
-          data-reveal
-          data-tilt
+          data-glow="light"
           class="bg-surface-container-lowest border border-outline-variant p-xl shadow-sm"
         >
           <p class="font-label-bold text-label-bold uppercase text-on-surface-variant mb-xs">
@@ -115,23 +90,13 @@ const FORM_ENDPOINT = ""; // e.g. "https://formspree.io/f/xxxxxxxx"
             {company.hours}
           </p>
         </div>
-
-        <div class="bg-primary text-on-primary p-xl shadow-sm">
-          <p class="font-label-bold text-label-bold uppercase text-secondary-fixed mb-xs">
-            Certification
-          </p>
-          <p class="font-headline-md text-headline-md mb-xs">DBE / MBE / SBE</p>
-          <p class="font-body-sm text-body-sm opacity-80">
-            {company.certification.number}
-          </p>
         </div>
       </aside>
 
       {/* Form column */}
-      <div class="lg:col-span-8">
-        <div data-reveal>
+      <div id="contact-form" class="lg:col-span-8 scroll-mt-28">
+        <div data-depth-in>
           <div class="flex items-center gap-sm mb-md">
-            <div class="w-12 h-1 bg-primary"></div>
             <p class="font-label-bold text-label-bold text-primary uppercase tracking-widest">
               Send a Message
             </p>
@@ -141,7 +106,7 @@ const FORM_ENDPOINT = ""; // e.g. "https://formspree.io/f/xxxxxxxx"
           </h2>
         </div>
 
-        <div class="ct-form-wrap relative">
+        <div data-rise="top" class="ct-form-wrap ct-slab relative">
           <form
             class="ct-form bg-surface-container-lowest border border-outline-variant p-xl shadow-sm"
             data-form
@@ -159,7 +124,7 @@ const FORM_ENDPOINT = ""; // e.g. "https://formspree.io/f/xxxxxxxx"
             />
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-lg">
-              <label class="field block">
+              <label data-rise class="field block">
                 <span class="font-label-bold text-label-bold uppercase text-on-surface-variant mb-xs block">
                   Name *
                 </span>
@@ -175,7 +140,7 @@ const FORM_ENDPOINT = ""; // e.g. "https://formspree.io/f/xxxxxxxx"
                 </span>
               </label>
 
-              <label class="field block">
+              <label data-rise class="field block">
                 <span class="font-label-bold text-label-bold uppercase text-on-surface-variant mb-xs block">
                   Company
                 </span>
@@ -187,7 +152,7 @@ const FORM_ENDPOINT = ""; // e.g. "https://formspree.io/f/xxxxxxxx"
                 />
               </label>
 
-              <label class="field block">
+              <label data-rise class="field block">
                 <span class="font-label-bold text-label-bold uppercase text-on-surface-variant mb-xs block">
                   Email *
                 </span>
@@ -203,7 +168,7 @@ const FORM_ENDPOINT = ""; // e.g. "https://formspree.io/f/xxxxxxxx"
                 </span>
               </label>
 
-              <label class="field block">
+              <label data-rise class="field block">
                 <span class="font-label-bold text-label-bold uppercase text-on-surface-variant mb-xs block">
                   Phone
                 </span>
@@ -215,7 +180,7 @@ const FORM_ENDPOINT = ""; // e.g. "https://formspree.io/f/xxxxxxxx"
                 />
               </label>
 
-              <label class="field block sm:col-span-2">
+              <label data-rise class="field block sm:col-span-2">
                 <span class="font-label-bold text-label-bold uppercase text-on-surface-variant mb-xs block">
                   Project Type
                 </span>
@@ -229,7 +194,7 @@ const FORM_ENDPOINT = ""; // e.g. "https://formspree.io/f/xxxxxxxx"
                 </select>
               </label>
 
-              <label class="field block sm:col-span-2">
+              <label data-rise class="field block sm:col-span-2">
                 <span class="font-label-bold text-label-bold uppercase text-on-surface-variant mb-xs block">
                   Project Details *
                 </span>
@@ -250,10 +215,10 @@ const FORM_ENDPOINT = ""; // e.g. "https://formspree.io/f/xxxxxxxx"
               <button
                 data-magnetic
                 type="submit"
-                class="bg-secondary-container text-on-primary px-xl py-md font-button text-button uppercase rounded inline-flex items-center justify-center gap-sm transition-all hover:bg-secondary shadow-lg active:scale-95"
+                class="bg-secondary-container text-on-secondary-container px-xl py-md font-button text-button uppercase rounded inline-flex items-center justify-center gap-sm transition-all hover:bg-secondary shadow-lg active:scale-95"
               >
                 Send Message
-                <span class="material-symbols-outlined">arrow_forward</span>
+                <Icon name="arrow_forward" />
               </button>
               <p class="font-label-bold text-label-bold uppercase text-on-surface-variant">
                 No spam. Replies within 1 business day.
@@ -267,14 +232,12 @@ const FORM_ENDPOINT = ""; // e.g. "https://formspree.io/f/xxxxxxxx"
             data-success
             aria-live="polite"
           >
-            <span class="material-symbols-outlined text-primary mb-md" style="font-size:56px;">
-              check_circle
-            </span>
+            <Icon name="check_circle" class="text-primary mb-md" style="font-size:56px;" />
             <h3 class="font-headline-lg text-headline-lg text-primary mb-md">
               Request received.
             </h3>
             <p class="font-body-md text-on-surface-variant max-w-[32rem]">
-              Thanks — we'll be in touch shortly. Need it faster?{" "}
+              Thanks, we'll be in touch shortly. Need it faster?{" "}
               <a
                 href={company.phoneHref}
                 class="text-secondary underline decoration-secondary hover:text-secondary-container"
@@ -290,6 +253,18 @@ const FORM_ENDPOINT = ""; // e.g. "https://formspree.io/f/xxxxxxxx"
 </BaseLayout>
 
 <style>
+  /* depth, without moving the form under the visitor's cursor: fields
+     lift toward them on focus, nothing tilts while they type */
+  .ct-form-wrap :is(input, textarea, select) {
+    transition: transform 0.35s cubic-bezier(0.2, 0.7, 0, 1), box-shadow 0.35s ease, border-color 0.2s;
+  }
+  .ct-form-wrap :is(input, textarea, select):focus {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px -14px rgba(0, 102, 34, 0.55);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ct-form-wrap :is(input, textarea, select):focus { transform: none; }
+  }
   .ct-honey {
     position: absolute !important;
     left: -9999px;
@@ -303,16 +278,41 @@ const FORM_ENDPOINT = ""; // e.g. "https://formspree.io/f/xxxxxxxx"
   .field.has-error select {
     border-color: var(--color-secondary);
   }
+  /* a slab: the panel has an edge, so it reads as a solid object as it
+     stands up (data-rise) rather than a flat rectangle */
+  .ct-slab { position: relative; }
+  .ct-slab::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: #daf1e2;
+    transform: translate3d(0, 6px, -1px);
+    border: 1px solid var(--color-hairline);
+    pointer-events: none;
+  }
+  /* sending: the form turns over and the reply is on its back */
+  .ct-form-wrap { perspective: 1800px; transform-style: preserve-3d; }
+  .ct-form, .ct-success { backface-visibility: hidden; transform-style: preserve-3d; }
+  .ct-form { transition: transform 0.9s cubic-bezier(0.2, 0.7, 0, 1), opacity 0.4s ease 0.3s; }
+  .ct-success {
+    transform: rotateY(-180deg) !important;
+    transition: transform 0.9s cubic-bezier(0.2, 0.7, 0, 1), opacity 0.2s ease 0.35s !important;
+  }
   .ct-form-wrap.is-sent .ct-form {
     opacity: 0;
-    transform: translateY(-12px);
+    transform: rotateY(180deg);
     pointer-events: none;
-    transition: opacity 0.5s ease, transform 0.5s ease;
   }
   .ct-form-wrap.is-sent .ct-success {
     opacity: 1;
-    transform: none;
+    transform: rotateY(0deg) !important;
     pointer-events: auto;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ct-form, .ct-success { transition: opacity 0.3s ease !important; }
+    .ct-success { transform: none !important; }
+    .ct-form-wrap.is-sent .ct-form { transform: none; }
   }
 </style>
 
@@ -369,7 +369,7 @@ const FORM_ENDPOINT = ""; // e.g. "https://formspree.io/f/xxxxxxxx"
         wrap.classList.add("is-sent");
       } catch (err) {
         submit?.removeAttribute("disabled");
-        alert("Sorry — something went wrong. Please call +1 (410) 650-9850.");
+        alert("Sorry, something went wrong. Please call +1 (410) 650-9850.");
       }
     });
   }

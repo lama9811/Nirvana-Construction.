@@ -1,0 +1,259 @@
+---
+/* ============================================================
+   PlanExtrude — the /contact/ hero: "from the drawings".
+
+   A floor plan (drawn for the site, src/data/plan-walls.ts) lies flat
+   as a blueprint and its walls rise out of their own printed lines as the camera tilts to 3/4. It plays
+   on its own like a background video (./loop-clock.ts: rise, hold,
+   sink, hold) behind a static headline — no scroll track, so the form
+   is one short scroll away. Pauses off screen / on hidden tabs.
+   Scene: ./plan-extrude-scene.ts (dynamic import only).
+   ============================================================ */
+import { company } from "../../data/company";
+import Icon from "../Icon.astro";
+import { PLAN_WALLS, PLAN_PX } from "../../data/plan-walls";
+---
+
+<section class="pe" data-pe aria-label="Contact Nirvana Construction">
+  <a href="#contact-form" class="pe-skip">Skip to the form</a>
+  <div class="pe-track">
+    <div class="pe-sticky">
+      <div class="pe-bg" aria-hidden="true"></div>
+      {/* the same sheet as a still, for reduced motion / no WebGL */}
+      <svg class="pe-still" viewBox={`0 0 ${PLAN_PX.w} ${PLAN_PX.h}`} aria-hidden="true" preserveAspectRatio="xMidYMid slice">
+        <rect width={PLAN_PX.w} height={PLAN_PX.h} fill="#0d2616" />
+        <g stroke="#cdf0d7" stroke-linecap="square">
+          {PLAN_WALLS.map(([x1, y1, x2, y2, t]) => <line x1={x1} y1={y1} x2={x2} y2={y2} stroke-width={t} />)}
+        </g>
+      </svg>
+      <canvas class="pe-canvas" data-pe-canvas aria-hidden="true"></canvas>
+      <div class="pe-scrim" aria-hidden="true"></div>
+
+      <div class="pe-stages">
+        <div class="pe-stage pe-stage-intro" data-stage="0">
+          <p class="pe-mono pe-eyebrow"><span class="pe-dot" aria-hidden="true"></span>Contact</p>
+          <h1 class="pe-h1">
+            <span class="pe-line"><span>Start a project.</span></span>
+            <span class="pe-line pe-line-b"><span>Get a callback.</span></span>
+          </h1>
+          <p class="pe-lede">
+            Tell us about the job, its scope, schedule and location, and we'll
+            be in touch quickly. Or just call.
+          </p>
+          <div class="pe-actions">
+            <a href="#contact-form" class="btn-primary">Send a Message <Icon name="arrow_forward" /></a>
+            <a href={company.phoneHref} class="pe-phone"><Icon name="call" /> {company.phone}</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pe {
+    --hdr: 5rem;
+    --g: max(1.5rem, calc((100vw - 1280px) / 2 + 1.5rem));
+    position: relative;
+    background: #051a0c;
+    color: #fff;
+  }
+  @media (min-width: 768px) {
+    .pe { --hdr: 5.5rem; }
+  }
+  .pe:not([data-static]) { margin-top: calc(var(--hdr) * -1); }
+  .pe-track { position: relative; }
+  .pe-sticky { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+
+  .pe-skip {
+    position: absolute;
+    left: var(--g);
+    top: calc(var(--hdr) + 0.75rem);
+    z-index: 20;
+    padding: 0.6rem 1rem;
+    background: #ff6600;
+    color: #0a1f14;
+    font-family: var(--font-display);
+    font-weight: 600;
+    transform: translateY(-200%);
+    opacity: 0;
+    transition: transform 0.2s, opacity 0.2s;
+  }
+  .pe-skip:focus { transform: none; opacity: 1; }
+
+  .pe-bg { position: absolute; inset: 0; background: radial-gradient(80% 60% at 60% 50%, #0c3a1d 0%, #051a0c 70%); }
+  .pe-still { display: none; }
+  .pe-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1); }
+  .pe[data-ready] .pe-canvas { opacity: 1; }
+  .pe-scrim {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(90deg, rgba(5, 26, 12, 0.85) 0%, rgba(5, 26, 12, 0.45) 38%, transparent 60%),
+      linear-gradient(0deg, rgba(5, 26, 12, 0.55) 0%, transparent 35%);
+  }
+
+  /* phones: the copy sits over the sheet, so shade it from the bottom */
+  @media (max-width: 767px) {
+    .pe-scrim {
+      background: linear-gradient(0deg, rgba(5, 26, 12, 0.94) 0%, rgba(5, 26, 12, 0.82) 42%, rgba(5, 26, 12, 0.2) 70%, transparent 85%);
+    }
+  }
+  .pe-stages { position: absolute; inset: 0; max-width: 80rem; margin-inline: auto; pointer-events: none; }
+  .pe-stage {
+    position: absolute;
+    left: 1.5rem;
+    right: 1.5rem;
+    bottom: clamp(3.5rem, 11vh, 7rem);
+    max-width: 34rem;
+    opacity: 0;
+    visibility: hidden;
+    will-change: opacity, transform;
+  }
+  .pe-stage[data-on] { pointer-events: auto; }
+  .pe-stage-intro { opacity: 1; visibility: visible; pointer-events: auto; }
+  .pe-mono { font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255, 255, 255, 0.62); }
+  .pe-eyebrow { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1.25rem; }
+  .pe-dot { width: 0.4rem; height: 0.4rem; border-radius: 999px; background: #ff6600; box-shadow: 0 0 12px 2px rgba(255, 102, 0, 0.55); }
+  .pe-h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(2.5rem, 5.8vw, 5.25rem); line-height: 0.95; letter-spacing: -0.045em; margin: 0 0 1.4rem; }
+  .pe-h2 { font-family: var(--font-display); font-weight: 700; font-size: clamp(2.2rem, 5vw, 4.5rem); line-height: 0.95; letter-spacing: -0.045em; margin: 0.9rem 0 1.2rem; }
+  .pe-line-b { color: rgba(255, 255, 255, 0.6); }
+  .pe-lede { font-family: var(--font-body); color: rgba(255, 255, 255, 0.8); max-width: 32rem; line-height: 1.6; margin-bottom: 1.75rem; }
+  .pe-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.5rem; }
+  .pe-phone { display: inline-flex; align-items: center; gap: 0.5rem; color: rgba(255, 255, 255, 0.85); }
+  .pe-phone:hover { color: #ff6600; }
+
+  .pe-line { display: block; overflow: hidden; padding-bottom: 0.06em; }
+  .pe-line > span { display: block; transform: translateY(105%); transition: transform 0.8s cubic-bezier(0.2, 0.7, 0, 1); }
+  .pe-line:nth-child(2) > span { transition-delay: 0.07s; }
+  [data-on] .pe-line > span,
+  .pe-stage-intro .pe-line > span { transform: none; }
+
+
+  /* ---- static: reduced motion / no WebGL — the copy over the flat plan ---- */
+  .pe[data-static] .pe-track { height: auto; }
+  .pe[data-static] .pe-sticky { position: relative; height: auto; min-height: min(80svh, 44rem); display: flex; align-items: flex-end; }
+  .pe[data-static] .pe-stages { position: relative; inset: auto; width: 100%; padding: 6rem 0 3.5rem; pointer-events: auto; }
+  .pe[data-static] .pe-stage { position: relative; left: auto; right: auto; bottom: auto; opacity: 1; visibility: visible; margin: 0 1.5rem; }
+  .pe[data-static] .pe-line > span { transform: none; }
+  .pe[data-static][data-nogl] .pe-still { display: block; position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.55; }
+  @media (prefers-reduced-motion: reduce) {
+    .pe-line > span { transform: none; transition: none; }
+  }
+</style>
+
+<script>
+  import { pingPong, type Loop } from "./loop-clock";
+  import type { PlanHandle } from "./plan-extrude-scene";
+
+  /* walls rise 7 s → hold the model 3.5 s → sink back 5 s → rest 2 s */
+  const LOOP: Loop = { from: 0, to: 1, up: 7, holdHi: 3.5, down: 5, holdLo: 2 };
+  type Root = HTMLElement & { __peCleanup?: () => void };
+
+  function webglAvailable() {
+    try {
+      const c = document.createElement("canvas");
+      const gl = c.getContext("webgl2") || c.getContext("webgl");
+      gl?.getExtension("WEBGL_lose_context")?.loseContext();
+      return !!gl;
+    } catch {
+      return false;
+    }
+  }
+
+  function initPlan() {
+    document.querySelectorAll<Root>("[data-pe]").forEach((root) => {
+      root.__peCleanup?.();
+      const sticky = root.querySelector<HTMLElement>(".pe-sticky")!;
+      const canvas = root.querySelector<HTMLCanvasElement>("[data-pe-canvas]")!;
+
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (!webglAvailable()) {
+        root.setAttribute("data-nogl", "");
+        root.setAttribute("data-static", "");
+        return;
+      }
+      if (reduced) root.setAttribute("data-static", "");
+
+      /* the clock only runs while the hero is on screen and the tab is visible */
+      let playT = 0;
+      let lastNow = performance.now();
+      let visible = true;
+      let raf = 0;
+      let ctl: PlanHandle | null = null;
+      let disposed = false;
+      const target = () => pingPong(playT, LOOP);
+      const frame = (now: number) => {
+        raf = 0;
+        if (disposed || !visible || document.hidden) return;
+        playT += Math.min(0.1, (now - lastNow) / 1000);
+        lastNow = now;
+        ctl?.kick();
+        raf = requestAnimationFrame(frame);
+      };
+      const play = () => {
+        if (raf || disposed || reduced || !visible || document.hidden) return;
+        lastNow = performance.now();
+        raf = requestAnimationFrame(frame);
+      };
+      const io = new IntersectionObserver((e) => {
+        visible = e.some((x) => x.isIntersecting);
+        play();
+      });
+      io.observe(root);
+      const onVis = () => play();
+      document.addEventListener("visibilitychange", onVis);
+      const onResize = () => ctl?.resize();
+      window.addEventListener("resize", onResize);
+
+      const goStatic = () => {
+        root.setAttribute("data-nogl", "");
+        root.setAttribute("data-static", "");
+        if (raf) cancelAnimationFrame(raf);
+        raf = 0;
+        io.disconnect();
+      };
+
+      const lite = window.matchMedia("(max-width: 767px), (pointer: coarse)").matches;
+      import("./plan-extrude-scene")
+        .then(({ createPlan }) =>
+          createPlan({
+            canvas,
+            host: sticky,
+            lite,
+            getTarget: target,
+            onFrame: () => {},
+            still: reduced ? 1 : undefined,
+          }),
+        )
+        .then((c) => {
+          if (disposed) return c?.dispose();
+          if (!c) return goStatic();
+          ctl = c;
+          if (import.meta.env.DEV) (window as unknown as { __nvPlan?: PlanHandle }).__nvPlan = c;
+          root.setAttribute("data-ready", "");
+          play();
+        })
+        .catch(goStatic);
+
+      root.__peCleanup = () => {
+        disposed = true;
+        if (raf) cancelAnimationFrame(raf);
+        io.disconnect();
+        document.removeEventListener("visibilitychange", onVis);
+        window.removeEventListener("resize", onResize);
+        ctl?.dispose();
+        ctl = null;
+        root.removeAttribute("data-ready");
+        delete root.__peCleanup;
+      };
+    });
+  }
+
+  document.addEventListener("astro:page-load", initPlan);
+  document.addEventListener("astro:before-swap", () => {
+    document.querySelectorAll<Root>("[data-pe]").forEach((r) => r.__peCleanup?.());
+  });
+</script>

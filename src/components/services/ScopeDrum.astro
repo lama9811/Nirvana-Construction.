@@ -1,0 +1,150 @@
+---
+/* ============================================================
+   ScopeDrum — "Every wall in the building": the full scope list
+   set large and rolled on a 3D drum. As you scroll, each line
+   turns flat and lights as it crosses the middle of the screen,
+   and the lines above and below curve away from you. The heading
+   holds still beside it on desktop.
+
+   Pose maths: src/lib/drum.ts (unit tested). With no JS or with
+   reduced motion it is a plain, fully legible list.
+   ============================================================ */
+import { scopeOfWork } from "../../data/services";
+---
+
+<section id="scope" class="sc" data-sc>
+  <div class="sc-side">
+    <h2 class="font-headline-lg text-headline-lg uppercase tracking-tight text-primary mb-lg">
+      Every Wall In The Building
+    </h2>
+    <p data-reveal class="font-body-lg text-body-lg text-on-surface-variant max-w-[26rem]">
+      We carry the whole interior package, so one crew answers for every
+      layer from the first stud to the last coat of paint.
+    </p>
+  </div>
+
+  <ul class="sc-drum" data-sc-drum>
+    {
+      scopeOfWork.map((item) => (
+        <li class="sc-row" data-sc-row>
+          <span class="sc-mark" aria-hidden="true" />
+          <span class="sc-text">{item}</span>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .sc {
+    display: grid;
+    gap: 2.5rem;
+    align-items: start;
+  }
+  @media (min-width: 1024px) {
+    .sc { grid-template-columns: 5fr 7fr; gap: 4rem; }
+    .sc-side { position: sticky; top: 40vh; }
+  }
+  .sc-drum {
+    perspective: 900px;
+    perspective-origin: 50% 50%;
+    padding-block: 1rem;
+  }
+  .sc-row {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding-block: clamp(0.6rem, 1.4vw, 1rem);
+    border-bottom: 1px solid var(--color-hairline);
+    transform-origin: 0 50%;
+    will-change: transform, opacity;
+  }
+  .sc-text {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.6rem, 3.6vw, 3.1rem);
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    color: var(--color-primary);
+    transition: color 0.35s;
+  }
+  .sc-mark {
+    flex: none;
+    width: 0.7rem;
+    height: 0.7rem;
+    background: #ff6600;
+    transition: transform 0.45s cubic-bezier(0.3, 1.6, 0.5, 1), background 0.35s;
+  }
+
+  /* live: the drum. Rows are muted until they cross the centre line */
+  .sc[data-live] .sc-row { border-bottom-color: transparent; }
+  .sc[data-live] .sc-text { color: #7e9486; }
+  .sc[data-live] .sc-mark { background: var(--color-hairline); transform: scale(0.6); }
+  .sc[data-live] .sc-row[data-on] .sc-text { color: var(--color-primary); }
+  .sc[data-live] .sc-row[data-on] .sc-mark { background: #ff6600; transform: scale(1) rotate(45deg); }
+</style>
+
+<script>
+  import { drumPose } from "../../lib/drum";
+
+  type Root = HTMLElement & { __scCleanup?: () => void };
+
+  function initScopeDrum() {
+    document.querySelectorAll<Root>("[data-sc]").forEach((root) => {
+      root.__scCleanup?.();
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      const rows = [...root.querySelectorAll<HTMLElement>("[data-sc-row]")];
+      root.setAttribute("data-live", "");
+
+      let raf = 0;
+      let inView = false;
+      let lit = -1;
+      const paint = () => {
+        raf = 0;
+        const half = window.innerHeight / 2;
+        let best = -1;
+        let bestD = Infinity;
+        rows.forEach((row, i) => {
+          const r = row.getBoundingClientRect();
+          const d = (r.top + r.height / 2 - half) / half;
+          const k = drumPose(d);
+          row.style.transform = `rotateX(${k.rx.toFixed(2)}deg) scale(${k.scale.toFixed(3)})`;
+          row.style.opacity = k.opacity.toFixed(3);
+          if (Math.abs(d) < bestD) {
+            bestD = Math.abs(d);
+            best = i;
+          }
+        });
+        if (best !== lit) {
+          if (lit >= 0) rows[lit].removeAttribute("data-on");
+          rows[best].setAttribute("data-on", "");
+          lit = best;
+        }
+      };
+      const kick = () => {
+        if (inView && !raf) raf = requestAnimationFrame(paint);
+      };
+      const io = new IntersectionObserver((e) => {
+        inView = e.some((x) => x.isIntersecting);
+        kick();
+      });
+      io.observe(root);
+      window.addEventListener("scroll", kick, { passive: true });
+      window.addEventListener("resize", kick);
+      paint();
+
+      root.__scCleanup = () => {
+        if (raf) cancelAnimationFrame(raf);
+        io.disconnect();
+        window.removeEventListener("scroll", kick);
+        window.removeEventListener("resize", kick);
+        delete root.__scCleanup;
+      };
+    });
+  }
+
+  document.addEventListener("astro:page-load", initScopeDrum);
+  document.addEventListener("astro:before-swap", () => {
+    document.querySelectorAll<Root>("[data-sc]").forEach((r) => r.__scCleanup?.());
+  });
+</script>

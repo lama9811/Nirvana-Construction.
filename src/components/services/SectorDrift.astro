@@ -1,0 +1,190 @@
+---
+/* ============================================================
+   SectorDrift — the six sectors as two rows of cards drifting in
+   opposite directions across a plane tilted into 3D. The plane
+   leans back as it enters and settles as you scroll through it
+   (CSS scroll-driven animation where supported, a fixed lean
+   elsewhere). Hovering or focusing a row stops it; the card under
+   the pointer lifts toward you.
+
+   Each row renders its cards once for real and repeats them
+   aria-hidden, so a screen reader hears each sector once.
+   Reduced motion: no drift, no copies, a plain flat grid.
+   ============================================================ */
+import { services } from "../../data/services";
+import Icon from "../Icon.astro";
+
+const icons: Record<string, string> = {
+  retail: "apartment",
+  hospitality: "groups",
+  medical: "shield",
+  education: "public",
+  office: "architecture",
+  renovation: "construction",
+};
+const rows = [
+  { items: services.slice(0, 3), dir: "left", tone: "dark" },
+  { items: services.slice(3), dir: "right", tone: "light" },
+];
+/* each half of the track must be wider than the widest screen */
+const COPIES = 4;
+---
+
+<section id="sectors" class="sd">
+  <h2 class="font-headline-lg text-headline-lg uppercase tracking-tight text-primary mb-lg">
+    Sectors We Frame
+  </h2>
+  <p data-reveal class="font-body-lg text-body-lg text-on-surface-variant mb-xl max-w-[36rem]">
+    We build inside every kind of commercial space, and each one asks for
+    something different from the wall.
+  </p>
+
+  <div class="sd-viewport">
+    <div class="sd-plane">
+      {
+        rows.map((row) => (
+          <div class:list={["sd-row", `sd-${row.dir}`, `sd-${row.tone}`]}>
+            <ul class="sd-track">
+              {Array.from({ length: COPIES }, (_, copy) =>
+                row.items.map((s) => (
+                  <li class="sd-card" aria-hidden={copy > 0 ? "true" : undefined} data-copy={copy > 0 ? "" : undefined}>
+                    <article class="sd-face">
+                      <span class="sd-icon">
+                        <Icon name={icons[s.slug] ?? "apartment"} strokeWidth={1.5} />
+                      </span>
+                      <h3 class="sd-title">{s.title}</h3>
+                      <p class="sd-detail">{s.detail}</p>
+                    </article>
+                  </li>
+                )),
+              )}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .sd-viewport {
+    /* full bleed, so the rows run edge to edge of the screen */
+    margin-inline: calc(50% - 50vw);
+    overflow-x: clip;
+    perspective: 1600px;
+    perspective-origin: 50% 30%;
+    padding-block: 1.5rem 3rem;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+  }
+  .sd-plane {
+    display: grid;
+    gap: 1.5rem;
+    transform-style: preserve-3d;
+    transform: rotateX(14deg) rotateZ(-3deg) scale(1.02);
+    transform-origin: 50% 0;
+  }
+  @supports (animation-timeline: view()) {
+    .sd-plane {
+      animation: sd-settle linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 55%;
+    }
+  }
+  @keyframes sd-settle {
+    from { transform: rotateX(34deg) rotateZ(-7deg) translateY(4rem) scale(0.94); }
+    to   { transform: rotateX(10deg) rotateZ(-2deg) translateY(0) scale(1.02); }
+  }
+
+  .sd-row { overflow: visible; transform-style: preserve-3d; }
+  .sd-track {
+    display: flex;
+    gap: 1.5rem;
+    width: max-content;
+    transform-style: preserve-3d;
+    animation: sd-drift 60s linear infinite;
+  }
+  .sd-right .sd-track { animation-direction: reverse; animation-duration: 66s; }
+  .sd-row:hover .sd-track,
+  .sd-row:focus-within .sd-track { animation-play-state: paused; }
+  /* half the track = two of the four copies */
+  @keyframes sd-drift {
+    from { transform: translate3d(0, 0, 0); }
+    to   { transform: translate3d(-50%, 0, 0); }
+  }
+
+  .sd-card { width: clamp(17rem, 30vw, 23rem); flex: none; transform-style: preserve-3d; }
+  .sd-face {
+    position: relative;
+    height: 100%;
+    padding: 1.75rem;
+    border: 1px solid var(--color-hairline);
+    background: #fff;
+    transition: transform 0.5s cubic-bezier(0.2, 0.7, 0, 1), box-shadow 0.5s;
+    box-shadow: 0 20px 40px -28px rgba(5, 41, 17, 0.35);
+  }
+  .sd-face::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: #ff6600;
+  }
+  .sd-card:hover .sd-face {
+    transform: translateZ(40px) translateY(-6px);
+    box-shadow: 0 40px 70px -30px rgba(5, 41, 17, 0.55);
+  }
+  .sd-dark .sd-face { background: #052911; border-color: #0c3a1d; }
+  .sd-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-bottom: 1.25rem;
+    font-size: 1.4rem;
+    color: #ff6600;
+    border: 1px solid rgba(255, 102, 0, 0.35);
+  }
+  .sd-light .sd-icon { color: var(--color-secondary); background: #fff4ec; border-color: #ffd9bf; }
+  .sd-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.375rem;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    color: var(--color-primary);
+    margin-bottom: 0.6rem;
+  }
+  .sd-detail { font-size: 0.9375rem; line-height: 1.6; color: var(--color-on-surface-variant); }
+  .sd-dark .sd-title { color: #fff; }
+  .sd-dark .sd-detail { color: rgba(255, 255, 255, 0.75); }
+
+  @media (max-width: 767px) {
+    .sd-card { width: 78vw; }
+    .sd-plane { transform: rotateX(8deg) rotateZ(-2deg); }
+    @keyframes sd-settle {
+      from { transform: rotateX(24deg) rotateZ(-4deg) translateY(3rem) scale(0.95); }
+      to   { transform: rotateX(6deg) rotateZ(-1deg) translateY(0) scale(1); }
+    }
+    .sd-track { animation-duration: 42s; }
+    .sd-right .sd-track { animation-duration: 46s; }
+  }
+
+  /* reduced motion: a flat, still grid of the six real cards */
+  @media (prefers-reduced-motion: reduce) {
+    .sd-viewport { margin-inline: 0; -webkit-mask-image: none; mask-image: none; perspective: none; padding: 0; }
+    .sd-plane { transform: none !important; animation: none !important; }
+    .sd-track {
+      animation-name: none !important;
+      transform: none !important;
+      width: auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    }
+    .sd-card { width: auto; }
+    .sd-card[data-copy] { display: none; }
+    .sd-card:hover .sd-face { transform: none; }
+  }
+</style>

@@ -1,0 +1,145 @@
+---
+/* ============================================================
+   Icon — inline SVG replacements for the 17 Material Symbols
+   glyphs the site used.
+
+   Drop-in for the old icon font: the svg is sized in `em` and
+   painted with `currentColor`, so every existing size utility
+   (text-base, text-[400px], style="font-size:120px") and colour
+   utility keeps working exactly as before.
+
+   Removing the Material Symbols variable font drops a ~200KB
+   render-blocking request that existed to serve 17 glyphs.
+   ============================================================ */
+
+interface Props {
+  name: string;
+  /* accessible name — when omitted the icon is decorative */
+  label?: string;
+  /* stroke weight; large decorative icons look better lighter */
+  strokeWidth?: number;
+  class?: string;
+}
+
+const { name, label, strokeWidth = 1.75, class: className = "" } = Astro.props;
+
+/* Every path is drawn on a 24x24 grid, stroke-only, so the icons
+   share one optical weight with the hairline rules used site-wide. */
+const ICONS: Record<string, string> = {
+  mail: `
+    <rect x="2.6" y="5" width="18.8" height="14" rx="1.6"/>
+    <path d="M3.2 6.4 12 13l8.8-6.6"/>`,
+
+  call: `
+    <path d="M4.5 5.2C4.5 4 5.5 3 6.7 3h1.9l2 4.5-2.2 1.5c1 2.2 2.9 4.1 5.1 5.1l1.5-2.2 4.5 2v1.9c0 1.2-1 2.2-2.2 2.2C10.9 18 4.5 11.6 4.5 5.2Z"/>`,
+
+  location_on: `
+    <path d="M12 21.4s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/>
+    <circle cx="12" cy="10.4" r="2.5"/>`,
+
+  arrow_forward: `
+    <path d="M4 12h15.5"/>
+    <path d="M13.5 6 19.5 12l-6 6"/>`,
+
+  chevron_right: `
+    <path d="M9.5 5.5 16 12l-6.5 6.5"/>`,
+
+  /* drafting compass — reads as "architecture" without a building */
+  architecture: `
+    <circle cx="12" cy="4.6" r="1.7"/>
+    <path d="M12 6.3v1.4"/>
+    <path d="M11.2 7.7 6.6 20"/>
+    <path d="M12.8 7.7 17.4 20"/>
+    <path d="M9 16h6"/>`,
+
+  schedule: `
+    <circle cx="12" cy="12" r="8.6"/>
+    <path d="M12 7.2v5.2l3.6 2.1"/>`,
+
+  public: `
+    <circle cx="12" cy="12" r="8.6"/>
+    <path d="M3.4 12h17.2"/>
+    <path d="M12 3.4c2.6 2.4 4.1 5.3 4.1 8.6s-1.5 6.2-4.1 8.6c-2.6-2.4-4.1-5.3-4.1-8.6S9.4 5.8 12 3.4Z"/>`,
+
+  /* hard hat */
+  engineering: `
+    <path d="M3.6 17.4h16.8"/>
+    <path d="M6.4 17.4v-3.1a5.6 5.6 0 0 1 11.2 0v3.1"/>
+    <path d="M9.9 9.2V6.6h4.2v2.6"/>`,
+
+  check_circle: `
+    <circle cx="12" cy="12" r="8.6"/>
+    <path d="M8 12.3l2.8 2.8 5.2-5.4"/>`,
+
+  /* medal — distinct from check_circle */
+  verified: `
+    <circle cx="12" cy="9.6" r="6.2"/>
+    <path d="M9.4 9.8l2 2 3.5-3.6"/>
+    <path d="M8.7 15.3 7 21.4l5-2.2 5 2.2-1.7-6.1"/>`,
+
+  groups: `
+    <circle cx="9.2" cy="9.4" r="3"/>
+    <path d="M3.6 19c0-3 2.5-5.1 5.6-5.1s5.6 2.1 5.6 5.1"/>
+    <circle cx="17" cy="10.4" r="2.2"/>
+    <path d="M15.6 14.3c2.9-.5 5 1.5 5 4.7"/>`,
+
+  shield: `
+    <path d="M12 3.2l7 2.8v5.4c0 4.3-3 8-7 9.7-4-1.7-7-5.4-7-9.7V6Z"/>`,
+
+  apartment: `
+    <rect x="5" y="3.5" width="14" height="17" rx="1.2"/>
+    <path d="M9 7.6h2M13 7.6h2M9 11.6h2M13 11.6h2M9 15.6h2M13 15.6h2"/>
+    <path d="M10.4 20.5v-2.6h3.2v2.6"/>`,
+
+  /* barricade — unambiguous "construction" */
+  construction: `
+    <rect x="3.6" y="8.6" width="16.8" height="6.8" rx="0.8"/>
+    <path d="M7.2 8.6v6.8M10.8 8.6v6.8M14.4 8.6v6.8M18 8.6v6.8"/>
+    <path d="M5.2 15.4v4M18.8 15.4v4"/>`,
+
+  /* paint roller */
+  format_paint: `
+    <rect x="3.6" y="4" width="12" height="5" rx="1"/>
+    <path d="M15.6 6.5h3.4a1.4 1.4 0 0 1 1.4 1.4v1.8a1.4 1.4 0 0 1-1.4 1.4h-6.5v2.4"/>
+    <rect x="10.5" y="14.8" width="4" height="5.7" rx="1"/>`,
+
+  grid_view: `
+    <rect x="3.8" y="3.8" width="6.6" height="6.6" rx="1.1"/>
+    <rect x="13.6" y="3.8" width="6.6" height="6.6" rx="1.1"/>
+    <rect x="3.8" y="13.6" width="6.6" height="6.6" rx="1.1"/>
+    <rect x="13.6" y="13.6" width="6.6" height="6.6" rx="1.1"/>`,
+};
+
+const body = ICONS[name];
+if (import.meta.env.DEV && !body) {
+  console.warn(`[Icon] unknown icon "${name}" — nothing will render.`);
+}
+---
+
+{
+  body && (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width={strokeWidth}
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class={`nv-icon ${className}`}
+      role={label ? "img" : undefined}
+      aria-label={label}
+      aria-hidden={label ? undefined : "true"}
+      set:html={body}
+    />
+  )
+}
+
+<style>
+  .nv-icon {
+    width: 1em;
+    height: 1em;
+    display: inline-block;
+    flex: none;
+    vertical-align: -0.125em;
+  }
+</style>

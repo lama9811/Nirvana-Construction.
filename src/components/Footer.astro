@@ -2,6 +2,8 @@
 /* Footer.astro — Stitch-style 4-column footer with brand block, services,
    quick links, and contact. */
 import { company } from "../data/company";
+import { trades } from "../data/services";
+import Icon from "./Icon.astro";
 ---
 
 <footer class="bg-on-background border-t-4 border-secondary">
@@ -18,24 +20,20 @@ import { company } from "../data/company";
           loading="lazy"
         />
       </picture>
-      <p class="font-body-sm text-body-sm text-surface-variant mb-lg max-w-[28rem]">
-        Commercial drywall and metal-stud framing across the Greater Baltimore
-        region.
-      </p>
       <div class="flex gap-md">
         <a
           href={company.phoneHref}
           class="text-surface hover:text-secondary-fixed transition-colors"
           aria-label="Call"
         >
-          <span class="material-symbols-outlined">call</span>
+          <Icon name="call" />
         </a>
         <a
           href={company.emailHref}
           class="text-surface hover:text-secondary-fixed transition-colors"
           aria-label="Email"
         >
-          <span class="material-symbols-outlined">mail</span>
+          <Icon name="mail" />
         </a>
         <a
           href={company.social.facebook}
@@ -44,7 +42,7 @@ import { company } from "../data/company";
           target="_blank"
           rel="noopener"
         >
-          <span class="material-symbols-outlined">public</span>
+          <Icon name="public" />
         </a>
       </div>
     </div>
@@ -52,38 +50,18 @@ import { company } from "../data/company";
     <div>
       <h4 class="font-label-bold text-label-bold uppercase text-surface mb-md">Our Services</h4>
       <ul class="space-y-sm">
-        <li>
-          <a
-            href="/services/"
-            class="font-body-sm text-body-sm text-surface-variant hover:text-secondary-fixed transition-colors"
-          >
-            Metal-Stud Framing
-          </a>
-        </li>
-        <li>
-          <a
-            href="/services/"
-            class="font-body-sm text-body-sm text-surface-variant hover:text-secondary-fixed transition-colors"
-          >
-            Drywall Hang &amp; Finish
-          </a>
-        </li>
-        <li>
-          <a
-            href="/services/"
-            class="font-body-sm text-body-sm text-surface-variant hover:text-secondary-fixed transition-colors"
-          >
-            Acoustical Ceilings
-          </a>
-        </li>
-        <li>
-          <a
-            href="/services/"
-            class="font-body-sm text-body-sm text-surface-variant hover:text-secondary-fixed transition-colors"
-          >
-            Insulation &amp; Soundproofing
-          </a>
-        </li>
+        {
+          trades.map((t) => (
+            <li>
+              <a
+                href="/services/"
+                class="font-body-sm text-body-sm text-surface-variant hover:text-secondary-fixed transition-colors"
+              >
+                {t.title}
+              </a>
+            </li>
+          ))
+        }
       </ul>
     </div>
 
@@ -155,7 +133,7 @@ import { company } from "../data/company";
 
   <div class="border-t border-outline/20">
     <div class="max-w-container-max mx-auto py-lg px-lg text-center font-body-sm text-body-sm text-surface-variant/60">
-      © {new Date().getFullYear()} {company.legalName}. Built to the line.
+      © {new Date().getFullYear()} {company.legalName} {company.tagline}
     </div>
   </div>
 </footer>

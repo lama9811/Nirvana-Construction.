@@ -1,0 +1,109 @@
+---
+/* PARKED 2026-09-27 — "Commercial Sectors We Frame" bento cards,
+   removed from the homepage at the user's request ("remove this part
+   for now"). Not rendered anywhere. To restore: import this component
+   in src/pages/index.astro and place <SectorCards /> after the GC
+   marquee block, before "The Nirvana Difference". */
+import Icon from "../Icon.astro";
+---
+
+  {/* ============ Sector cards ============ */}
+  <section class="py-xxl bg-surface-container-low">
+    <div class="max-w-container-max mx-auto px-lg">
+      <div class="text-center mb-xxl">
+        <h2 class="font-headline-lg text-headline-lg text-primary mb-sm">
+          Commercial Sectors We Frame
+        </h2>
+        <div class="w-16 h-1 bg-secondary mx-auto"></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+        {/* Retail */}
+        <div data-reveal data-tilt class="bg-white border border-outline-variant p-lg flex flex-col group hover:shadow-2xl transition-shadow duration-300">
+          <div class="w-full h-64 mb-lg overflow-hidden relative">
+            <img
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              src="/images/projects/golf-galaxy.webp"
+              srcset="/images/projects/golf-galaxy-800.webp 800w, /images/projects/golf-galaxy.webp 1600w"
+              sizes="(min-width: 768px) 33vw, 100vw"
+              alt="Golf Galaxy retail fit-out in Towson, MD."
+              loading="lazy"
+            />
+          </div>
+          <h3 class="font-headline-md text-headline-md text-primary mb-md">
+            Retail &amp; Restaurant
+          </h3>
+          <p class="font-body-md text-on-surface-variant mb-lg flex-grow">
+            We frame and finish storefronts, big-box fit-outs, and
+            quick-service restaurants on tight schedules so the doors open on
+            the date that was promised.
+          </p>
+          <a
+            href="/services/"
+            class="text-secondary font-label-bold text-label-bold uppercase inline-flex items-center gap-xs hover:gap-sm transition-all"
+          >
+            Learn More <Icon name="chevron_right" />
+          </a>
+        </div>
+
+        {/* Medical */}
+        <div class="reveal bg-white border border-outline-variant p-lg flex flex-col group hover:shadow-xl transition-all duration-300 relative">
+          <div class="absolute top-0 right-0 w-12 h-12 bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold">
+            ★
+          </div>
+          <div class="w-full h-64 mb-lg overflow-hidden relative">
+            <img
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              src="/images/projects/mace-medical.webp"
+              srcset="/images/projects/mace-medical-800.webp 800w, /images/projects/mace-medical.webp 1600w"
+              sizes="(min-width: 768px) 33vw, 100vw"
+              alt="MACE Medical healthcare facility in Dundalk, MD."
+              loading="lazy"
+            />
+          </div>
+          <h3 class="font-headline-md text-headline-md text-primary mb-md">
+            Medical &amp; Healthcare
+          </h3>
+          <p class="font-body-md text-on-surface-variant mb-lg flex-grow">
+            We deliver infection-control framing and lead-lined assemblies
+            for clinics, dialysis centers, and medical offices that pass
+            healthcare inspection the first time.
+          </p>
+          <a
+            href="/services/"
+            class="text-secondary font-label-bold text-label-bold uppercase inline-flex items-center gap-xs hover:gap-sm transition-all"
+          >
+            Learn More <Icon name="chevron_right" />
+          </a>
+        </div>
+
+        {/* Education / Community */}
+        <div data-reveal data-tilt class="bg-white border border-outline-variant p-lg flex flex-col group hover:shadow-2xl transition-shadow duration-300">
+          <div class="w-full h-64 mb-lg overflow-hidden relative">
+            <img
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              src="/images/projects/hcps-forest-hill.webp"
+              srcset="/images/projects/hcps-forest-hill-800.webp 800w, /images/projects/hcps-forest-hill.webp 1600w"
+              sizes="(min-width: 768px) 33vw, 100vw"
+              alt="HCPS Forest Hill Annex in Forest Hill, MD."
+              loading="lazy"
+            />
+          </div>
+          <h3 class="font-headline-md text-headline-md text-primary mb-md">
+            Education &amp; Community
+          </h3>
+          <p class="font-body-md text-on-surface-variant mb-lg flex-grow">
+            We build metal-stud framing and drywall for schools and community
+            facilities with durable, fire-rated assemblies engineered to hold
+            up under decades of daily use.
+          </p>
+          <a
+            href="/services/"
+            class="text-secondary font-label-bold text-label-bold uppercase inline-flex items-center gap-xs hover:gap-sm transition-all"
+          >
+            Learn More <Icon name="chevron_right" />
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+

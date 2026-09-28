@@ -1,0 +1,278 @@
+---
+/* ============================================================
+   HeroCanvas — a scroll-scrubbed photographic hero.
+
+   This is the mechanism eladiodieste.com uses, reproduced from
+   observation rather than guessed at: a single 2D canvas at device
+   pixel ratio, painted as a deterministic function of scroll
+   position. It does not animate on its own — idle costs nothing —
+   and scrolling back to the top returns the same pixels.
+
+   What it does here: crossfades a sequence of real project
+   photographs while slowly dollying each one, so the hero reads as
+   one continuous camera move from daylight through dusk to night.
+
+   Progressive enhancement, in this order:
+     1. a normal <picture> renders and is the LCP element
+     2. if canvas + motion are available, the canvas paints over it
+     3. under prefers-reduced-motion, or with no 2D context, the
+        canvas never initialises and the <picture> simply stays
+
+   Nothing here depends on three.js, GSAP or Lenis.
+   ============================================================ */
+
+import { srcsetFor, srcFor, dimensions } from "../lib/images";
+
+interface Props {
+  /* image manifest slugs, painted in order as the hero scrolls */
+  slugs: string[];
+  /* alt text for the first (fallback) photograph */
+  alt: string;
+  class?: string;
+}
+
+const { slugs, alt, class: className = "" } = Astro.props;
+
+const first = slugs[0];
+const dims = dimensions(first);
+
+/* The canvas needs one concrete URL per frame. 1600px is the widest
+   variant every hero photograph actually has, so it is the honest
+   common denominator — see src/data/image-manifest.json. */
+const frameUrls = slugs.map((s) => {
+  const e = dimensions(s);
+  return { slug: s, url: `/images/projects/${s}-1600.webp`, fallback: srcFor(s), w: e?.width ?? 0 };
+});
+
+/* Only advertise a frame URL that exists at 1600; otherwise use the
+   slug's own default file, which the manifest guarantees is present. */
+import manifest from "../data/image-manifest.json";
+const m = manifest as Record<string, { webp: number[] }>;
+const urls = frameUrls.map((f) =>
+  m[f.slug]?.webp?.includes(1600) ? f.url : f.fallback,
+);
+---
+
+<div class={`hero-canvas-wrap ${className}`} data-hero-canvas data-frames={JSON.stringify(urls)}>
+  {/* Layer 1 — the real image. LCP element, and the permanent fallback. */}
+  <picture>
+    <source type="image/avif" srcset={srcsetFor(first, "avif")} sizes="100vw" />
+    <img
+      class="hero-canvas-still"
+      src={srcFor(first)}
+      srcset={srcsetFor(first, "webp")}
+      sizes="100vw"
+      alt={alt}
+      width={dims?.width}
+      height={dims?.height}
+      fetchpriority="high"
+      decoding="async"
+    />
+  </picture>
+
+  {/* Layer 2 — painted only once the frames have loaded. */}
+  <canvas class="hero-canvas-el" aria-hidden="true"></canvas>
+</div>
+
+<style>
+  .hero-canvas-wrap {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+  .hero-canvas-still,
+  .hero-canvas-el {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    /* Pull the photography back so the giant type is the subject and the
+       tenant's own signage recedes — the reference hero is far moodier
+       than a straight daylight photograph. */
+    filter: saturate(0.78) contrast(1.06) brightness(0.86);
+  }
+  .hero-canvas-el {
+    opacity: 0;
+    transition: opacity 0.6s ease-out;
+  }
+  /* once painting starts the canvas takes over from the still */
+  .hero-canvas-wrap[data-ready] .hero-canvas-el {
+    opacity: 1;
+  }
+</style>
+
+<script>
+  type Wrap = HTMLElement & { __heroCleanup?: () => void };
+
+  function initHeroCanvas() {
+    const wraps = document.querySelectorAll<Wrap>("[data-hero-canvas]");
+
+    wraps.forEach((wrap) => {
+      /* tear down any instance left by a previous page render */
+      wrap.__heroCleanup?.();
+
+      const canvas = wrap.querySelector<HTMLCanvasElement>(".hero-canvas-el");
+      if (!canvas) return;
+
+      /* Respect reduced motion: leave the <picture> in place untouched. */
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+      if (reduced.matches) return;
+
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return; // no 2D context — the still image stays
+
+      let frames: string[] = [];
+      try {
+        frames = JSON.parse(wrap.dataset.frames || "[]");
+      } catch {
+        return;
+      }
+      if (frames.length === 0) return;
+
+      const images: HTMLImageElement[] = [];
+      let loaded = 0;
+      let running = false;
+      let lastProgress = -1;
+      let cssW = 0;
+      let cssH = 0;
+      let rafId = 0;
+
+      const dpr = () => Math.min(window.devicePixelRatio || 1, 2);
+
+      function resize() {
+        const r = wrap.getBoundingClientRect();
+        cssW = r.width;
+        cssH = r.height;
+        const ratio = dpr();
+        canvas.width = Math.max(1, Math.round(cssW * ratio));
+        canvas.height = Math.max(1, Math.round(cssH * ratio));
+        lastProgress = -1; // force a repaint at the new size
+        schedule();
+      }
+
+      /* cover-fit an image into the canvas, with a zoom factor */
+      function drawCover(img: HTMLImageElement, zoom: number, driftY: number, alpha: number) {
+        if (!img.naturalWidth) return;
+        const ratio = dpr();
+        const cw = cssW * ratio;
+        const ch = cssH * ratio;
+        const scale = Math.max(cw / img.naturalWidth, ch / img.naturalHeight) * zoom;
+        const dw = img.naturalWidth * scale;
+        const dh = img.naturalHeight * scale;
+        const dx = (cw - dw) / 2;
+        const dy = (ch - dh) / 2 + driftY * ratio;
+        ctx!.globalAlpha = alpha;
+        ctx!.drawImage(img, dx, dy, dw, dh);
+        ctx!.globalAlpha = 1;
+      }
+
+      function paint(progress: number) {
+        const ratio = dpr();
+        ctx!.clearRect(0, 0, cssW * ratio, cssH * ratio);
+
+        /* map scroll progress across the frame sequence */
+        const span = frames.length - 1;
+        const pos = progress * span;
+        const i0 = Math.min(Math.floor(pos), span);
+        const i1 = Math.min(i0 + 1, span);
+        const t = pos - i0;
+
+        /* each frame dollies in slightly across its own segment, and the
+           whole stack drifts upward — the "one continuous camera move" */
+        const zoom0 = 1.06 - 0.06 * t;
+        const zoom1 = 1.12 - 0.06 * t;
+        const drift = -progress * 40;
+
+        const a = images[i0];
+        const b = images[i1];
+        if (a?.complete && a.naturalWidth) drawCover(a, zoom0, drift, 1);
+        if (i1 !== i0 && t > 0.001 && b?.complete && b.naturalWidth) {
+          drawCover(b, zoom1, drift, t);
+        }
+      }
+
+      function currentProgress() {
+        const r = wrap.getBoundingClientRect();
+        /* 0 when the hero's top hits the viewport top, 1 when its
+           bottom has passed the viewport top */
+        const travel = r.height || 1;
+        return Math.min(1, Math.max(0, -r.top / travel));
+      }
+
+      function frame() {
+        rafId = 0;
+        const p = currentProgress();
+        if (Math.abs(p - lastProgress) > 0.0008) {
+          lastProgress = p;
+          paint(p);
+        }
+      }
+
+      function schedule() {
+        if (!running || rafId) return;
+        rafId = requestAnimationFrame(frame);
+      }
+
+      /* ---- load the frames, then take over from the still ---- */
+      frames.forEach((src, i) => {
+        const img = new Image();
+        img.decoding = "async";
+        img.src = src;
+        images[i] = img;
+        const done = () => {
+          loaded++;
+          /* start as soon as the first frame is ready so there is no gap */
+          if (i === 0) {
+            running = true;
+            resize();
+            wrap.setAttribute("data-ready", "");
+          } else {
+            lastProgress = -1;
+            schedule();
+          }
+        };
+        if (img.complete && img.naturalWidth) done();
+        else {
+          img.addEventListener("load", done, { once: true });
+          img.addEventListener("error", () => loaded++, { once: true });
+        }
+      });
+
+      const onScroll = () => schedule();
+      const onResize = () => resize();
+      const onReducedChange = (e: MediaQueryListEvent) => {
+        if (e.matches) {
+          running = false;
+          wrap.removeAttribute("data-ready");
+        } else {
+          running = true;
+          resize();
+          wrap.setAttribute("data-ready", "");
+        }
+      };
+
+      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("resize", onResize);
+      reduced.addEventListener("change", onReducedChange);
+
+      wrap.__heroCleanup = () => {
+        running = false;
+        if (rafId) cancelAnimationFrame(rafId);
+        window.removeEventListener("scroll", onScroll);
+        window.removeEventListener("resize", onResize);
+        reduced.removeEventListener("change", onReducedChange);
+        wrap.removeAttribute("data-ready");
+        delete wrap.__heroCleanup;
+      };
+    });
+  }
+
+  document.addEventListener("astro:page-load", initHeroCanvas);
+  document.addEventListener("astro:before-swap", () => {
+    document
+      .querySelectorAll<Wrap>("[data-hero-canvas]")
+      .forEach((w) => w.__heroCleanup?.());
+  });
+</script>

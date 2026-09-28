@@ -1,21 +1,8 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { company, figures } from "../data/company";
+import Icon from "../components/Icon.astro";
 
-const cities = [
-  "Baltimore",
-  "Annapolis",
-  "Towson",
-  "Owings Mills",
-  "Bel Air",
-  "Forest Hill",
-  "Aberdeen",
-  "Glen Burnie",
-  "Dundalk",
-  "Middle River",
-  "Gaithersburg",
-  "Nottingham",
-];
 
 const values = [
   {
@@ -35,80 +22,24 @@ const values = [
   },
 ];
 
-/* Placeholder team — swap with real names + headshots when ready.
-   Drop portraits into /public/images/team/<slug>.webp at 800px square
-   and reference them in `photo` below. */
-const team = [
-  {
-    slug: "president",
-    name: "Team Member",
-    role: "Principal & President",
-    photo: null,
-  },
-  {
-    slug: "operations",
-    name: "Team Member",
-    role: "Operations Manager",
-    photo: null,
-  },
-  {
-    slug: "estimator",
-    name: "Team Member",
-    role: "Senior Estimator",
-    photo: null,
-  },
-  {
-    slug: "field",
-    name: "Team Member",
-    role: "Field Superintendent",
-    photo: null,
-  },
-];
+import LogoBuild from "../components/immersive/LogoBuild.astro";
+import MarylandMap from "../components/immersive/MarylandMap.astro";
+import CertSeal from "../components/CertSeal.astro";
+import ProjectImage from "../components/ProjectImage.astro";
 ---
 
 <BaseLayout
   title="About"
-  description="Nirvana Construction is a commercial drywall and metal-stud framing subcontractor serving Maryland and the Greater Baltimore region. DBE / MBE / SBE certified. Built to the line."
+  description="Nirvana Construction is a commercial drywall and metal-stud framing subcontractor serving Maryland and the Greater Baltimore region. DBE / MBE / SBE certified. Excellence without compromise."
 >
-  {/* ============ Hero ============ */}
-  <section class="relative h-[440px] md:h-[520px] w-full flex items-center overflow-hidden">
-    <div class="absolute inset-0" style="height:120%;top:-10%;">
-      <img
-        data-parallax="0.22"
-        class="w-full h-full object-cover object-center"
-        src="/images/projects/jobsite-04.webp"
-        srcset="/images/projects/jobsite-04-800.webp 800w, /images/projects/jobsite-04.webp 1600w"
-        sizes="100vw"
-        alt="A commercial Nirvana Construction interior nearing completion."
-        fetchpriority="high"
-      />
-    </div>
-    <div class="absolute inset-0 bg-on-background/60"></div>
-    <div class="relative max-w-container-max mx-auto px-lg w-full">
-      <div class="max-w-2xl text-surface">
-        <span
-          data-reveal
-          class="inline-block px-md py-xs bg-secondary text-on-secondary font-label-bold text-label-bold uppercase mb-md"
-        >
-          About Nirvana
-        </span>
-        <h1 data-words data-delay="0.1" class="font-headline-xl text-headline-xl mb-md">
-          A commercial trade partner. Not a sales pitch.
-        </h1>
-        <p data-reveal class="font-body-lg text-body-lg text-white/85">
-          Commercial drywall and metal-stud framing for general contractors
-          across Maryland.
-        </p>
-      </div>
-    </div>
-  </section>
+  {/* ============ Hero: the logo, built from steel studs ============ */}
+  <LogoBuild />
 
   {/* ============ Who we are ============ */}
   <section class="py-xxl bg-surface-container-low">
     <div class="max-w-container-max mx-auto px-lg grid grid-cols-1 lg:grid-cols-12 gap-xxl">
       <div class="lg:col-span-5">
         <div class="flex items-center gap-sm mb-lg">
-          <div class="w-12 h-1 bg-secondary"></div>
           <p class="font-label-bold text-label-bold text-secondary uppercase tracking-widest">
             The Company
           </p>
@@ -116,19 +47,34 @@ const team = [
         <h2 data-words class="font-headline-lg text-headline-lg text-primary mb-lg max-w-[32rem]">
           We frame &amp; finish commercial interiors.
         </h2>
+        {/* three finished jobs, layered in depth: the stack turns as the
+            section scrolls by and leans toward the cursor */}
+        <div data-reveal class="mt-xl">
+          <div data-stack class="about-stack">
+            <div data-z style="--z:0" class="about-card about-card-a">
+              <ProjectImage slug="golf-galaxy-night" class="w-full h-full object-cover" sizes="(min-width: 1024px) 24vw, 70vw" alt="A finished Golf Galaxy store lit at night." />
+            </div>
+            <div data-z style="--z:70" class="about-card about-card-b">
+              <ProjectImage slug="chipotle" class="w-full h-full object-cover" sizes="(min-width: 1024px) 20vw, 60vw" alt="A completed Chipotle restaurant exterior." />
+            </div>
+            <div data-z style="--z:140" class="about-card about-card-c">
+              <ProjectImage slug="f45-exterior" class="w-full h-full object-cover" sizes="(min-width: 1024px) 18vw, 55vw" alt="The finished F45 Training studio exterior." />
+            </div>
+          </div>
+        </div>
       </div>
       <div class="lg:col-span-7 space-y-lg">
-        <p data-reveal class="font-body-lg text-body-lg text-on-surface-variant">
-          We frame and finish commercial interiors across the Baltimore region
-          — from fast-track tenant fit-outs to large new-build work — backed
-          by experienced crews and proven field leadership.
+        <p data-scrub class="about-lede">
+          We frame and finish commercial interiors across the Baltimore region,
+          from fast-track tenant fit-outs to large new-build work, backed by
+          experienced crews and proven field leadership.
         </p>
-        <p data-reveal class="font-body-md text-on-surface-variant">
+        <p data-scrub class="font-body-lg text-body-lg text-on-surface-variant">
           We work the way a good trade partner should: clear communication,
           tight coordination with every other trade, and exactly what was
-          drawn — square, plumb, on layout, and ready for inspection.
+          drawn: square, plumb, on layout and ready for inspection.
         </p>
-        <p data-reveal class="font-body-md text-on-surface-variant">
+        <p data-scrub class="font-body-lg text-body-lg text-on-surface-variant">
           Strict QC and safety standards mean clean installs, accurate
           layouts, and schedules that hold.
         </p>
@@ -138,15 +84,14 @@ const team = [
 
   {/* ============ Stat counters ============ */}
   <section class="py-xl bg-surface-container-lowest border-y border-outline-variant">
-    <div class="max-w-container-max mx-auto px-lg grid grid-cols-2 md:grid-cols-4 gap-gutter">
+    <div data-depth-in data-depth-stagger class="max-w-container-max mx-auto px-lg grid grid-cols-2 md:grid-cols-4 gap-gutter">
       {figures.map((f, i) => (
-        <div data-reveal class="flex flex-col gap-xs" style={`transition-delay:${i * 60}ms`}>
+        <div class="flex flex-col gap-xs">
           <span
-            data-count={f.value}
-            data-suffix={i === 0 ? "+" : ""}
+            data-flip={`${f.value}${i === 0 ? "+" : ""}`}
             class="font-headline-lg text-headline-lg text-primary font-bold"
           >
-            0
+            {`${f.value}${i === 0 ? "+" : ""}`}
           </span>
           <span class="font-label-bold text-label-bold uppercase text-on-surface-variant">
             {f.label}
@@ -158,12 +103,10 @@ const team = [
 
   {/* ============ Values / Differentiators ============ */}
   <section class="py-xxl bg-on-background text-white relative overflow-hidden">
-    <div class="absolute right-0 top-0 w-1/3 h-full opacity-10 pointer-events-none hidden md:block">
-      <span class="material-symbols-outlined text-[400px] leading-none">architecture</span>
-    </div>
-    <div class="max-w-container-max mx-auto px-lg">
+    <div class="nv-studs" aria-hidden="true"></div>
+    <div class="relative max-w-container-max mx-auto px-lg">
       <div class="max-w-2xl mb-xxl">
-        <span class="text-[#fd761a] font-label-bold text-label-bold uppercase tracking-widest mb-md block">
+        <span class="text-secondary-fixed font-label-bold text-label-bold uppercase tracking-widest mb-md block">
           How we work
         </span>
         <h2 data-words class="font-headline-xl text-headline-xl mb-lg">
@@ -174,18 +117,16 @@ const team = [
           for inspection.
         </p>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
-        {values.map((v, i) => (
+      <div data-depth-in data-depth-stagger data-fan class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+        {values.map((v) => (
           <div
-            data-reveal
-            data-tilt
-            class="bg-on-background/50 border border-on-primary-container/40 p-lg flex flex-col gap-md hover:shadow-2xl transition-shadow duration-300"
-            style={`transition-delay:${i * 80}ms`}
+            data-glow
+            class="bg-green-900 border border-on-primary-container/40 p-lg flex flex-col gap-md shadow-2xl"
           >
             <div class="w-12 h-12 rounded-lg bg-primary-container flex items-center justify-center border border-on-primary-container">
-              <span class="material-symbols-outlined text-primary-fixed">{v.icon}</span>
+              <Icon name={v.icon} class="text-primary-fixed" />
             </div>
-            <h4 class="font-label-bold text-label-bold uppercase text-[#fd761a]">
+            <h4 class="font-label-bold text-label-bold uppercase text-secondary-fixed">
               {v.label}
             </h4>
             <p class="font-body-sm text-body-sm text-white/80">{v.body}</p>
@@ -198,26 +139,14 @@ const team = [
   {/* ============ Certification ============ */}
   <section class="py-xxl bg-surface-container-low">
     <div class="max-w-container-max mx-auto px-lg grid grid-cols-1 lg:grid-cols-2 gap-xxl items-center">
-      <div data-reveal data-tilt class="relative">
-        <div class="bg-on-background text-surface p-xl border border-outline shadow-lg aspect-[5/4] flex flex-col justify-between">
-          <div class="absolute top-md left-md w-5 h-5 border-t-2 border-l-2 border-secondary-container"></div>
-          <div class="absolute top-md right-md w-5 h-5 border-t-2 border-r-2 border-secondary-container"></div>
-          <div class="absolute bottom-md left-md w-5 h-5 border-b-2 border-l-2 border-secondary-container"></div>
-          <div class="absolute bottom-md right-md w-5 h-5 border-b-2 border-r-2 border-secondary-container"></div>
-          <p class="font-label-bold text-label-bold uppercase text-[#fd761a]">
-            Certification
-          </p>
-          <p class="font-headline-xl text-headline-xl text-surface text-center">
-            DBE&nbsp;·&nbsp;MBE&nbsp;·&nbsp;SBE
-          </p>
-          <p class="font-label-bold text-label-bold uppercase text-on-surface-variant">
-            {company.certification.number}
-          </p>
-        </div>
+      {/* the certification is shown by the client's own Maryland MBE seal,
+          on the page itself — no plaque behind it */}
+      <div data-depth-in class="flex flex-col items-center justify-center gap-md text-center py-lg">
+        <CertSeal size={220} class="cert-seal-hero" />
+        <p class="label-mono text-green-600">DBE · MBE · SBE · {company.certification.number}</p>
       </div>
       <div class="space-y-lg">
         <div class="flex items-center gap-sm mb-md">
-          <div class="w-12 h-1 bg-secondary"></div>
           <p class="font-label-bold text-label-bold text-secondary uppercase tracking-widest">
             Certified
           </p>
@@ -241,54 +170,34 @@ const team = [
   {/* ============ Service area ============ */}
   <section class="py-xxl bg-surface-container-lowest">
     <div class="max-w-container-max mx-auto px-lg grid grid-cols-1 lg:grid-cols-12 gap-xxl items-start">
-      <div class="lg:col-span-7">
-        <div class="flex items-center gap-sm mb-lg">
-          <div class="w-12 h-1 bg-primary"></div>
-          <p class="font-label-bold text-label-bold text-primary uppercase tracking-widest">
-            Service Area
-          </p>
+      {/* the service-area text and city list were removed at the client's
+          request; the map and the office card now share the row */}
+      <aside class="lg:col-span-12 grid grid-cols-1 lg:grid-cols-12 gap-gutter items-center">
+        <div data-depth-in class="lg:col-span-7">
+          <MarylandMap />
         </div>
-        <h2 data-words class="font-headline-lg text-headline-lg text-primary mb-lg">
-          {company.serviceArea}.
-        </h2>
-        <p data-reveal class="font-body-lg text-body-lg text-on-surface-variant mb-xl">
-          Headquartered in Nottingham, MD, we work throughout the Baltimore
-          metropolitan area and across the state of Maryland — from Annapolis
-          to Aberdeen, Owings Mills to Forest Hill.
-        </p>
-        <ul data-reveal class="grid grid-cols-2 sm:grid-cols-3 gap-x-lg gap-y-sm">
-          {cities.map((c) => (
-            <li class="flex items-center gap-sm font-body-sm text-on-surface-variant">
-              <span class="w-2 h-px bg-secondary"></span>
-              {c}
-            </li>
-          ))}
-        </ul>
-      </div>
-      <aside class="lg:col-span-5">
         <div
-          data-reveal
-          data-tilt
-          class="bg-surface-container border border-outline-variant p-xl"
+          data-depth-in
+          data-glow="light"
+          class="lg:col-span-5 bg-surface-container border border-outline-variant p-xl"
         >
-          <div class="bg-secondary h-1 w-12 mb-md"></div>
           <h3 class="font-headline-md text-headline-md mb-md text-primary">
             Where we are
           </h3>
           <div class="space-y-md">
             <div class="flex items-start gap-sm">
-              <span class="material-symbols-outlined text-secondary mt-px">location_on</span>
+              <Icon name="location_on" class="text-secondary mt-px" />
               <p class="font-body-md text-on-surface-variant">
                 {company.address.street}<br />
                 {company.address.city}, {company.address.state} {company.address.zip}
               </p>
             </div>
             <div class="flex items-start gap-sm">
-              <span class="material-symbols-outlined text-secondary mt-px">schedule</span>
+              <Icon name="schedule" class="text-secondary mt-px" />
               <p class="font-body-md text-on-surface-variant">{company.hours}</p>
             </div>
             <div class="flex items-start gap-sm">
-              <span class="material-symbols-outlined text-secondary mt-px">call</span>
+              <Icon name="call" class="text-secondary mt-px" />
               <a
                 href={company.phoneHref}
                 class="font-body-md text-primary hover:text-secondary transition-colors"
@@ -297,7 +206,7 @@ const team = [
               </a>
             </div>
             <div class="flex items-start gap-sm">
-              <span class="material-symbols-outlined text-secondary mt-px">mail</span>
+              <Icon name="mail" class="text-secondary mt-px" />
               <a
                 href={company.emailHref}
                 class="font-body-md text-primary hover:text-secondary transition-colors break-all"
@@ -311,74 +220,6 @@ const team = [
     </div>
   </section>
 
-  {/* ============ Team ============ */}
-  <section class="py-xxl bg-surface-container-low">
-    <div class="max-w-container-max mx-auto px-lg">
-      <div class="flex items-center gap-sm mb-lg">
-        <div class="w-12 h-1 bg-secondary"></div>
-        <p class="font-label-bold text-label-bold text-secondary uppercase tracking-widest">
-          The Team
-        </p>
-      </div>
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-lg mb-xxl items-end">
-        <h2 data-words class="font-headline-lg text-headline-lg text-primary lg:col-span-7">
-          The people behind the work.
-        </h2>
-        <p data-reveal class="font-body-md text-on-surface-variant lg:col-span-5 max-w-[28rem]">
-          Experienced field leadership and a steady office crew — the people
-          who plan, price, and run every Nirvana build.
-        </p>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
-        {team.map((m, i) => (
-          <article
-            data-reveal
-            data-tilt
-            class="bg-surface-container-lowest border border-outline-variant shadow-sm hover:shadow-2xl transition-shadow duration-300 overflow-hidden"
-            style={`transition-delay:${i * 80}ms`}
-          >
-            <div class="relative aspect-square bg-surface-container-high overflow-hidden">
-              {m.photo ? (
-                <img
-                  src={`/images/team/${m.photo}`}
-                  alt={`${m.name} — ${m.role}`}
-                  loading="lazy"
-                  class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                />
-              ) : (
-                <div class="w-full h-full flex items-center justify-center bg-primary/5">
-                  <span
-                    class="material-symbols-outlined text-primary/40"
-                    style="font-size:120px;"
-                  >
-                    engineering
-                  </span>
-                </div>
-              )}
-              <div class="absolute top-0 right-0 bg-secondary text-on-primary px-md py-xs font-label-bold text-label-bold uppercase">
-                {String(i + 1).padStart(2, "0")}
-              </div>
-            </div>
-            <div class="p-lg">
-              <p class="font-label-bold text-label-bold uppercase text-secondary mb-xs">
-                {m.role}
-              </p>
-              <h3 class="font-headline-md text-headline-md text-primary">
-                {m.name}
-              </h3>
-            </div>
-          </article>
-        ))}
-      </div>
-
-      <p data-reveal class="mt-xl font-body-sm text-body-sm text-on-surface-variant italic max-w-2xl">
-        Names &amp; headshots coming soon — drop portraits in
-        <code class="font-mono text-primary not-italic">/public/images/team/</code>
-        and reference them in <code class="font-mono text-primary not-italic">src/pages/about.astro</code>.
-      </p>
-    </div>
-  </section>
 
   {/* ============ CTA ============ */}
   <section class="bg-primary text-on-primary py-xxl">
@@ -394,19 +235,42 @@ const team = [
         <a
           data-magnetic
           href="/contact/"
-          class="inline-flex items-center gap-sm bg-secondary text-on-primary px-xxl py-md font-button text-button uppercase hover:bg-secondary-container transition-all shadow-lg"
+          class="inline-flex items-center gap-sm bg-secondary text-on-primary px-xxl py-md font-button text-button uppercase hover:bg-secondary-container hover:text-on-secondary-container transition-all shadow-lg"
         >
-          <span class="material-symbols-outlined">mail</span>
+          <Icon name="mail" />
           Get in Touch
         </a>
         <a
           href={company.phoneHref}
           class="inline-flex items-center gap-sm border-2 border-on-primary text-on-primary px-xxl py-md font-button text-button uppercase hover:bg-on-primary hover:text-primary transition-all"
         >
-          <span class="material-symbols-outlined">call</span>
+          <Icon name="call" />
           {company.phone}
         </a>
       </div>
     </div>
   </section>
 </BaseLayout>
+
+<style>
+  .about-lede {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.5rem, 2.6vw, 2.25rem);
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    color: var(--color-primary);
+  }
+  .about-stack { position: relative; height: clamp(18rem, 32vw, 24rem); }
+  .about-card {
+    position: absolute;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    border: 1px solid var(--color-hairline);
+    box-shadow: 0 40px 70px -35px rgba(5, 41, 17, 0.6);
+    background: #e7efe9;
+  }
+  .about-card-a { left: 0; top: 0; width: 64%; height: 70%; }
+  .about-card-b { right: 0; top: 14%; width: 50%; height: 56%; }
+  .about-card-c { left: 20%; bottom: 0; width: 46%; height: 48%; border: 4px solid #fff; }
+</style>

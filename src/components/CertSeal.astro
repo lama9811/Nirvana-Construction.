@@ -1,0 +1,45 @@
+---
+/* CertSeal — the Maryland MBE certification seal (Office of Minority
+   Business Enterprise, MDOT), supplied by the client.
+   public/images/certifications/mbe-maryland.{webp,png} (258×271, trimmed
+   from the client's file — never upscaled).
+
+   The seal's ring lettering is dark and its background transparent, so on
+   dark surfaces it sits inside a white disc (`badge`), like a real badge. */
+interface Props {
+  /* rendered width in px */
+  size?: number;
+  /* wrap in a white disc for dark backgrounds */
+  badge?: boolean;
+  class?: string;
+}
+const { size = 140, badge = false, class: cls = "" } = Astro.props;
+const h = Math.round((size * 271) / 258);
+---
+
+<span class:list={["cert-seal", badge && "cert-seal-badge", cls]} style={`--seal:${size}px`}>
+  <picture>
+    <source type="image/webp" srcset="/images/certifications/mbe-maryland.webp" />
+    <img
+      src="/images/certifications/mbe-maryland.png"
+      width={size}
+      height={h}
+      alt="Maryland Office of Minority Business Enterprise certification seal, Maryland Department of Transportation"
+      loading="lazy"
+      decoding="async"
+    />
+  </picture>
+</span>
+
+<style>
+  .cert-seal { display: inline-grid; place-items: center; flex: none; }
+  /* never wider than its container (small phones), never above --seal */
+  .cert-seal img { width: min(var(--seal), 100%); height: auto; display: block; }
+  .cert-seal { max-width: 100%; }
+  .cert-seal-badge {
+    padding: calc(var(--seal) * 0.1);
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+  }
+</style>

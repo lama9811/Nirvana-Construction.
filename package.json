@@ -8,7 +8,10 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "fetch-images": "node scripts/fetch-images.mjs"
+    "fetch-images": "node scripts/fetch-images.mjs",
+    "verify-images": "node scripts/verify-srcsets.mjs",
+    "test": "node --test \"tests/**/*.test.ts\"",
+    "verify:3d": "node scripts/verify-3d-bundles.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^5.0.5",

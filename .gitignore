@@ -21,3 +21,6 @@ npm-debug.log*
 
 # macOS
 .DS_Store
+
+# Playwright MCP browser scratch (screenshots, snapshots, console logs)
+.playwright-mcp/

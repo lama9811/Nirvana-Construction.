@@ -1,0 +1,259 @@
+---
+/* ============================================================
+   ProcessPath — the three phases on a line that draws itself as
+   you scroll. As the line reaches each node the node lights and
+   its card swings up out of the page in 3D. Desktop zig-zags the
+   cards either side of the line; phones run them down one side.
+
+   Progressive: start states apply only under [data-live], which
+   the script sets — no JS or reduced motion shows everything.
+   ============================================================ */
+import Icon from "../Icon.astro";
+
+const steps = [
+  {
+    icon: "architecture",
+    phase: "Strategic Phase",
+    title: "Pre-Construction & Takeoff",
+    body: "We review the drawings, walk the site with the GC, and put together a clean number: quantities, scope and schedule, with no vague allowances.",
+  },
+  {
+    icon: "construction",
+    phase: "Execution Phase",
+    title: "Framing, Hanging, Finishing",
+    body: "We frame to layout, hang clean board and bring it to a level finish, coordinating with the GC, the MEPs and the inspector through every phase of the build.",
+  },
+  {
+    icon: "verified",
+    phase: "Finalization Phase",
+    title: "Punch & Inspection",
+    body: "We walk the punch list with the GC and pass inspection on the first walk, with ceilings dropped, finishes ready for paint, and the schedule we signed kept.",
+  },
+];
+---
+
+<section id="process" class="pp blueprint-bg" data-pp>
+  <h2 class="font-headline-lg text-headline-lg uppercase tracking-tight text-primary mb-xl">
+    The Process
+  </h2>
+
+  <ol class="pp-list" data-pp-list>
+    {
+      steps.map((s, i) => (
+        <li class:list={["pp-step", i % 2 ? "pp-right" : "pp-left"]} data-pp-step>
+          <span class="pp-node" aria-hidden="true">
+            <Icon name={s.icon} strokeWidth={1.6} />
+          </span>
+          <article class="pp-card">
+            <p class="pp-phase">{s.phase}</p>
+            <h3 class="pp-title">{s.title}</h3>
+            <p class="pp-body">{s.body}</p>
+          </article>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<style>
+  .pp {
+    padding: clamp(1.5rem, 4vw, 3rem);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: 0.5rem;
+    background-color: #fff;
+    overflow: hidden;
+  }
+  .pp-list {
+    --node: 3.5rem;
+    --gap: 2.5rem;
+    position: relative;
+    display: grid;
+    gap: var(--gap);
+    perspective: 1200px;
+  }
+  /* the spine (::before) and its drawn fill (::after), down the node column */
+  .pp-list::before,
+  .pp-list::after {
+    content: "";
+    position: absolute;
+    top: calc(var(--node) / 2);
+    bottom: calc(var(--node) / 2);
+    left: calc(var(--node) / 2 - 1px);
+    width: 2px;
+    background: var(--color-hairline);
+  }
+  .pp-list::after {
+    background: linear-gradient(180deg, #009933, #ff6600);
+    transform-origin: top;
+  }
+
+  .pp-step {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--node) 1fr;
+    gap: 1.25rem;
+    align-items: start;
+  }
+  .pp-node {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: var(--node);
+    height: var(--node);
+    border-radius: 999px;
+    font-size: 1.5rem;
+    color: #fff;
+    background: var(--color-primary);
+    box-shadow: 0 0 0 6px #fff;
+    transition: transform 0.6s cubic-bezier(0.3, 1.6, 0.5, 1), background 0.4s, color 0.4s;
+  }
+  .pp-node::after {
+    /* one ripple as the node lights */
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 2px solid #009933;
+    opacity: 0;
+  }
+  .pp-card {
+    position: relative;
+    padding: 1.5rem 1.75rem;
+    background: #fff;
+    border: 1px solid var(--color-hairline);
+    box-shadow: 0 30px 60px -40px rgba(5, 41, 17, 0.45);
+    transform-origin: 50% 0;
+    transition:
+      transform 0.9s cubic-bezier(0.2, 0.7, 0, 1),
+      opacity 0.7s ease,
+      box-shadow 0.4s;
+  }
+  .pp-card:hover { box-shadow: 0 40px 70px -35px rgba(5, 41, 17, 0.55); }
+  .pp-phase {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-secondary);
+    margin-bottom: 0.4rem;
+  }
+  .pp-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.3rem, 2vw, 1.6rem);
+    letter-spacing: -0.025em;
+    color: var(--color-primary);
+    margin-bottom: 0.5rem;
+  }
+  .pp-body { color: var(--color-on-surface-variant); line-height: 1.65; max-width: 36rem; }
+  @media (max-width: 599px) {
+    .pp { padding: 1.5rem 1rem; }
+    .pp-list { --node: 2.5rem; --gap: 1.75rem; }
+    .pp-step { gap: 0.875rem; }
+    .pp-node { font-size: 1.15rem; box-shadow: 0 0 0 4px #fff; }
+    .pp-card { padding: 1.25rem; }
+  }
+
+  /* desktop: the spine runs down the middle, cards alternate either side */
+  @media (min-width: 900px) {
+    .pp-list::before,
+    .pp-list::after { left: calc(50% - 1px); }
+    .pp-step { grid-template-columns: 1fr var(--node) 1fr; gap: 2rem; }
+    .pp-node { grid-column: 2; grid-row: 1; }
+    .pp-left .pp-card { grid-column: 1; grid-row: 1; transform-origin: 100% 0; }
+    .pp-right .pp-card { grid-column: 3; grid-row: 1; transform-origin: 0 0; }
+    .pp-left .pp-card { text-align: right; }
+    .pp-left .pp-body { margin-left: auto; }
+    /* a short arm from the card to the spine */
+    .pp-card::before {
+      content: "";
+      position: absolute;
+      top: calc(var(--node) / 2);
+      width: 2rem;
+      height: 1px;
+      background: var(--color-hairline);
+    }
+    .pp-left .pp-card::before { right: -2rem; }
+    .pp-right .pp-card::before { left: -2rem; }
+  }
+
+  /* ---------- live start states ---------- */
+  .pp[data-live] .pp-list::after { transform: scaleY(var(--pp, 0)); }
+  .pp[data-live] .pp-node { transform: scale(0.55); background: #fff; color: #009933; box-shadow: 0 0 0 6px #fff, inset 0 0 0 2px var(--color-hairline); }
+  .pp[data-live] .pp-card { opacity: 0; transform: rotateX(-72deg) translateY(1.5rem); }
+  @media (min-width: 900px) {
+    .pp[data-live] .pp-left .pp-card { transform: rotateY(38deg) rotateX(-20deg) translateX(-2rem); }
+    .pp[data-live] .pp-right .pp-card { transform: rotateY(-38deg) rotateX(-20deg) translateX(2rem); }
+  }
+  .pp[data-live] .pp-step[data-on] .pp-node {
+    transform: scale(1);
+    background: var(--color-primary);
+    color: #fff;
+    box-shadow: 0 0 0 6px #fff;
+  }
+  .pp[data-live] .pp-step[data-on] .pp-node::after { animation: pp-ripple 1s ease-out 1; }
+  .pp[data-live] .pp-step[data-on] .pp-card { opacity: 1; transform: none; transition-delay: 0.08s; }
+  @keyframes pp-ripple {
+    from { opacity: 0.8; transform: scale(1); }
+    to   { opacity: 0; transform: scale(1.9); }
+  }
+</style>
+
+<script>
+  type Root = HTMLElement & { __ppCleanup?: () => void };
+
+  function initProcessPath() {
+    document.querySelectorAll<Root>("[data-pp]").forEach((root) => {
+      root.__ppCleanup?.();
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      const list = root.querySelector<HTMLElement>("[data-pp-list]")!;
+      const steps = [...root.querySelectorAll<HTMLElement>("[data-pp-step]")];
+      root.setAttribute("data-live", "");
+
+      let raf = 0;
+      let inView = false;
+      const update = () => {
+        raf = 0;
+        const r = list.getBoundingClientRect();
+        /* the line's tip rides 62% down the screen */
+        const tip = window.innerHeight * 0.62 - r.top;
+        const p = Math.max(0, Math.min(1, tip / r.height));
+        list.style.setProperty("--pp", p.toFixed(4));
+        for (const s of steps) {
+          const node = s.offsetTop + 28; // node centre, px from the list top
+          /* steps follow the line both ways: scrolling back up folds them away */
+          s.toggleAttribute("data-on", tip >= node || s.contains(document.activeElement));
+        }
+      };
+      const kick = () => {
+        if (inView && !raf) raf = requestAnimationFrame(update);
+      };
+      const io = new IntersectionObserver((e) => {
+        inView = e.some((x) => x.isIntersecting);
+        kick();
+      });
+      io.observe(list);
+      window.addEventListener("scroll", kick, { passive: true });
+      window.addEventListener("resize", kick);
+      /* reaching a card by Tab or an anchor shows it */
+      const onFocus = () => steps.forEach((s) => s.setAttribute("data-on", ""));
+      root.addEventListener("focusin", onFocus);
+      update();
+
+      root.__ppCleanup = () => {
+        if (raf) cancelAnimationFrame(raf);
+        io.disconnect();
+        window.removeEventListener("scroll", kick);
+        window.removeEventListener("resize", kick);
+        root.removeEventListener("focusin", onFocus);
+        delete root.__ppCleanup;
+      };
+    });
+  }
+
+  document.addEventListener("astro:page-load", initProcessPath);
+  document.addEventListener("astro:before-swap", () => {
+    document.querySelectorAll<Root>("[data-pp]").forEach((r) => r.__ppCleanup?.());
+  });
+</script>

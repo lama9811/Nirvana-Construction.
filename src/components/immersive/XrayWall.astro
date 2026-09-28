@@ -1,0 +1,715 @@
+---
+/* ============================================================
+   XrayWall — the /services/ hero: the X-ray / exploded wall
+   (Concept C from the 2026-09-27 bake-off).
+
+   One wall section, finished to Level 5, fills the viewport with the
+   h1 set on it. Scrolling swings the camera to 3/4, x-rays the board
+   to show the frame, then explodes the assembly along its thickness —
+   every layer called out like an exploded axonometric — and puts it
+   back together before landing on "Get in Touch".
+
+   Progressive enhancement:
+     · no JS / before three arrives: a light stage with the h1 + CTA
+     · no WebGL / three fails: a photograph under the same copy
+     · prefers-reduced-motion: no scroll track; the exploded
+       composition renders once, statically, with every callout
+   three.js, its RoomEnvironment addon and the scene module are all
+   dynamic imports, so none of them enter the eager homepage bundle.
+   ============================================================ */
+import { company } from "../../data/company";
+import { trades } from "../../data/services";
+import Icon from "../Icon.astro";
+import { srcsetFor, srcFor, dimensions } from "../../lib/images";
+
+const t = Object.fromEntries(trades.map((x) => [x.slug, x]));
+
+/* interior -> exterior, then the ceiling. `id` must match a layer id in
+   xray-scene.ts. Trade copy comes straight from src/data/services.ts. */
+const callouts = [
+  { id: "finish", trade: t["drywall"], name: "Level 5 finish", copy: "Taped, coated, skimmed and sanded until the joints disappear." },
+  { id: "board", trade: t["drywall"], name: "5/8\" Type X board", copy: t["drywall"].blurb },
+  { id: "blocking", trade: t["rough-carpentry"], name: "2x6 blocking", copy: t["rough-carpentry"].blurb },
+  { id: "frame", trade: t["metal-framing"], name: "6\" studs @ 16\" o.c.", copy: t["metal-framing"].blurb },
+  { id: "insulation", trade: t["insulation"], name: "Mineral wool", copy: t["insulation"].blurb },
+  { id: "sheathing", trade: t["rough-carpentry"], name: "Sheathing", copy: "Structural panel fastened to the frame, joints taped tight." },
+  { id: "eps", trade: t["eifs"], name: "EIFS insulation board", copy: t["eifs"].blurb },
+  { id: "lamina", trade: t["eifs"], name: "Base coat + finish", copy: "Mesh embedded in the base coat, sand-texture finish over it." },
+  { id: "ceiling", trade: t["acoustical-ceilings"], name: "2x4 suspended grid", copy: t["acoustical-ceilings"].blurb },
+].map((c, i) => ({ ...c, item: i + 1 }));
+
+const fb = "f45-exterior";
+const fbDims = dimensions(fb);
+---
+
+<section class="xw" data-xw aria-label="Our services: a wall assembly, layer by layer">
+  <div class="xw-track" data-xw-track>
+    <div class="xw-stage" data-xw-stage>
+      {/* no-WebGL fallback only; lazy + hidden, so it costs nothing otherwise */}
+      <picture class="xw-fallback" aria-hidden="true">
+        <source type="image/avif" srcset={srcsetFor(fb, "avif")} sizes="100vw" />
+        <img src={srcFor(fb)} srcset={srcsetFor(fb, "webp")} sizes="100vw" alt="" width={fbDims?.width} height={fbDims?.height} loading="lazy" decoding="async" />
+      </picture>
+
+      <canvas class="xw-canvas" data-xw-canvas aria-hidden="true"></canvas>
+      <div class="xw-vignette" aria-hidden="true"></div>
+
+      {/* projected engineering annotation */}
+      <svg class="xw-svg" data-xw-svg aria-hidden="true"></svg>
+      <span class="xw-dim" data-xw-dim aria-hidden="true">16" o.c.</span>
+      <span class="xw-scan" data-xw-scan aria-hidden="true">X-ray</span>
+
+      <ul class="xw-callouts" aria-label="The wall assembly, interior face to exterior face">
+        {
+          callouts.map((c) => (
+            <li class="xw-callout" data-callout={c.id}>
+              <span class="xw-balloon" aria-hidden="true">{c.item}</span>
+              <span class="xw-callout-text">
+                <span class="xw-meta">
+                  <span class="xw-meta-idx">{c.trade.index}</span> · {c.trade.title}
+                </span>
+                <span class="xw-name">{c.name}</span>
+                <span class="xw-copy">{c.copy}</span>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+
+      {/* narrow screens: numbered balloons on the model + this key */}
+      <ol class="xw-legend" data-xw-legend aria-hidden="true">
+        {
+          callouts.map((c) => (
+            <li data-legend={c.id}>
+              <span class="xw-balloon">{c.item}</span>
+              <span>
+                {c.name}
+                <span class="xw-legend-trade">{c.trade.index} {c.trade.title}</span>
+              </span>
+            </li>
+          ))
+        }
+      </ol>
+
+      {/* ---- opening frame: the h1 set on the finished wall ---- */}
+      <div class="xw-intro" data-xw-intro>
+        <div class="xw-intro-inner">
+          <p class="xw-eyebrow">
+            <span class="xw-eyebrow-dot" aria-hidden="true"></span>
+            Our Services
+          </p>
+          <h1 class="xw-h1">
+            Commercial framing &amp; drywall,
+            <span class="xw-h1-b">end to end.</span>
+          </h1>
+          <div class="xw-intro-row">
+            <p class="xw-lede">
+              We self-perform all six trades inside a commercial wall, from framing,
+              board, blocking and insulation to EIFS and ceilings, so one crew
+              answers for every layer of it.
+            </p>
+            <div class="xw-actions">
+              <a data-magnetic href="/contact/" class="btn-primary">
+                Get in Touch
+                <Icon name="arrow_forward" />
+              </a>
+              <a href="/projects/" class="btn-ghost xw-ghost">
+                See the Work
+                <Icon name="chevron_right" />
+              </a>
+            </div>
+          </div>
+        </div>
+        <p class="xw-spec" aria-hidden="true">
+          Section A-A<br />12'-0" × 10'-0"<br />Level 5 · Type X
+        </p>
+        <p class="xw-cue" aria-hidden="true"><span></span>Scroll to open the wall</p>
+      </div>
+
+      {/* ---- closing frame ---- */}
+      <div class="xw-outro" data-xw-outro>
+        <div class="xw-outro-inner">
+          <p class="label-mono-light mb-md">Section A-A · Assembled</p>
+          <h2 class="xw-h2">Every layer.<br />One crew.</h2>
+          <p class="xw-outro-copy">
+            We carry the framing, the board, the blocking, the insulation, the
+            EIFS and the ceiling in-house, so there is one foreman to call and
+            nobody left to point at when a detail needs sorting out.
+          </p>
+          <div class="xw-actions">
+            <a href="/contact/" class="btn-primary">
+              Get in Touch
+              <Icon name="arrow_forward" />
+            </a>
+            <a href={company.phoneHref} class="xw-phone">
+              <Icon name="call" />
+              {company.phone}
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* ---- drawing-sheet strip ---- */}
+      <div class="xw-hud" data-xw-hud aria-hidden="true">
+        <span class="xw-hud-a">Section A-A · Typical exterior wall · {company.certification.number}</span>
+        <span class="xw-hud-b" data-xw-chapter>Finished face · Level 5</span>
+        <span class="xw-hud-c"><span class="xw-bar"><span data-xw-progress></span></span></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .xw {
+    --xw-hdr: 5rem;
+    --xw-gut: 1.5rem;
+    --xw-light: #e7e6e0;
+    position: relative;
+    background: var(--xw-light);
+    color: var(--color-ink);
+  }
+  @media (min-width: 768px) {
+    .xw { --xw-hdr: 5.5rem; --xw-gut: 2rem; }
+  }
+
+  .xw-track { position: relative; }
+  .xw-stage {
+    position: relative;
+    height: calc(100svh - var(--xw-hdr));
+    min-height: 560px;
+    overflow: hidden;
+    background: var(--xw-light);
+    isolation: isolate;
+  }
+  /* loop (background-video) mode: the hero slides up under the transparent
+     header so the pill nav floats over the wall; one viewport tall, no
+     scroll track */
+  .xw[data-loop] { margin-top: calc(var(--xw-hdr) * -1); }
+  .xw[data-loop] .xw-stage { height: 100svh; min-height: 560px; background: #061a0e; }
+  .xw[data-loop] :is(.xw-svg, .xw-callouts, .xw-legend, .xw-hud, .xw-dim, .xw-scan, .xw-outro, .xw-spec, .xw-cue) { display: none; }
+  /* the wall plays on the dark drawing floor, so the copy turns light */
+  .xw[data-loop] .xw-vignette {
+    opacity: 1;
+    background:
+      linear-gradient(90deg, rgba(5, 26, 12, 0.88) 0%, rgba(5, 26, 12, 0.55) 34%, transparent 58%),
+      radial-gradient(130% 100% at 50% 45%, transparent 55%, rgba(3, 14, 7, 0.38) 100%);
+  }
+  .xw[data-loop] :is(.xw-h1, .xw-ghost) { color: #fff; }
+  .xw[data-loop] .xw-h1-b { color: #70eb99; }
+  .xw[data-loop] :is(.xw-eyebrow, .xw-lede) { color: rgba(255, 255, 255, 0.78); }
+  .xw[data-loop] .xw-intro-row { border-color: rgba(255, 255, 255, 0.18); }
+  .xw[data-loop] .xw-intro-inner > :is(.xw-h1, .xw-eyebrow) { max-width: 40%; }
+  /* the wall plays on the right: keep the lede and buttons in the copy column */
+  .xw[data-loop] .xw-intro-row {
+    max-width: 40%;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 1.5rem;
+  }
+  @media (max-width: 1119px) {
+    .xw[data-loop] .xw-intro-inner > :is(.xw-h1, .xw-eyebrow) { max-width: none; }
+    .xw[data-loop] .xw-intro-row { max-width: none; }
+    .xw[data-loop] .xw-vignette {
+      background: linear-gradient(0deg, rgba(5, 26, 12, 0.94) 0%, rgba(5, 26, 12, 0.8) 45%, rgba(5, 26, 12, 0.15) 68%, transparent 80%);
+    }
+  }
+
+  .xw-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    opacity: 0;
+    transition: opacity 0.7s ease-out;
+  }
+  .xw[data-ready] .xw-canvas { opacity: 1; }
+  .xw-vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(130% 100% at 50% 45%, transparent 55%, rgba(3, 14, 7, 0.38) 100%);
+    opacity: 0;
+    transition: opacity 0.7s;
+  }
+  .xw[data-ready] .xw-vignette { opacity: 1; }
+
+  /* ---- fallback photograph ---- */
+  .xw-fallback { display: none; }
+  .xw[data-fallback] .xw-fallback { display: block; position: absolute; inset: 0; }
+  .xw[data-fallback] .xw-fallback img { width: 100%; height: 100%; object-fit: cover; }
+  .xw[data-fallback] .xw-stage::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(242, 241, 236, 0.96) 0%, rgba(242, 241, 236, 0.88) 45%, rgba(242, 241, 236, 0.35) 100%);
+  }
+  .xw[data-fallback] :is(.xw-canvas, .xw-vignette, .xw-svg, .xw-callouts, .xw-legend, .xw-outro, .xw-hud, .xw-dim, .xw-scan, .xw-cue, .xw-spec) { display: none; }
+
+  /* ---- annotation layer ---- */
+  .xw-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 2;
+  }
+  .xw-svg :global(.xw-leader) {
+    fill: none;
+    stroke: rgba(236, 246, 239, 0.62);
+    stroke-width: 1;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    opacity: 0;
+  }
+  .xw-svg :global(.xw-leader-dot) {
+    fill: var(--color-orange-500);
+    stroke: #061a0e;
+    stroke-width: 1.5;
+    opacity: 0;
+  }
+  .xw-svg :global(.xw-dim-line) {
+    fill: none;
+    stroke: #70eb99;
+    stroke-width: 1;
+    opacity: 0;
+  }
+  .xw-dim,
+  .xw-scan {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 3;
+    opacity: 0;
+    pointer-events: none;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .xw-dim { color: #70eb99; }
+  .xw-scan {
+    color: #061a0e;
+    background: #70eb99;
+    padding: 0.2rem 0.45rem;
+    border-radius: 2px;
+  }
+
+  .xw-callouts { list-style: none; margin: 0; padding: 0; }
+  .xw-callout {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 3;
+    width: 12.75rem;
+    display: flex;
+    gap: 0.625rem;
+    align-items: flex-start;
+    color: #fff;
+    opacity: 0;
+    pointer-events: none;
+    will-change: transform, opacity;
+    text-shadow: 0 1px 10px rgba(6, 26, 14, 0.9);
+  }
+  .xw-balloon {
+    flex: 0 0 auto;
+    width: 22px;
+    height: 22px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    background: rgba(6, 26, 14, 0.72);
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    color: #fff;
+    text-shadow: none;
+  }
+  .xw-callout-text { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
+  .xw-meta {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.62);
+    line-height: 22px;
+  }
+  .xw-meta-idx { color: #70eb99; }
+  .xw-name {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.0625rem;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+  .xw-copy {
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  /* narrow: balloons only on the model; words move to the key */
+  .xw[data-narrow] .xw-callout { width: auto; }
+  .xw[data-narrow] .xw-callout-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .xw-legend {
+    display: none;
+    position: absolute;
+    z-index: 3;
+    left: var(--xw-gut);
+    right: var(--xw-gut);
+    bottom: 3.5rem;
+    margin: 0;
+    padding: 0.75rem 0 0;
+    list-style: none;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 0.8125rem;
+    line-height: 1.2;
+    opacity: 0;
+  }
+  @media (min-width: 640px) {
+    .xw-legend { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  .xw[data-narrow]:not([data-fallback]) .xw-legend { display: grid; }
+  .xw-legend li { display: flex; gap: 0.5rem; align-items: flex-start; }
+  .xw-legend-trade {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+    margin-top: 0.15rem;
+  }
+
+  /* ---- intro: set on the finished wall, so it is INK on light ---- */
+  .xw-intro {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    padding: 0 var(--xw-gut);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-bottom: clamp(4.5rem, 11vh, 7.5rem);
+    will-change: transform, opacity;
+  }
+  .xw-intro-inner { width: 100%; max-width: 80rem; margin: 0 auto; }
+  .xw-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-ink-soft);
+    margin-bottom: 1.25rem;
+  }
+  .xw-eyebrow-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--color-green-500); flex: 0 0 auto; }
+  .xw-h1 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.6rem, 6.6vw, 6.5rem);
+    line-height: 0.92;
+    letter-spacing: -0.045em;
+    color: var(--color-ink);
+    max-width: 15ch;
+    text-wrap: balance;
+  }
+  .xw-h1-b { display: block; color: var(--color-green-700); }
+  .xw-intro-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem 3rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(10, 31, 20, 0.18);
+  }
+  .xw-lede {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.55;
+    color: var(--color-ink-soft);
+    max-width: 34rem;
+  }
+  .xw-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.25rem; }
+  .xw-ghost { color: var(--color-ink); }
+  .xw-spec {
+    position: absolute;
+    top: 1.75rem;
+    right: var(--xw-gut);
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.14em;
+    line-height: 1.7;
+    text-transform: uppercase;
+    color: var(--color-ink-mute);
+  }
+  .xw-cue {
+    position: absolute;
+    bottom: 1.5rem;
+    right: var(--xw-gut);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-ink-mute);
+  }
+  .xw-cue span {
+    display: block;
+    width: 2.5rem;
+    height: 1px;
+    background: currentColor;
+    transform-origin: left;
+    animation: xw-cue 2.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  }
+  @keyframes xw-cue {
+    0% { transform: scaleX(0); transform-origin: left; }
+    50% { transform: scaleX(1); transform-origin: left; }
+    50.01% { transform-origin: right; }
+    100% { transform: scaleX(0); transform-origin: right; }
+  }
+  @media (max-width: 639px) {
+    .xw-spec { display: none; }
+    .xw-cue { display: none; }
+    .xw-intro { padding-bottom: 2rem; }
+    .xw-intro-row { margin-top: 1.25rem; padding-top: 1.25rem; }
+    .xw-lede { font-size: 0.9375rem; }
+  }
+
+  /* ---- outro ---- */
+  .xw-outro {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    padding: 0 var(--xw-gut);
+    display: flex;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    color: #fff;
+    pointer-events: none;
+  }
+  .xw-outro-inner {
+    width: 100%;
+    max-width: 80rem;
+    margin: 0 auto;
+    pointer-events: auto;
+  }
+  .xw-outro-inner > * { max-width: 30rem; }
+  .xw-h2 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.4rem, 5.2vw, 4.75rem);
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    margin-bottom: 1.5rem;
+  }
+  .xw-outro-copy {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.78);
+    margin-bottom: 2rem;
+  }
+  .xw-phone {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-body);
+    color: rgba(255, 255, 255, 0.85);
+  }
+  .xw-phone:hover { color: var(--color-secondary-fixed); }
+  .xw[data-narrow] .xw-outro { align-items: flex-end; padding-bottom: 4rem; }
+  .xw[data-narrow] .xw-h2 { font-size: 2.25rem; margin-bottom: 1rem; }
+  .xw[data-narrow] .xw-outro-copy { font-size: 0.9375rem; margin-bottom: 1.25rem; }
+
+  /* ---- drawing-sheet strip ---- */
+  .xw-hud {
+    position: absolute;
+    z-index: 3;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2.75rem;
+    padding: 0 var(--xw-gut);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    background: linear-gradient(to top, rgba(6, 26, 14, 0.85), rgba(6, 26, 14, 0));
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .xw-hud-b { color: #fff; }
+  .xw-bar { display: block; width: 7.5rem; height: 1px; background: rgba(255, 255, 255, 0.2); }
+  .xw-bar span { display: block; height: 100%; background: var(--color-orange-500); transform: scaleX(0); transform-origin: left; }
+  @media (max-width: 767px) {
+    .xw-hud-a { display: none; }
+  }
+
+  /* ---- reduced motion: a single static, fully-labelled plate ---- */
+  @media (prefers-reduced-motion: reduce) {
+    .xw-stage { height: auto; min-height: max(calc(100svh - var(--xw-hdr)), 860px); }
+    .xw-intro { justify-content: flex-start; padding-top: 2rem; padding-bottom: 0; }
+    .xw-spec, .xw-cue { display: none; }
+    .xw-cue span { animation: none; }
+  }
+  @media (prefers-reduced-motion: reduce) and (max-width: 1023px) {
+    .xw-stage { min-height: 1040px; }
+  }
+  .xw[data-reduced][data-ready]:not([data-fallback]) .xw-intro { color: #fff; }
+  .xw[data-reduced][data-ready]:not([data-fallback]) :is(.xw-h1, .xw-ghost) { color: #fff; }
+  .xw[data-reduced][data-ready]:not([data-fallback]) .xw-h1-b { color: #70eb99; }
+  .xw[data-reduced][data-ready]:not([data-fallback]) :is(.xw-eyebrow, .xw-lede) { color: rgba(255, 255, 255, 0.75); }
+  .xw[data-reduced][data-ready]:not([data-fallback]) .xw-intro-row { border-color: rgba(255, 255, 255, 0.18); }
+  .xw[data-reduced][data-ready]:not([data-fallback]) .xw-h1 { font-size: clamp(2.2rem, 4.6vw, 4.25rem); }
+</style>
+
+<script>
+  import { pingPong, type Loop } from "./loop-clock";
+  import type { XrayHandle } from "./xray-scene";
+
+  /* x-ray → explode (9 s) → hold the exploded wall (3.5 s) → reassemble and
+     close the board (6 s) → rest on the x-ray (1.5 s). The loop stays inside
+     the dark part of the sequence, so the light headline always reads. */
+  const LOOP: Loop = { from: 0.16, to: 0.7, up: 9, holdHi: 3.5, down: 6, holdLo: 1.5 };
+  type Root = HTMLElement & { __xw?: () => void };
+
+  function initXray() {
+    document.querySelectorAll<Root>("[data-xw]").forEach((root) => {
+      root.__xw?.();
+
+      /* the hero slides up under the header by exactly its height */
+      const header = document.querySelector("header");
+      if (header) root.style.setProperty("--xw-hdr", `${header.offsetHeight}px`);
+
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      root.toggleAttribute("data-reduced", reduced);
+
+      let disposed = false;
+      let handle: XrayHandle | null = null;
+      let raf = 0;
+      let io: IntersectionObserver | null = null;
+      const onVis = () => play();
+
+      /* one place that leaves nothing driving the copy: plain static layout */
+      const fallback = () => {
+        if (disposed) return;
+        root.removeAttribute("data-loop");
+        root.setAttribute("data-fallback", "");
+        if (raf) cancelAnimationFrame(raf);
+        raf = 0;
+        io?.disconnect();
+        document.removeEventListener("visibilitychange", onVis);
+        root.querySelectorAll<HTMLElement>("[data-xw-intro], [data-xw-outro], [data-xw-intro] a, [data-xw-intro] button").forEach((el) => {
+          el.inert = false;
+          el.style.removeProperty("opacity");
+          el.style.removeProperty("visibility");
+          el.style.removeProperty("transform");
+        });
+      };
+
+      /* probe WebGL before downloading ~180KB of three for nothing */
+      const probe = document.createElement("canvas");
+      const gl = (probe.getContext("webgl2") || probe.getContext("webgl")) as WebGLRenderingContext | null;
+      if (!gl) {
+        fallback();
+        return;
+      }
+      gl.getExtension("WEBGL_lose_context")?.loseContext();
+
+      if (!reduced) root.setAttribute("data-loop", "");
+
+      /* the clock only runs while the wall is on screen and the tab is visible */
+      let playT = 0;
+      let lastNow = performance.now();
+      let visible = true;
+      const target = () => pingPong(playT, LOOP);
+      const frame = (now: number) => {
+        raf = 0;
+        if (disposed || !visible || document.hidden) return;
+        playT += Math.min(0.1, (now - lastNow) / 1000);
+        lastNow = now;
+        handle?.kick();
+        raf = requestAnimationFrame(frame);
+      };
+      function play() {
+        if (raf || disposed || reduced || !visible || document.hidden || !handle) return;
+        lastNow = performance.now();
+        raf = requestAnimationFrame(frame);
+      }
+      io = new IntersectionObserver((e) => {
+        visible = e.some((x) => x.isIntersecting);
+        play();
+      });
+      io.observe(root);
+      document.addEventListener("visibilitychange", onVis);
+
+      Promise.all([
+        import("three"),
+        import("three/examples/jsm/environments/RoomEnvironment.js"),
+        import("./xray-scene"),
+      ])
+        .then(([THREE, env, mod]) => {
+          if (disposed) return;
+          handle = mod.createXray(
+            THREE,
+            env.RoomEnvironment,
+            root,
+            reduced,
+            reduced ? undefined : { getTarget: target, copyLeft: 0.42, copyBottom: 0.5 },
+          );
+          if (!handle) return fallback();
+          if (import.meta.env.DEV) (window as unknown as { __nvXray?: XrayHandle }).__nvXray = handle;
+          requestAnimationFrame(() => root.setAttribute("data-ready", ""));
+          play();
+        })
+        .catch(fallback);
+
+      root.__xw = () => {
+        disposed = true;
+        if (raf) cancelAnimationFrame(raf);
+        io?.disconnect();
+        document.removeEventListener("visibilitychange", onVis);
+        handle?.dispose();
+        handle = null;
+        root.removeAttribute("data-ready");
+        delete root.__xw;
+      };
+    });
+  }
+
+  document.addEventListener("astro:page-load", initXray);
+  document.addEventListener("astro:before-swap", () => {
+    document.querySelectorAll<Root>("[data-xw]").forEach((r) => r.__xw?.());
+  });
+</script>

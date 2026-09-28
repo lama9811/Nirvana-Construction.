@@ -1,0 +1,378 @@
+{
+  "aldi": {
+    "webp": [
+      680
+    ],
+    "avif": [
+      680
+    ],
+    "display": 680,
+    "w": 680,
+    "h": 453,
+    "aspect": 1.5011,
+    "hasAvifDefault": true
+  },
+  "autozone": {
+    "webp": [
+      800,
+      1200
+    ],
+    "avif": [
+      800,
+      1200
+    ],
+    "display": 1200,
+    "w": 1200,
+    "h": 800,
+    "aspect": 1.5,
+    "hasAvifDefault": true
+  },
+  "burlington": {
+    "webp": [
+      574
+    ],
+    "avif": [
+      574
+    ],
+    "display": 574,
+    "w": 574,
+    "h": 383,
+    "aspect": 1.4987,
+    "hasAvifDefault": true
+  },
+  "chipotle": {
+    "webp": [
+      800,
+      841
+    ],
+    "avif": [
+      800,
+      841
+    ],
+    "display": 841,
+    "w": 841,
+    "h": 561,
+    "aspect": 1.4991,
+    "hasAvifDefault": true
+  },
+  "f45-exterior": {
+    "webp": [
+      800,
+      1600,
+      2400,
+      3840
+    ],
+    "avif": [
+      800,
+      1600,
+      2400,
+      3840
+    ],
+    "display": 1600,
+    "w": 1600,
+    "h": 1067,
+    "aspect": 1.4995,
+    "hasAvifDefault": true
+  },
+  "f45-interior": {
+    "webp": [
+      639
+    ],
+    "avif": [
+      639
+    ],
+    "display": 639,
+    "w": 639,
+    "h": 426,
+    "aspect": 1.5,
+    "hasAvifDefault": true
+  },
+  "first-watch": {
+    "webp": [
+      800,
+      1600,
+      2400
+    ],
+    "avif": [
+      800,
+      1600,
+      2400
+    ],
+    "display": 1600,
+    "w": 1600,
+    "h": 1067,
+    "aspect": 1.4995,
+    "hasAvifDefault": true
+  },
+  "first-watch-interior": {
+    "webp": [
+      382
+    ],
+    "avif": [
+      382
+    ],
+    "display": 382,
+    "w": 382,
+    "h": 255,
+    "aspect": 1.498,
+    "hasAvifDefault": true
+  },
+  "five-below": {
+    "webp": [
+      800,
+      808
+    ],
+    "avif": [
+      800,
+      808
+    ],
+    "display": 808,
+    "w": 808,
+    "h": 539,
+    "aspect": 1.4991,
+    "hasAvifDefault": true
+  },
+  "flagship-carwash-2": {
+    "webp": [
+      628
+    ],
+    "avif": [
+      628
+    ],
+    "display": 628,
+    "w": 628,
+    "h": 419,
+    "aspect": 1.4988,
+    "hasAvifDefault": true
+  },
+  "flagship-carwash": {
+    "webp": [
+      800
+    ],
+    "avif": [],
+    "display": 1600,
+    "w": 1600,
+    "h": 1067,
+    "aspect": 1.4995,
+    "hasAvifDefault": true
+  },
+  "golf-galaxy": {
+    "webp": [
+      800
+    ],
+    "avif": [],
+    "display": 1600,
+    "w": 1600,
+    "h": 1067,
+    "aspect": 1.4995,
+    "hasAvifDefault": true
+  },
+  "golf-galaxy-day": {
+    "webp": [
+      640
+    ],
+    "avif": [
+      640
+    ],
+    "display": 640,
+    "w": 640,
+    "h": 427,
+    "aspect": 1.4988,
+    "hasAvifDefault": true
+  },
+  "golf-galaxy-night": {
+    "webp": [
+      800,
+      1524
+    ],
+    "avif": [
+      800,
+      1524
+    ],
+    "display": 1524,
+    "w": 1524,
+    "h": 1016,
+    "aspect": 1.5,
+    "hasAvifDefault": true
+  },
+  "grocery-outlet": {
+    "webp": [
+      800,
+      1536
+    ],
+    "avif": [
+      800,
+      1536
+    ],
+    "display": 1536,
+    "w": 1536,
+    "h": 1024,
+    "aspect": 1.5,
+    "hasAvifDefault": true
+  },
+  "hcps-forest-hill": {
+    "webp": [
+      800
+    ],
+    "avif": [],
+    "display": 1600,
+    "w": 1600,
+    "h": 1067,
+    "aspect": 1.4995,
+    "hasAvifDefault": true
+  },
+  "jcc": {
+    "webp": [
+      800
+    ],
+    "avif": [],
+    "display": 1600,
+    "w": 1600,
+    "h": 1067,
+    "aspect": 1.4995,
+    "hasAvifDefault": true
+  },
+  "jobsite-01": {
+    "webp": [
+      800
+    ],
+    "avif": [],
+    "display": 1600,
+    "w": 1600,
+    "h": 1067,
+    "aspect": 1.4995,
+    "hasAvifDefault": true
+  },
+  "jobsite-02": {
+    "webp": [
+      800
+    ],
+    "avif": [],
+    "display": 1600,
+    "w": 1600,
+    "h": 1067,
+    "aspect": 1.4995,
+    "hasAvifDefault": true
+  },
+  "jobsite-03": {
+    "webp": [
+      800
+    ],
+    "avif": [],
+    "display": 1600,
+    "w": 1600,
+    "h": 1067,
+    "aspect": 1.4995,
+    "hasAvifDefault": true
+  },
+  "jobsite-04": {
+    "webp": [
+      800
+    ],
+    "avif": [],
+    "display": 1600,
+    "w": 1600,
+    "h": 1067,
+    "aspect": 1.4995,
+    "hasAvifDefault": true
+  },
+  "jobsite-05": {
+    "webp": [
+      800
+    ],
+    "avif": [],
+    "display": 1600,
+    "w": 1600,
+    "h": 1067,
+    "aspect": 1.4995,
+    "hasAvifDefault": true
+  },
+  "jobsite-06": {
+    "webp": [
+      800
+    ],
+    "avif": [],
+    "display": 1600,
+    "w": 1600,
+    "h": 1067,
+    "aspect": 1.4995,
+    "hasAvifDefault": true
+  },
+  "jobsite-07": {
+    "webp": [
+      800
+    ],
+    "avif": [],
+    "display": 1600,
+    "w": 1600,
+    "h": 1067,
+    "aspect": 1.4995,
+    "hasAvifDefault": true
+  },
+  "jobsite-08": {
+    "webp": [
+      800,
+      3840
+    ],
+    "avif": [],
+    "display": 2000,
+    "w": 2000,
+    "h": 1333,
+    "aspect": 1.5004,
+    "hasAvifDefault": true
+  },
+  "johns-hopkins": {
+    "webp": [
+      800,
+      1000
+    ],
+    "avif": [
+      800,
+      1000
+    ],
+    "display": 1000,
+    "w": 1000,
+    "h": 667,
+    "aspect": 1.4993,
+    "hasAvifDefault": true
+  },
+  "mace-medical": {
+    "webp": [
+      800
+    ],
+    "avif": [],
+    "display": 1600,
+    "w": 1600,
+    "h": 1067,
+    "aspect": 1.4995,
+    "hasAvifDefault": true
+  },
+  "oreilly": {
+    "webp": [
+      259
+    ],
+    "avif": [
+      259
+    ],
+    "display": 259,
+    "w": 259,
+    "h": 173,
+    "aspect": 1.4971,
+    "hasAvifDefault": true
+  },
+  "panda-express": {
+    "webp": [
+      800,
+      1599
+    ],
+    "avif": [
+      800,
+      1599
+    ],
+    "display": 1599,
+    "w": 1599,
+    "h": 1066,
+    "aspect": 1.5,
+    "hasAvifDefault": true
+  }
+}

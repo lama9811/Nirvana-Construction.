@@ -1,41 +1,58 @@
 /* ============================================================
-   NIRVANA CONSTRUCTION — "Cinematic Blueprint" design system
+   NIRVANA CONSTRUCTION — design system
+   Brand colours are derived from the logo itself:
+     #009933  green   (H140 S100% L30%) — 54–64% of logo pixels
+     #FF6600  orange  (H24  S100% L50%) — 21–23% of logo pixels
+   Both hues are preserved exactly; every other step is derived.
+   See docs/superpowers/specs/2026-09-17-logo-brand-rebuild-design.md
    ============================================================ */
 
 @import "tailwindcss";
 
-/* ---------- Self-hosted typefaces -------------------------- */
+/* ---------- Self-hosted typefaces --------------------------
+   Space Grotesk (display/UI) · Inter (body) · JetBrains Mono (labels).
+   All same-origin: no Google Fonts requests, no Material Symbols.
+   Clash Display / Switzer remain in /public/fonts but are no longer
+   declared — the cinematic variant can be revived by re-adding them.
+   ----------------------------------------------------------- */
 @font-face {
-  font-family: "Clash Display";
-  src: url("/fonts/ClashDisplay-Semibold.woff2") format("woff2");
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Clash Display";
-  src: url("/fonts/ClashDisplay-Bold.woff2") format("woff2");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Switzer";
-  src: url("/fonts/Switzer-Regular.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Switzer";
-  src: url("/fonts/Switzer-Medium.woff2") format("woff2");
+  font-family: "Space Grotesk";
+  src: url("/fonts/space-grotesk-500.woff2") format("woff2");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Switzer";
-  src: url("/fonts/Switzer-Semibold.woff2") format("woff2");
+  font-family: "Space Grotesk";
+  src: url("/fonts/space-grotesk-600.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("/fonts/space-grotesk-700.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/inter-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/inter-500.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/inter-600.woff2") format("woff2");
   font-weight: 600;
   font-style: normal;
   font-display: swap;
@@ -47,140 +64,116 @@
   font-style: normal;
   font-display: swap;
 }
-@font-face {
-  font-family: "JetBrains Mono";
-  src: url("/fonts/JetBrainsMono-Medium.woff2") format("woff2");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
 
-/* ---------- Design tokens ---------------------------------- */
 @theme {
-  /* surfaces — warm cream paper */
-  --color-ink: #f5f1e7;        /* page background (was charcoal) */
-  --color-graphite: #ece6d4;   /* elevated surface */
-  --color-graphite-2: #e0d9c3; /* deeper warm */
-  --color-steel: #b8b1a0;      /* mid warm gray */
+  /* ================= BRAND — derived from the logo ================= */
+  /* green — hue 140 held exactly; 500 is the literal logo hex */
+  --color-green-50: #f2f8f4;
+  --color-green-100: #daf1e2;
+  --color-green-200: #adebc2;
+  --color-green-300: #70eb99;
+  --color-green-500: #009933; /* ← logo green, verbatim */
+  --color-green-600: #00852c; /* 4.78:1 on white — green at text size */
+  --color-green-700: #006622; /* 7.18:1 on white — links, hover */
+  --color-green-800: #034519;
+  --color-green-900: #052911; /* dark section bands */
+  --color-green-950: #051a0c; /* deepest band, footer */
 
-  /* text — deep on cream */
-  --color-bone: #1a1f1b;       /* primary text — near-black, green-tinted */
-  --color-ash: #5a625a;        /* secondary */
-  --color-concrete: #8b9088;   /* tertiary */
+  /* orange — hue 24 held exactly; 500 is the literal logo hex.
+     NOTE: white on #FF6600 is 2.94:1 and FAILS WCAG at every size.
+     Orange fills must carry the dark ink label (5.87:1). Orange as
+     *text* on white must use orange-600. */
+  --color-orange-50: #f8f4f2;
+  --color-orange-100: #f1e3da;
+  --color-orange-200: #ebc6ad;
+  --color-orange-300: #eba170;
+  --color-orange-500: #ff6600; /* ← logo orange, verbatim */
+  --color-orange-600: #853500; /* 8.38:1 on white — orange at text size */
+  --color-orange-700: #662900;
+  --color-orange-800: #451d03;
+  --color-orange-900: #291305;
 
-  /* brand — green is the primary, orange is the action accent */
-  --color-emerald: #0e9c46;
-  --color-emerald-deep: #0a6c31;
-  --color-emerald-glow: #18c95a;
+  /* neutrals — very slightly green-tinted so they sit with the brand */
+  --color-ink: #0a1f14; /* body text — 17.23:1 on white */
+  --color-ink-soft: #3f5247; /* secondary text */
+  --color-ink-mute: #6b7a70; /* tertiary text, meta */
+  --color-hairline: #c7d6cc; /* 1px rules and borders */
+  --color-paper: #ffffff; /* page base */
 
-  --color-flare: #e85427;
-  --color-flare-deep: #b03e1a;
-  --color-flare-glow: #ff7448;
+  /* ================= SEMANTIC (Material names kept) =================
+     These names are used throughout the five pages. Re-pointing them
+     here moves the whole site onto the logo palette with no template
+     churn. The unused Material tokens (*-fixed, *-fixed-dim, tertiary,
+     error containers) have been removed. */
 
-  /* typefaces */
-  --font-display: "Clash Display", "Arial Narrow", sans-serif;
-  --font-body: "Switzer", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
-  --font-sans: "Switzer", ui-sans-serif, system-ui, sans-serif;
-
-  /* motion */
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in-out-quint: cubic-bezier(0.83, 0, 0.17, 1);
-
-  /* container */
-  --breakpoint-xs: 30rem;
-
-  /* ----------- Stitch design tokens (Material-style) ----------- */
-  /* Surfaces */
+  /* surfaces */
   --color-surface-container-lowest: #ffffff;
-  --color-surface: #f8f9ff;
-  --color-surface-bright: #f8f9ff;
-  --color-background: #f8f9ff;
-  --color-surface-container-low: #eff4ff;
-  --color-surface-container: #e5eeff;
-  --color-surface-container-high: #dce9ff;
-  --color-surface-container-highest: #d3e4fe;
-  --color-surface-variant: #d3e4fe;
-  --color-surface-dim: #cbdbf5;
-  --color-surface-tint: #2b6954;
-  --color-inverse-surface: #213145;
-  --color-inverse-on-surface: #eaf1ff;
+  --color-surface: #f8faf8;
+  --color-surface-bright: #ffffff;
+  --color-background: #ffffff;
+  --color-surface-container-low: #f2f8f4;
+  --color-surface-container: #e8f3ec;
+  --color-surface-container-high: #daf1e2;
+  --color-surface-container-highest: #c9e9d6;
+  --color-surface-variant: #daf1e2; /* light — for use ON dark bands */
+  --color-surface-dim: #bcdcc7;
+  --color-inverse-surface: #052911;
+  --color-inverse-on-surface: #f2f8f4;
 
-  /* Outlines */
-  --color-outline: #707974;
-  --color-outline-variant: #bfc9c3;
+  /* outlines */
+  --color-outline: #6b7a70;
+  --color-outline-variant: #c7d6cc;
 
-  /* On-* foregrounds */
-  --color-on-background: #0b1c30;
-  --color-on-surface: #0b1c30;
-  --color-on-surface-variant: #404944;
+  /* text */
+  --color-on-background: #052911; /* dark band background + strong text */
+  --color-on-surface: #0a1f14;
+  --color-on-surface-variant: #3f5247;
 
-  /* Primary (deep forest green) */
-  --color-primary: #003527;
+  /* primary = brand green */
+  --color-primary: #006622;
   --color-on-primary: #ffffff;
-  --color-primary-container: #064e3b;
-  --color-on-primary-container: #80bea6;
-  --color-primary-fixed: #b0f0d6;
-  --color-primary-fixed-dim: #95d3ba;
-  --color-on-primary-fixed: #002117;
-  --color-on-primary-fixed-variant: #0b513d;
-  --color-inverse-primary: #95d3ba;
+  --color-primary-container: #052911;
+  --color-on-primary-container: #adebc2;
+  --color-inverse-primary: #70eb99;
 
-  /* Secondary (burnt / safety orange) */
-  --color-secondary: #9d4300;
+  /* secondary = brand orange (the action colour) */
+  --color-secondary: #853500;
   --color-on-secondary: #ffffff;
-  --color-secondary-container: #fd761a;
-  --color-on-secondary-container: #5c2400;
-  --color-secondary-fixed: #ffdbca;
-  --color-secondary-fixed-dim: #ffb690;
-  --color-on-secondary-fixed: #341100;
-  --color-on-secondary-fixed-variant: #783200;
+  --color-secondary-container: #ff6600;
+  --color-on-secondary-container: #0a1f14; /* dark label — passes at 5.87:1 */
 
-  /* Tertiary (cool blue accent) */
-  --color-tertiary: #003343;
-  --color-on-tertiary: #ffffff;
-  --color-tertiary-container: #104a5f;
-  --color-on-tertiary-container: #87b9d1;
-  --color-tertiary-fixed: #bee9ff;
-  --color-tertiary-fixed-dim: #9ccee6;
-  --color-on-tertiary-fixed: #001f2a;
-  --color-on-tertiary-fixed-variant: #144c61;
+  /* the two *-fixed tokens that are genuinely in use. Both are intended
+     for placement ON the dark green bands, which is what made them read
+     "unexpectedly" before — they were tuned for a navy background.
+       primary-fixed   #adebc2 on #052911 — icon/accent green
+       secondary-fixed #ff6600 on #052911 — 4.56:1, passes AA for text */
+  --color-primary-fixed: #adebc2;
+  --color-on-primary-fixed: #052911;
+  --color-secondary-fixed: #ff6600;
+  --color-on-secondary-fixed: #0a1f14;
 
-  /* Error */
-  --color-error: #ba1a1a;
-  --color-on-error: #ffffff;
-  --color-error-container: #ffdad6;
-  --color-on-error-container: #93000a;
+  /* ================= LEGACY (kept for 404 + parked components) =====
+     The cinematic-blueprint names are still referenced by 404.astro and
+     the parked components in src/components/. Re-pointed rather than
+     deleted so nothing breaks. */
+  --color-bone: #0a1f14;
+  --color-graphite: #f2f8f4;
+  --color-graphite-2: #daf1e2;
+  --color-steel: #c7d6cc;
+  --color-concrete: #6b7a70;
+  --color-ash: #3f5247;
+  --color-emerald: #009933;
+  --color-emerald-deep: #006622;
+  --color-emerald-glow: #70eb99;
+  --color-flare: #ff6600;
+  --color-flare-deep: #853500;
+  --color-flare-glow: #eba170;
 
-  /* Stitch spacing (Material-style names) */
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-base: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-gutter: 24px;
-  --spacing-xl: 32px;
-  --spacing-xxl: 64px;
-  --spacing-container-max: 1280px;
-
-  /* Restore Tailwind v4's default container tokens — without these the
-     custom --spacing-{xs,sm,md,lg,xl} above were leaking into max-w-*
-     utilities and collapsing paragraphs to 4–32 px wide. */
-  --container-3xs: 16rem;
-  --container-2xs: 18rem;
-  --container-xs: 20rem;
-  --container-sm: 24rem;
-  --container-md: 28rem;
-  --container-lg: 32rem;
-  --container-xl: 36rem;
-  --container-2xl: 42rem;
-  --container-3xl: 48rem;
-  --container-4xl: 56rem;
-  --container-5xl: 64rem;
-  --container-6xl: 72rem;
-  --container-7xl: 80rem;
-
-  /* Typography — display = Space Grotesk (modern, characterful), body = Inter */
+  /* ================= TYPEFACES ================= */
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
   --font-headline-xl: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-headline-lg: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-headline-lg-mobile: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
@@ -190,8 +183,35 @@
   --font-body-md: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-body-sm: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-label-bold: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-label-mono: "JetBrains Mono", ui-monospace, monospace;
 
-  /* Stitch font sizes (size / line-height / weight / tracking) */
+  /* ================= TYPE SCALE =================
+     New fluid display tier with proportional negative tracking — the
+     one move shared by every modern reference we studied. There is a
+     deliberate gap between display-md and headline-md: metadata is
+     tiny, body is comfortable, display is large, nothing competes. */
+  --text-display-xl: clamp(2.75rem, 7vw, 6rem);
+  --text-display-xl--line-height: 0.96;
+  --text-display-xl--font-weight: 700;
+  --text-display-xl--letter-spacing: -0.04em;
+
+  --text-display-lg: clamp(2rem, 4.5vw, 3.5rem);
+  --text-display-lg--line-height: 1.02;
+  --text-display-lg--font-weight: 700;
+  --text-display-lg--letter-spacing: -0.03em;
+
+  --text-display-md: clamp(1.5rem, 2.5vw, 2.25rem);
+  --text-display-md--line-height: 1.12;
+  --text-display-md--font-weight: 600;
+  --text-display-md--letter-spacing: -0.02em;
+
+  /* the mono micro-label that carries all the facts */
+  --text-label-mono: 0.6875rem; /* 11px */
+  --text-label-mono--line-height: 1.4;
+  --text-label-mono--font-weight: 400;
+  --text-label-mono--letter-spacing: 0.14em;
+
+  /* existing Stitch scale — retained so the five pages keep working */
   --text-headline-xl: 48px;
   --text-headline-xl--line-height: 56px;
   --text-headline-xl--font-weight: 700;
@@ -222,23 +242,57 @@
   --text-button: 14px;
   --text-button--line-height: 16px;
   --text-button--font-weight: 700;
+
+  /* ================= SPACING =================
+     NOTE: these --spacing-* names also shadow max-w-{xs,sm,md,lg,xl},
+     which is why paragraph widths across the site use bracket syntax
+     (max-w-[32rem]). The --container-* restores below are nominal only. */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-base: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-gutter: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 64px;
+  --spacing-container-max: 1280px;
+
+  --container-3xs: 16rem;
+  --container-2xs: 18rem;
+  --container-xs: 20rem;
+  --container-sm: 24rem;
+  --container-md: 28rem;
+  --container-lg: 32rem;
+  --container-xl: 36rem;
+  --container-2xl: 42rem;
+  --container-3xl: 48rem;
+  --container-4xl: 56rem;
+  --container-5xl: 64rem;
+  --container-6xl: 72rem;
+  --container-7xl: 80rem;
+
+  /* ================= MOTION ================= */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quint: cubic-bezier(0.83, 0, 0.17, 1);
+
+  --breakpoint-xs: 30rem;
 }
 
 /* ---------- Base ------------------------------------------- */
 @layer base {
   * {
-    border-color: color-mix(in oklab, var(--color-bone) 10%, transparent);
+    border-color: var(--color-hairline);
   }
 
   html {
     -webkit-text-size-adjust: 100%;
     scroll-behavior: auto; /* Lenis owns scrolling */
-    background-color: var(--color-ink);
+    background-color: var(--color-paper);
   }
 
   body {
-    background-color: var(--color-ink);
-    color: var(--color-bone);
+    background-color: var(--color-paper);
+    color: var(--color-ink);
     font-family: var(--font-body);
     font-weight: 400;
     line-height: 1.6;
@@ -250,49 +304,141 @@
 
   h1, h2, h3, h4 {
     font-family: var(--font-display);
-    font-weight: 600;
-    line-height: 0.95;
+    font-weight: 700;
+    line-height: 1.05;
     letter-spacing: -0.02em;
     text-wrap: balance;
   }
 
   ::selection {
-    background-color: var(--color-flare);
+    background-color: var(--color-orange-500);
     color: var(--color-ink);
   }
 
-  /* dark, slim scrollbar */
   ::-webkit-scrollbar { width: 10px; height: 10px; }
-  ::-webkit-scrollbar-track { background: var(--color-ink); }
+  ::-webkit-scrollbar-track { background: var(--color-green-50); }
   ::-webkit-scrollbar-thumb {
-    background: var(--color-steel);
-    border: 2px solid var(--color-ink);
-    border-radius: 99px;
+    background: var(--color-hairline);
+    border: 2px solid var(--color-green-50);
+    border-radius: 6px;
   }
-  ::-webkit-scrollbar-thumb:hover { background: var(--color-concrete); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--color-ink-mute); }
 
   :focus-visible {
-    outline: 2px solid var(--color-flare);
+    outline: 2px solid var(--color-orange-500);
     outline-offset: 3px;
   }
 
-  /* Lenis */
+  /* Lenis — required for the smooth-scroll bridge in src/lib/motion.ts */
   html.lenis, html.lenis body { height: auto; }
   .lenis.lenis-smooth { scroll-behavior: auto !important; }
   .lenis.lenis-stopped { overflow: hidden; }
 }
 
-/* ---------- Stitch utilities ------------------------------- */
+/* ---------- Components ------------------------------------- */
 @layer components {
-  /* Faint dot-grid backdrop used on hero overlay + CTA section */
+  /* the mono micro-label used for all metadata, eyebrows and rules */
+  .label-mono {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-ink-mute);
+  }
+  .label-mono-light {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: color-mix(in oklab, #ffffff 62%, transparent);
+  }
+
+  /* primary action — logo orange with the dark label that passes AA */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--color-orange-500);
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.875rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.9375rem 1.75rem;
+    border-radius: 2px;
+    transition: background-color 0.2s var(--ease-out-expo), transform 0.2s var(--ease-out-expo);
+  }
+  .btn-primary:hover {
+    background-color: #ff7a24;
+    transform: translateY(-1px);
+  }
+
+  /* secondary action — hairline outline, inherits its colour */
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid currentColor;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.875rem;
+    letter-spacing: 0.04em;
+    padding: 0.9375rem 1.75rem;
+    border-radius: 2px;
+    transition: background-color 0.2s var(--ease-out-expo);
+  }
+  .btn-ghost:hover { background-color: color-mix(in oklab, currentColor 10%, transparent); }
+
+  /* faint blueprint grid — the "we build to the drawings" motif */
+  .blueprint-grid {
+    background-image:
+      linear-gradient(color-mix(in oklab, var(--color-green-500) 8%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in oklab, var(--color-green-500) 8%, transparent) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  /* vertical column rules, like a stud layout — borrowed from Magma */
+  .column-rules {
+    background-image: repeating-linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--color-hairline) 55%, transparent) 0 1px,
+      transparent 1px 12.5%
+    );
+  }
+
+  /* ---- running marquee ----
+     Duplicated track translated -50%: the second copy makes the loop
+     seamless. Honours reduced-motion by simply stopping. */
+  .marquee {
+    display: flex;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+  .marquee-track {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 3.5rem;
+    padding-right: 3.5rem;
+    animation: marquee-scroll var(--marquee-duration, 38s) linear infinite;
+  }
+  .marquee:hover .marquee-track { animation-play-state: paused; }
+  @keyframes marquee-scroll {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(-100%, 0, 0); }
+  }
+}
+
+/* ---------- Retained atoms (referenced by existing pages) --- */
+@layer components {
+  /* faint dot-grid backdrop used on hero overlay + CTA section */
   .blueprint-bg {
-    background-image: radial-gradient(circle, #e2e8f0 1px, transparent 1px);
+    background-image: radial-gradient(circle, var(--color-hairline) 1px, transparent 1px);
     background-size: 24px 24px;
   }
-  /* Material Symbols sizing rule */
-  .material-symbols-outlined {
-    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
-  }
+
   /* Stitch "reveal" — IntersectionObserver-driven entrance fade */
   .reveal {
     opacity: 0;
@@ -304,42 +450,36 @@
     opacity: 1;
     transform: translateY(0);
   }
-}
 
-/* ---------- Reusable atoms --------------------------------- */
-@layer components {
-  /* mono "blueprint annotation" label */
+  /* mono "blueprint annotation" label (wider tracking than .label-mono) */
   .label {
     font-family: var(--font-mono);
     font-size: 0.6875rem;
-    font-weight: 500;
+    font-weight: 400;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: var(--color-ash);
+    color: var(--color-ink-soft);
   }
 
-  /* faint blueprint grid backdrop */
   .bg-blueprint {
     background-image:
-      linear-gradient(color-mix(in oklab, var(--color-bone) 4%, transparent) 1px, transparent 1px),
-      linear-gradient(90deg, color-mix(in oklab, var(--color-bone) 4%, transparent) 1px, transparent 1px);
+      linear-gradient(color-mix(in oklab, var(--color-ink) 4%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in oklab, var(--color-ink) 4%, transparent) 1px, transparent 1px);
     background-size: 64px 64px;
   }
 
-  /* hairline rule */
   .rule {
     height: 1px;
-    background: color-mix(in oklab, var(--color-bone) 12%, transparent);
+    background: color-mix(in oklab, var(--color-ink) 12%, transparent);
   }
 }
 
 /* ---------- Utilities -------------------------------------- */
 @utility text-stroke {
-  -webkit-text-stroke: 1px color-mix(in oklab, var(--color-bone) 38%, transparent);
+  -webkit-text-stroke: 1px color-mix(in oklab, var(--color-ink) 38%, transparent);
   color: transparent;
 }
 
-/* fluid display sizing helpers */
 @utility text-hero {
   font-size: clamp(3.25rem, 11vw, 12rem);
   line-height: 0.9;
@@ -368,6 +508,7 @@
 /* page-load: prevent flash before JS reveals */
 .no-js [data-reveal] { opacity: 1; transform: none; }
 
+/* ---------- Reduced motion --------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -378,4 +519,188 @@
     scroll-behavior: auto !important;
   }
   [data-reveal] { opacity: 1 !important; transform: none !important; }
+
+  /* the marquee must not jump to its end state — kill the animation
+     outright rather than let it run at 0.001ms */
+  .marquee-track { animation-name: none !important; transform: none !important; }
+  .marquee {
+    overflow-x: auto;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .btn-primary:hover { transform: none; }
+}
+
+/* ---------- Hero wordmark (Dieste-style split lockup) ------
+   Two sizes rather than one: "Nirvana" is 7 characters and
+   "Construction" is 12, so a single clamp would either overflow the
+   long word or waste the short one. Each is tuned to sit inside the
+   1280px container at every width, and neither is allowed to wrap. */
+@layer components {
+  .nv-wordmark {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 0.82;
+    letter-spacing: -0.05em;
+    white-space: nowrap;
+    color: var(--color-surface);
+  }
+  .nv-wordmark-a {
+    font-size: clamp(3.25rem, 16vw, 15rem);
+  }
+  .nv-wordmark-b {
+    font-size: clamp(1.85rem, 9.2vw, 8.6rem);
+    text-align: right;
+  }
+}
+
+/* ---------- Depth motion (src/lib/depth.ts) ----------------
+   Start states only exist under html.js-depth (set by the module),
+   so without JS — or under reduced motion — content is at rest. */
+html.js-depth [data-depth-in]:not([data-depth-stagger]),
+html.js-depth [data-depth-in][data-depth-stagger] > * {
+  opacity: 0;
+  transform: perspective(1200px) rotateX(18deg) translate3d(0, 40px, -120px);
+  transform-origin: 50% 100%;
+  transition: opacity 0.9s var(--ease-out-expo), transform 0.9s var(--ease-out-expo);
+  transition-delay: var(--d, 0ms);
+}
+html.js-depth [data-depth-in].is-in:not([data-depth-stagger]),
+html.js-depth [data-depth-in].is-in[data-depth-stagger] > * {
+  opacity: 1;
+  transform: none;
+}
+/* entrance finished: the element's own hover transitions come back, with no
+   stagger delay, and data-glow's cursor tilt is free to move it */
+html.js-depth [data-depth-in].depth-done:not([data-depth-stagger]),
+html.js-depth [data-depth-in].depth-done[data-depth-stagger] > * {
+  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0, 1), box-shadow 0.3s ease, border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+  transition-delay: 0s;
+}
+html.js-depth [data-depth-in].depth-done[data-glow]:not([data-depth-stagger]),
+html.js-depth [data-depth-in].depth-done[data-depth-stagger] > [data-glow] {
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+}
+[data-flip] { display: inline-flex; align-items: baseline; }
+.flip-drum {
+  display: inline-block;
+  height: 1em;
+  line-height: 1;
+  overflow: hidden;
+}
+.flip-reel {
+  display: flex;
+  flex-direction: column;
+  transform: translateY(0);
+  transition: transform 1.6s cubic-bezier(0.2, 0.7, 0, 1);
+}
+.flip-reel > span { height: 1em; line-height: 1; }
+[data-flip].is-in .flip-reel { transform: translateY(calc(var(--to) * -1em)); }
+[data-flip].is-in .flip-drum .flip-reel { transition-delay: calc(var(--i, 0) * 0.12s); }
+[data-glow] {
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0, 1);
+}
+[data-glow]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  background: radial-gradient(260px 200px at var(--gx, 50%) var(--gy, 50%), rgba(255, 255, 255, 0.16), transparent 70%);
+}
+[data-glow]:not(.absolute):not(.fixed) { position: relative; }
+/* on light cards a white highlight disappears — use a faint logo-green light */
+[data-glow="light"]::after {
+  background: radial-gradient(260px 200px at var(--gx, 50%) var(--gy, 50%), rgba(0, 153, 51, 0.09), transparent 70%);
+}
+[data-glow].glow-on::after { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  [data-glow] { transform: none !important; }
+  .flip-reel { transition: none !important; }
+}
+
+/* data-fan (with data-depth-in data-depth-stagger): on ≥768px the cards
+   wait stacked on the middle card, fanned slightly, then deal out into
+   their columns. depth.ts sets --fi (index), --fc (centre), --fa (|fi-fc|). */
+@media (min-width: 768px) {
+  html.js-depth [data-fan][data-depth-in][data-depth-stagger]:not(.is-in) > * {
+    opacity: 1;
+    transform:
+      translateX(calc((var(--fc) - var(--fi)) * (100% + 1.5rem)))
+      translateY(calc(var(--fa) * 0.9rem))
+      rotate(calc((var(--fi) - var(--fc)) * 5deg))
+      scale(0.94);
+  }
+  html.js-depth [data-fan][data-depth-in][data-depth-stagger] > * {
+    transition-duration: 1.15s;
+    transition-delay: calc(var(--fa) * 90ms + 120ms);
+  }
+}
+
+/* data-stack: a layered group that turns with scroll (--sry/--srx) and
+   leans toward the cursor (--pry/--prx); children carry style="--z:N" */
+[data-stack] {
+  transform:
+    perspective(1600px)
+    rotateY(calc(var(--sry, 0deg) + var(--pry, 0deg)))
+    rotateX(calc(var(--srx, 0deg) + var(--prx, 0deg)));
+  transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.2, 0.7, 0, 1);
+}
+[data-stack] .stack-3d { transform-style: preserve-3d; }
+[data-stack] [data-z] {
+  transform: translateZ(calc(var(--z, 0) * 1px));
+  transition: transform 0.7s cubic-bezier(0.2, 0.7, 0, 1), box-shadow 0.4s;
+}
+[data-stack] [data-z]:hover { transform: translateZ(calc(var(--z, 0) * 1px + 30px)); }
+
+/* data-rise: set per frame by depth.ts; a short transition smooths it */
+html.js-depth [data-rise] {
+  transform:
+    perspective(1400px)
+    translate3d(0, var(--rise-y, 0px), var(--rise-z, 0px))
+    rotateX(var(--rise-rx, 0deg));
+  transform-origin: 50% 100%;
+  opacity: var(--rise-o, 1);
+  transition: transform 0.18s linear, opacity 0.18s linear;
+  will-change: transform;
+}
+
+/* data-scrub: words light in reading order as the block scrolls up */
+[data-scrub] .scrub-w { opacity: var(--lit, 1); transition: opacity 0.2s linear; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-stack] { transform: none !important; }
+  [data-stack] [data-z] { transform: none !important; }
+  [data-rise] { transform: none !important; opacity: 1 !important; }
+}
+
+/* homepage "Nirvana Difference": studs at 16" o.c. drifting behind the band */
+.nv-studs {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.045) 0 2px, transparent 2px 64px),
+    radial-gradient(60% 70% at 78% 45%, rgba(0, 153, 51, 0.22), transparent 70%);
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 20%, #000 80%, transparent);
+  mask-image: linear-gradient(180deg, transparent, #000 20%, #000 80%, transparent);
+  animation: nv-studs-drift 40s linear infinite;
+}
+@keyframes nv-studs-drift {
+  from { background-position: 0 0, 0 0; }
+  to   { background-position: 64px 0, 0 0; }
+}
+.nv-lift { box-shadow: 0 30px 60px -25px rgba(0, 0, 0, 0.6); }
+@media (prefers-reduced-motion: reduce) {
+  .nv-studs { animation-name: none !important; }
+}
+
+/* ---------- In-page link targets ----------------------------
+   Astro's router performs same-page #hash jumps itself; a scroll
+   margin keeps every target clear of the floating nav pill. */
+@layer base {
+  [id] { scroll-margin-top: 6.5rem; }
 }

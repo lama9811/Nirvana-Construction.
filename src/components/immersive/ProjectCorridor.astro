@@ -1,0 +1,773 @@
+---
+/* ============================================================
+   ProjectCorridor — the /projects/ hero, a walk past the real work.
+
+   Ported from the Concept D "stud field" prototype. A field of
+   stud-like bars in deep logo-green space flows through four
+   formations as you scroll —
+
+     LAYOUT    a grid of bars out of plumb, an orange laser level
+     FLOW      the field lifts into a travelling wave
+     CORRIDOR  two stud walls; the camera walks past every station in
+               src/data/corridor.ts — 15 stations, 18 photographs
+     PLUMB     every bar snaps into one wall, dead true
+
+   Engineering:
+     · three.js lives in ./corridor-scene.ts, reached ONLY by dynamic
+       import. The station list is resolved at BUILD time
+       (src/lib/corridor.ts), so every URL is a file that exists.
+     · Progress comes from this track's own bounding rect and is
+       damped here; lib/motion.ts is untouched.
+     · Copy windows fade INSIDE their ranges (same rule as the
+       homepage) and are inert while faded.
+     · Clicking a photograph scrolls to that project's card in the
+       grid below (resetting the filter first).
+     · Reduced motion or no WebGL: a static layout — the drawing, the
+       station photographs as a grid, and the close.
+   ============================================================ */
+
+import manifestJson from "../../data/image-manifest.json";
+import { company } from "../../data/company";
+import { projects } from "../../data/projects";
+import { corridorStations } from "../../data/corridor";
+import { resolveStations, trackVh, type ManifestEntry } from "../../lib/corridor";
+import Icon from "../Icon.astro";
+import ProjectImage from "../ProjectImage.astro";
+
+const M = manifestJson as Record<string, ManifestEntry>;
+const stations = resolveStations(corridorStations, projects, M, 1600);
+const stationsSmall = resolveStations(corridorStations, projects, M, 800);
+const n = stations.length;
+const photoCount = stations.reduce((a, s) => a + s.panels.length, 0);
+const trackStyle = `--track:${trackVh(n, false)}vh;--track-sm:${trackVh(n, true)}vh`;
+---
+
+<section
+  class="nv-imm"
+  data-immersive
+  data-stations={JSON.stringify(stations)}
+  data-stations-small={JSON.stringify(stationsSmall)}
+  aria-label="A walk past our projects"
+>
+  <a href="#project-grid" class="nv-imm-skip">Skip to the project list</a>
+
+  <div class="nv-imm-track" style={trackStyle}>
+    <div class="nv-imm-stage">
+      <div class="nv-imm-bg" aria-hidden="true"></div>
+      <canvas class="nv-imm-canvas" aria-hidden="true"></canvas>
+      <div class="nv-imm-fx" aria-hidden="true"></div>
+
+      {/* station labels, positioned each frame under their 3D panels */}
+      <div class="nv-imm-labels" aria-hidden="true">
+        {
+          stations.map((s, i) => (
+            <div class="nv-imm-plabel" data-plabel={i}>
+              <span class="nv-imm-mono">
+                {s.project ? `P${s.index}` : "Sheet"}
+                {s.meta && <> / {s.meta}</>}
+              </span>
+              <span class="nv-imm-pname">{s.name}</span>
+            </div>
+          ))
+        }
+      </div>
+
+      <div class="nv-imm-copy">
+        {/* ---- 01 · intro ---- */}
+        <div class="nv-imm-win nv-imm-intro" data-win="-1,0.07">
+          <div class="nv-imm-still-scrim" aria-hidden="true"></div>
+          <div class="nv-imm-intro-inner">
+            <p class="nv-imm-mono nv-imm-eyebrow">
+              <span class="nv-imm-dot" aria-hidden="true"></span>
+              Selected Projects · Maryland &amp; the Greater Baltimore Region
+            </p>
+            <h1 class="nv-imm-h1 font-display">
+              <span class="nv-line"><span>Work we've framed,</span></span>
+              <span class="nv-line"><span>boarded and finished.</span></span>
+            </h1>
+            <p class="nv-imm-lede">
+              We've carried commercial interiors across Maryland, from retail and
+              medical to education and community spaces, and every one of them was
+              handed over plumb, on layout and ready for inspection. Walk the corridor, or skip
+              straight to the list.
+            </p>
+            <div class="nv-imm-actions">
+              <a href="#project-grid" class="btn-ghost text-white">
+                Browse the list
+                <Icon name="chevron_right" />
+              </a>
+              <span class="nv-imm-mono nv-imm-cue">Scroll to walk · {photoCount} photographs</span>
+            </div>
+          </div>
+        </div>
+
+        {/* ---- interstitial, while the corridor forms ---- */}
+        <div class="nv-imm-win nv-imm-inter" data-win="0.085,0.15">
+          <p class="nv-imm-mono">{String(n).padStart(2, "0")} stops · one crew</p>
+          <h2 class="font-display">Real rooms, real handovers.<br />Every one of them ours.</h2>
+        </div>
+
+        {/* ---- the station we're passing, as large type ---- */}
+        <div class="nv-imm-now" aria-live="off">
+          <p class="nv-imm-mono nv-imm-now-meta" data-now-meta></p>
+          <p class="nv-imm-now-name font-display" data-now-name></p>
+        </div>
+
+        {/* ---- outro · the plumb wall ---- */}
+        <div class="nv-imm-win nv-imm-outro" data-win="0.925,2">
+          <p class="nv-imm-mono">
+            {company.certification.label} · {company.certification.number}
+          </p>
+          <h2 class="nv-imm-outro-title font-display">
+            <span class="nv-line"><span>Every one of</span></span>
+            <span class="nv-line"><span>them plumb.</span></span>
+          </h2>
+          <p class="nv-imm-lede">
+            We coordinate with the GC, work to the drawings and finish ready for
+            inspection, so the next project on this list can be yours.
+          </p>
+          <div class="nv-imm-actions">
+            <a href="#project-grid" class="btn-ghost text-white">
+              Browse all projects
+              <Icon name="chevron_right" />
+            </a>
+            <a href="/contact/" class="btn-primary">
+              Get in Touch
+              <Icon name="arrow_forward" />
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* ---- HUD ---- */}
+      <div class="nv-imm-hud" aria-hidden="true">
+        <span class="nv-imm-mono"><span data-hud-stage>Layout</span></span>
+        <span class="nv-imm-mono nv-imm-hud-sta" data-hud-sta>STA 0+00</span>
+        <span class="nv-imm-hud-prog"><span data-hud-bar></span></span>
+      </div>
+    </div>
+  </div>
+
+  {/* ---- static layout: reduced motion / no WebGL ---- */}
+  <div class="nv-imm-static">
+    <ol class="nv-imm-grid">
+      {
+        stations.map((s) => (
+          <li class="nv-imm-card">
+            <a href={s.project ? `#${s.project}` : "#project-grid"}>
+              <ProjectImage
+                slug={s.panels[0].slug}
+                alt={s.project ? `${s.name}, completed project` : "Drawing"}
+                sizes="(min-width: 768px) 50vw, 100vw"
+                class="nv-imm-card-img"
+              />
+              <span class="nv-imm-mono">{s.project ? `P${s.index}` : "Sheet"}{s.meta && <> / {s.meta}</>}</span>
+              <span class="nv-imm-card-name font-display">{s.name}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .nv-imm {
+    --hdr: 5rem;
+    --g: max(1.5rem, calc((100vw - 1280px) / 2 + 1.5rem));
+    position: relative;
+    background: #051a0c;
+    color: #fff;
+    /* slide under the sticky frosted header so the stage fills the
+       first viewport exactly — the header stays on top (z-50) */
+    margin-top: calc(var(--hdr) * -1);
+  }
+  @media (min-width: 768px) {
+    .nv-imm { --hdr: 5.5rem; }
+  }
+  .nv-imm-track { position: relative; height: var(--track, 1120vh); }
+  @media (max-width: 767px), (pointer: coarse) {
+    .nv-imm-track { height: var(--track-sm, 920vh); }
+  }
+  .nv-imm-stage {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100svh;
+    overflow: hidden;
+  }
+
+  .nv-imm-skip {
+    position: absolute;
+    left: var(--g);
+    top: calc(var(--hdr) + 0.75rem);
+    z-index: 20;
+    padding: 0.6rem 1rem;
+    background: #ff6600;
+    color: #0a1f14;
+    font-family: var(--font-display);
+    font-weight: 600;
+    transform: translateY(-200%);
+    opacity: 0;
+    transition: transform 0.2s, opacity 0.2s;
+  }
+  .nv-imm-skip:focus { transform: none; opacity: 1; }
+
+  .nv-imm-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(70% 55% at 50% 60%, #0b3a1c 0%, rgba(5, 26, 12, 0) 70%),
+      #051a0c;
+  }
+  .nv-imm-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    opacity: 0;
+    transition: opacity 1.4s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .nv-imm[data-ready] .nv-imm-canvas { opacity: 1; }
+
+  /* cheap post: vignette + film grain, compositor-only */
+  .nv-imm-fx {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    background: radial-gradient(120% 95% at 50% 50%, transparent 52%, rgba(2, 10, 5, 0.62) 100%);
+  }
+  .nv-imm-fx::after {
+    content: "";
+    position: absolute;
+    inset: -50%;
+    opacity: 0.07;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: nv-grain 0.9s steps(5) infinite;
+  }
+  .nv-imm[data-idle] .nv-imm-fx::after { animation-play-state: paused; }
+  @keyframes nv-grain {
+    0% { transform: translate(0, 0); }
+    20% { transform: translate(-3%, 2%); }
+    40% { transform: translate(2%, -3%); }
+    60% { transform: translate(-2%, -1%); }
+    80% { transform: translate(3%, 3%); }
+    100% { transform: translate(0, 0); }
+  }
+
+  .nv-imm-mono {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.62);
+  }
+
+  /* ---- masked line-rise for headings: plays when a window turns on ---- */
+  .nv-line { display: block; overflow: hidden; padding-bottom: 0.06em; }
+  .nv-line > span {
+    display: block;
+    transform: translateY(105%);
+    transition: transform 0.75s cubic-bezier(0.2, 0.7, 0, 1);
+  }
+  .nv-line:nth-child(2) > span { transition-delay: 0.07s; }
+  [data-on] .nv-line > span { transform: none; }
+
+  /* ---- station labels ---- */
+  .nv-imm-labels { position: absolute; inset: 0; pointer-events: none; }
+  .nv-imm-plabel {
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    white-space: nowrap;
+    will-change: transform, opacity;
+    padding-left: 0.75rem;
+    border-left: 1px solid rgba(255, 102, 0, 0.9);
+  }
+  .nv-imm-pname {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.125rem;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  /* ---- copy windows ---- */
+  .nv-imm-copy { position: absolute; inset: 0; pointer-events: none; }
+  .nv-imm-win { position: absolute; will-change: opacity, transform; }
+  .nv-imm-win :is(a, button) { pointer-events: auto; }
+
+  .nv-imm-intro {
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    padding: calc(var(--hdr) + 2rem) 0 6.5rem;
+  }
+  /* readability: the copy column gets its own directional shade */
+  .nv-imm-still-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(5, 26, 12, 0.78) 0%, rgba(5, 26, 12, 0.45) 45%, transparent 72%),
+      linear-gradient(0deg, rgba(5, 26, 12, 0.6) 0%, transparent 45%);
+  }
+  .nv-imm-intro-inner {
+    position: relative;
+    width: 100%;
+    padding-inline: var(--g);
+  }
+  .nv-imm-eyebrow { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+  .nv-imm-dot {
+    flex: none;
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 999px;
+    background: #ff6600;
+    box-shadow: 0 0 12px 2px rgba(255, 102, 0, 0.55);
+  }
+  .nv-imm-h1 {
+    font-weight: 700;
+    font-size: clamp(2.75rem, 6.6vw, 6.75rem);
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+    margin: 0 0 1.75rem;
+  }
+  .nv-imm-h1 .nv-line:nth-child(2) { color: rgba(255, 255, 255, 0.6); }
+  .nv-imm-lede {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.8);
+    max-width: 34rem;
+    margin-bottom: 2rem;
+  }
+  .nv-imm-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.5rem; }
+
+  .nv-imm-inter {
+    left: var(--g);
+    right: var(--g);
+    top: 50%;
+    translate: 0 -50%;
+    text-align: center;
+  }
+  .nv-imm-inter h2 {
+    font-weight: 600;
+    font-size: clamp(1.75rem, 3.6vw, 3.25rem);
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    margin-top: 1rem;
+    text-shadow: 0 2px 40px rgba(5, 26, 12, 0.8);
+  }
+
+  /* ---- the station we're passing ---- */
+  .nv-imm-now {
+    position: absolute;
+    left: var(--g);
+    right: var(--g);
+    bottom: 5.25rem;
+    pointer-events: none;
+  }
+  .nv-imm-now-name {
+    font-weight: 700;
+    font-size: clamp(2.5rem, 7.5vw, 7.5rem);
+    line-height: 0.9;
+    letter-spacing: -0.055em;
+    margin-top: 0.75rem;
+    text-shadow: 0 2px 40px rgba(5, 26, 12, 0.7);
+    max-width: 14ch;
+  }
+  .nv-imm-now > * {
+    transition: opacity 0.35s ease, transform 0.6s cubic-bezier(0.2, 0.7, 0, 1);
+  }
+  .nv-imm-now[data-swap] > * { opacity: 0; transform: translateY(0.4em); transition-duration: 0.18s; }
+  .nv-imm-now[data-off] > * { opacity: 0; }
+
+  .nv-imm-outro {
+    left: var(--g);
+    bottom: 6.5rem;
+    max-width: 36rem;
+  }
+  .nv-imm-outro::before {
+    content: "";
+    position: absolute;
+    inset: -6rem -8rem -4rem -30vw;
+    z-index: -1;
+    background: radial-gradient(closest-side, rgba(3, 16, 8, 0.82), transparent);
+  }
+  .nv-imm-outro-title {
+    font-weight: 700;
+    font-size: clamp(2.75rem, 6.5vw, 6rem);
+    line-height: 0.92;
+    letter-spacing: -0.05em;
+    margin: 1rem 0 1.25rem;
+  }
+
+  /* ---- HUD ---- */
+  .nv-imm-hud {
+    position: absolute;
+    left: var(--g);
+    right: var(--g);
+    bottom: 1.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    pointer-events: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    padding-top: 0.9rem;
+  }
+  .nv-imm-hud-prog {
+    position: relative;
+    width: 7rem;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+  }
+  .nv-imm-hud-prog > span {
+    position: absolute;
+    inset: 0;
+    background: #ff6600;
+    transform-origin: left;
+    transform: scaleX(0);
+  }
+  @media (max-width: 640px) {
+    .nv-imm-hud-sta { display: none; }
+    .nv-imm-cue { display: none; }
+  }
+
+  /* ---- static layout (hidden in the immersive mode) ---- */
+  .nv-imm-static { display: none; }
+  .nv-imm-grid {
+    list-style: none;
+    margin: 0;
+    padding: 1rem var(--g) 5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+    gap: 2.5rem 2rem;
+  }
+  .nv-imm-card a { display: flex; flex-direction: column; gap: 0.6rem; color: #fff; }
+  .nv-imm-card :global(img) { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
+  .nv-imm-card-name { font-weight: 600; font-size: 1.35rem; letter-spacing: -0.02em; }
+
+  /* ============================================================
+     Static composition — reduced motion, or no WebGL. Two copies:
+     one keyed to the media query so it applies before any script
+     runs, one to [data-static], set by script.
+     ============================================================ */
+  @media (prefers-reduced-motion: reduce) {
+    .nv-imm { margin-top: 0; }
+    .nv-imm-track { height: auto; }
+    .nv-imm-stage { position: relative; height: auto; overflow: visible; }
+    .nv-imm-bg, .nv-imm-canvas, .nv-imm-fx, .nv-imm-labels, .nv-imm-hud, .nv-imm-now, .nv-imm-inter, .nv-imm-outro, .nv-imm-cue { display: none; }
+    .nv-imm-copy { position: relative; inset: auto; pointer-events: auto; }
+    .nv-imm-win {
+      position: relative; inset: auto; left: auto; right: auto; bottom: auto; top: auto;
+      translate: none; opacity: 1 !important; transform: none !important; visibility: visible !important;
+    }
+    .nv-line > span { transform: none; transition: none; }
+    .nv-imm-intro { min-height: 0; padding: 7rem 0 3rem; }
+    .nv-imm-outro { padding: 0 var(--g) 5rem; max-width: none; }
+    .nv-imm-outro::before { display: none; }
+    .nv-imm-static { display: block; }
+    .nv-imm-fx::after { animation: none; }
+  }
+  .nv-imm[data-static] { margin-top: 0; }
+  .nv-imm[data-static] .nv-imm-track { height: auto; }
+  .nv-imm[data-static] .nv-imm-stage { position: relative; height: auto; overflow: visible; }
+  .nv-imm[data-static] :is(.nv-imm-bg, .nv-imm-canvas, .nv-imm-fx, .nv-imm-labels, .nv-imm-hud, .nv-imm-now, .nv-imm-inter, .nv-imm-outro, .nv-imm-cue) { display: none; }
+  /* static: the page's own CTA band closes the section */
+  .nv-imm[data-static] .nv-imm-copy { position: relative; inset: auto; pointer-events: auto; }
+  .nv-imm[data-static] .nv-imm-win {
+    position: relative; inset: auto; left: auto; right: auto; bottom: auto; top: auto;
+    translate: none; opacity: 1 !important; transform: none !important; visibility: visible !important;
+  }
+  .nv-imm[data-static] .nv-line > span { transform: none; }
+  .nv-imm[data-static] .nv-imm-intro { min-height: 0; padding: 7rem 0 3rem; }
+  .nv-imm[data-static] .nv-imm-outro { padding: 0 var(--g) 5rem; max-width: none; }
+  .nv-imm[data-static] .nv-imm-outro::before { display: none; }
+  .nv-imm[data-static] .nv-imm-static { display: block; }
+</style>
+
+<script>
+  import { getLenis } from "../../lib/motion";
+  import { activeStation } from "../../lib/corridor";
+  import type { ResolvedStation } from "../../lib/corridor";
+  import { stageOpacity } from "./flythrough-timeline";
+  import type { CorridorHandle } from "./corridor-scene";
+
+  type Root = HTMLElement & { __immCleanup?: () => void };
+
+  const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
+
+  const PHASE_NAMES: [number, string][] = [
+    [0, "Layout"],
+    [0.06, "Flow"],
+    [0.13, "Corridor"],
+    [0.915, "Plumb"],
+  ];
+
+  function webglAvailable() {
+    try {
+      const c = document.createElement("canvas");
+      const gl = c.getContext("webgl2") || c.getContext("webgl");
+      /* hand the probe context straight back — it must not count towards
+         the browser's cap on live WebGL contexts */
+      gl?.getExtension("WEBGL_lose_context")?.loseContext();
+      return !!gl;
+    } catch {
+      return false;
+    }
+  }
+
+  /* reset the grid filter, then glide to the project's card and flash it */
+  function goToCard(slug: string | null) {
+    if (!slug) return;
+    document.dispatchEvent(new CustomEvent("nv:reset-filter"));
+    const card = document.getElementById(slug);
+    if (!card) return;
+    requestAnimationFrame(() => {
+      const y = card.getBoundingClientRect().top + window.scrollY - 120;
+      const lenis = getLenis();
+      if (lenis) lenis.scrollTo(y, { duration: 1.6 });
+      else window.scrollTo({ top: y, behavior: "smooth" });
+      card.classList.remove("nv-flash");
+      void card.offsetWidth;
+      card.classList.add("nv-flash");
+      window.setTimeout(() => card.classList.remove("nv-flash"), 2200);
+    });
+  }
+
+  function init() {
+    document.querySelectorAll<Root>("[data-immersive]").forEach((root) => {
+      root.__immCleanup?.();
+
+      /* static layout cards jump to a grid card, so they reset the filter
+         first (a filtered grid could otherwise hide the target) */
+      root.querySelectorAll<HTMLAnchorElement>(".nv-imm-card a").forEach((a) => {
+        a.onclick = () => void document.dispatchEvent(new CustomEvent("nv:reset-filter"));
+      });
+
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (reduced) return;
+      if (!webglAvailable()) {
+        root.setAttribute("data-static", "");
+        return;
+      }
+
+      const small = window.matchMedia("(max-width: 767px), (pointer: coarse)").matches || window.innerWidth < 768;
+      const stations: ResolvedStation[] = JSON.parse(
+        (small ? root.dataset.stationsSmall : root.dataset.stations) || "[]",
+      );
+      const n = stations.length;
+
+      const track = root.querySelector<HTMLElement>(".nv-imm-track")!;
+      const stage = root.querySelector<HTMLElement>(".nv-imm-stage")!;
+      const canvas = root.querySelector<HTMLCanvasElement>(".nv-imm-canvas")!;
+      const hudStage = root.querySelector<HTMLElement>("[data-hud-stage]");
+      const hudSta = root.querySelector<HTMLElement>("[data-hud-sta]");
+      const hudBar = root.querySelector<HTMLElement>("[data-hud-bar]");
+      const now = root.querySelector<HTMLElement>(".nv-imm-now")!;
+      const nowMeta = root.querySelector<HTMLElement>("[data-now-meta]")!;
+      const nowName = root.querySelector<HTMLElement>("[data-now-name]")!;
+      const labels = [...root.querySelectorAll<HTMLElement>("[data-plabel]")];
+
+      const wins = [...root.querySelectorAll<HTMLElement>("[data-win]")].map((el) => {
+        const [a, b] = (el.dataset.win || "0,1").split(",").map(Number);
+        const hasH1 = !!el.querySelector("h1");
+        const links = hasH1 ? [...el.querySelectorAll<HTMLElement>("a, button")] : [];
+        return { el, w: [a, b] as const, last: -1, hasH1, links };
+      });
+
+      const progressOf = () => {
+        const r = track.getBoundingClientRect();
+        const travel = r.height - window.innerHeight;
+        return travel > 0 ? clamp01(-r.top / travel) : 0;
+      };
+
+      function updateWins(p: number) {
+        for (const w of wins) {
+          const o = stageOpacity(p, w.w);
+          if (Math.abs(o - w.last) < 0.002) continue;
+          w.last = o;
+          w.el.style.opacity = o.toFixed(3);
+          w.el.style.transform = `translate3d(0, ${((1 - o) * 22).toFixed(1)}px, 0)`;
+          if (w.hasH1) {
+            /* the h1 stays findable by heading navigation after it fades */
+            w.links.forEach((l) => (l.inert = o < 0.5));
+          } else {
+            w.el.style.visibility = o < 0.01 ? "hidden" : "visible";
+            /* faded copy must not take keyboard focus */
+            w.el.inert = o < 0.5;
+          }
+          o > 0.5 ? w.el.setAttribute("data-on", "") : w.el.removeAttribute("data-on");
+        }
+      }
+
+      /* the big station name: swaps with a quick out-and-up */
+      let shown = -2;
+      let swapT = 0;
+      function updateNow(p: number) {
+        const a = activeStation(p, n);
+        if (a === shown) return;
+        shown = a;
+        window.clearTimeout(swapT);
+        if (a < 0) {
+          now.setAttribute("data-off", "");
+          return;
+        }
+        now.removeAttribute("data-off");
+        now.setAttribute("data-swap", "");
+        swapT = window.setTimeout(() => {
+          const s = stations[a];
+          nowMeta.textContent = s.meta;
+          nowName.textContent = s.name;
+          now.removeAttribute("data-swap");
+        }, 180);
+      }
+
+      let lastStage = "";
+      let lastSta = "";
+      function updateHud(p: number, travelled: number) {
+        let name = PHASE_NAMES[0][1];
+        for (const [at, nm] of PHASE_NAMES) if (p >= at) name = nm;
+        if (name !== lastStage && hudStage) hudStage.textContent = lastStage = name;
+        const ft = Math.max(0, Math.round(travelled));
+        const sta = `STA ${Math.floor(ft / 100)}+${String(ft % 100).padStart(2, "0")}`;
+        if (sta !== lastSta && hudSta) hudSta.textContent = lastSta = sta;
+        if (hudBar) hudBar.style.transform = `scaleX(${p.toFixed(4)})`;
+      }
+
+      let field: CorridorHandle | null = null;
+      let disposed = false;
+      let isStatic = false;
+      let raf = 0;
+      let visible = true;
+      let last = performance.now();
+      /* land where the page already is — never replay from the top */
+      let p = progressOf();
+      let vel = 0;
+      /* the stud field shimmers while someone is here; 20 s after the last
+         input, with the camera settled, the loop (and the grain) stop */
+      let lastInput = performance.now();
+
+      const frame = (t: number) => {
+        raf = requestAnimationFrame(frame);
+        const dt = Math.min(0.05, Math.max(0.001, (t - last) / 1000));
+        last = t;
+        const target = progressOf();
+        const prev = p;
+        p += (target - p) * (1 - Math.exp(-dt * 5));
+        if (Math.abs(target - p) < 1e-5) p = target;
+        const speed = Math.min(1, (Math.abs(p - prev) / dt) * 3);
+        vel += (speed - vel) * Math.min(1, dt * 6);
+        updateWins(p);
+        updateNow(p);
+        const travelled = field ? field.update(p, dt, vel) : 0;
+        updateHud(p, travelled);
+        if (p === target && vel < 0.002 && t - lastInput > 20000) {
+          stop();
+          root.setAttribute("data-idle", "");
+        }
+      };
+
+      const start = () => {
+        if (raf || disposed || isStatic || !visible || document.hidden) return;
+        last = performance.now();
+        raf = requestAnimationFrame(frame);
+      };
+      const stop = () => {
+        if (raf) cancelAnimationFrame(raf);
+        raf = 0;
+      };
+
+      const io = new IntersectionObserver((entries) => {
+        visible = entries.some((e) => e.isIntersecting);
+        visible ? start() : stop();
+      });
+      io.observe(track);
+      const onVis = () => (document.hidden ? stop() : start());
+      document.addEventListener("visibilitychange", onVis);
+      const onInput = () => {
+        lastInput = performance.now();
+        root.removeAttribute("data-idle");
+        start();
+      };
+      window.addEventListener("scroll", onInput, { passive: true });
+      window.addEventListener("resize", onInput);
+      stage.addEventListener("pointermove", onInput, { passive: true });
+
+      /* one place that leaves NOTHING driving the copy once the 3D is gone:
+         loop, observers and listeners off; windows back to plain content */
+      const goStatic = () => {
+        isStatic = true;
+        root.setAttribute("data-static", "");
+        stop();
+        io.disconnect();
+        document.removeEventListener("visibilitychange", onVis);
+        window.removeEventListener("scroll", onInput);
+        window.removeEventListener("resize", onInput);
+        stage.removeEventListener("pointermove", onInput);
+        for (const w of wins) {
+          w.links.forEach((l) => (l.inert = false));
+          w.el.inert = false;
+          w.el.removeAttribute("data-on");
+          w.el.style.removeProperty("opacity");
+          w.el.style.removeProperty("visibility");
+          w.el.style.removeProperty("transform");
+        }
+      };
+
+      updateWins(p);
+      updateNow(p);
+      start();
+
+      import("./corridor-scene")
+        .then(({ createCorridor }) =>
+          createCorridor({
+            canvas,
+            stage,
+            stations,
+            labels,
+            onSelect: (i) => goToCard(stations[i]?.project ?? null),
+          }),
+        )
+        .then((f) => {
+          if (disposed) {
+            f?.dispose();
+            return;
+          }
+          if (!f) return goStatic();
+          field = f;
+          if (import.meta.env.DEV) (window as unknown as { __nvCorridor?: CorridorHandle }).__nvCorridor = f;
+          requestAnimationFrame(() => root.setAttribute("data-ready", ""));
+        })
+        .catch(goStatic);
+
+      root.__immCleanup = () => {
+        disposed = true;
+        stop();
+        io.disconnect();
+        window.clearTimeout(swapT);
+        document.removeEventListener("visibilitychange", onVis);
+        window.removeEventListener("scroll", onInput);
+        window.removeEventListener("resize", onInput);
+        stage.removeEventListener("pointermove", onInput);
+        field?.dispose();
+        field = null;
+        root.removeAttribute("data-ready");
+        delete root.__immCleanup;
+      };
+    });
+  }
+
+  document.addEventListener("astro:page-load", init);
+  document.addEventListener("astro:before-swap", () => {
+    document.querySelectorAll<Root>("[data-immersive]").forEach((r) => r.__immCleanup?.());
+  });
+</script>

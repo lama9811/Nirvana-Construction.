@@ -1,0 +1,67 @@
+---
+/* ============================================================
+   Marquee — a running strip of short text items.
+
+   Used for the two bands the client brief asked for: the general
+   contractors we work with, and our certifications. HDL Construction
+   shows both as a static grid; running them keeps the band alive at a
+   fraction of the vertical space.
+
+   The track is rendered twice and translated -100%, which is what makes
+   the loop seamless. The duplicate copy is aria-hidden so screen
+   readers and the accessibility tree see each item exactly once.
+
+   Renders nothing at all when `items` is empty, so a band with no data
+   yet (the GC list) simply does not appear.
+   ============================================================ */
+
+interface Props {
+  /* small mono label above the strip */
+  label?: string;
+  items: string[];
+  /* seconds for one full pass — longer lists want longer durations */
+  duration?: number;
+  /* colour scheme: on a light surface, or on a dark green band */
+  tone?: "light" | "dark";
+  class?: string;
+}
+
+const {
+  label,
+  items,
+  duration = Math.max(24, items.length * 4.5),
+  tone = "light",
+  class: className = "",
+} = Astro.props;
+
+const labelTone = tone === "dark" ? "text-surface-variant/70" : "text-ink-mute";
+const itemTone = tone === "dark" ? "text-white" : "text-ink";
+const dotTone = tone === "dark" ? "bg-secondary-fixed" : "bg-green-500";
+---
+
+{
+  items.length > 0 && (
+    <div class={className}>
+      {label && (
+        <p class={`label-mono text-center mb-lg ${labelTone}`}>{label}</p>
+      )}
+
+      <div class="marquee" style={`--marquee-duration:${duration}s`}>
+        {[0, 1].map((copy) => (
+          <div class="marquee-track" aria-hidden={copy === 1 ? "true" : undefined}>
+            {items.map((item) => (
+              <span class="flex items-center gap-3.5 flex-none">
+                <span class={`h-1.5 w-1.5 rounded-full ${dotTone}`} aria-hidden="true"></span>
+                <span
+                  class={`font-display text-lg sm:text-xl font-semibold whitespace-nowrap ${itemTone}`}
+                >
+                  {item}
+                </span>
+              </span>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}

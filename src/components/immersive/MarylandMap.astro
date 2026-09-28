@@ -1,0 +1,202 @@
+---
+/* ============================================================
+   MarylandMap — the /about/ service-area map. The real Maryland
+   outline in 3D, tilting up as it scrolls in, a pin per city and
+   Nottingham HQ pulsing orange. Scene: ./maryland-scene.ts (dynamic
+   import only).
+
+   The city list on the page is the accessible, crawlable content;
+   hovering or focusing a name there ([data-city]) lifts its pin.
+   Mouse and keyboard only — a tap on a name does nothing surprising.
+   ============================================================ */
+import { serviceArea } from "../../data/service-area";
+---
+
+<div class="mdm" data-mdm aria-label="Map of our Maryland service area, headquartered in Nottingham" role="img">
+  <canvas class="mdm-canvas" data-mdm-canvas aria-hidden="true"></canvas>
+  <div class="mdm-labels" aria-hidden="true">
+    {
+      serviceArea.map((c, i) => (
+        <span class:list={["mdm-label", c.hq && "mdm-label-hq"]} data-pin={i}>
+          {c.hq ? `${c.name} · HQ` : c.name}
+        </span>
+      ))
+    }
+  </div>
+  <p class="mdm-fallback">
+    <span class="mdm-fallback-kicker">Service area</span>
+    Headquartered in Nottingham, MD · serving the Greater Baltimore region and
+    across Maryland.
+  </p>
+  <span class="mdm-corner" aria-hidden="true">MD · 39.39°N 76.49°W</span>
+</div>
+
+<style>
+  .mdm {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 1rem;
+    background:
+      radial-gradient(90% 70% at 55% 45%, #0e3d1e 0%, #051a0c 75%);
+    box-shadow: inset 0 0 0 1px rgba(0, 153, 51, 0.25), 0 24px 60px -30px rgba(5, 26, 12, 0.7);
+  }
+  .mdm-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity 0.9s ease; }
+  .mdm[data-ready] .mdm-canvas { opacity: 1; }
+  .mdm-labels { position: absolute; inset: 0; pointer-events: none; }
+  .mdm-label {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: #fff;
+    background: rgba(5, 26, 12, 0.78);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+    opacity: 0;
+    transform: translate(-50%, -140%);
+    transition: opacity 0.25s ease;
+  }
+  .mdm-label-hq { color: #0a1f14; background: #ff6600; box-shadow: none; font-weight: 600; }
+  .mdm-label[data-show] { opacity: 1; }
+  .mdm-fallback {
+    display: none;
+    position: absolute;
+    inset: auto 1.5rem 1.5rem 1.5rem;
+    color: rgba(255, 255, 255, 0.85);
+    font-family: var(--font-body);
+    line-height: 1.5;
+  }
+  .mdm-fallback-kicker { display: block; font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.14em; text-transform: uppercase; color: #ff6600; margin-bottom: 0.4rem; }
+  .mdm[data-static] .mdm-fallback { display: block; }
+  .mdm[data-static] :is(.mdm-canvas, .mdm-labels) { display: none; }
+  .mdm-corner {
+    position: absolute;
+    right: 0.9rem;
+    top: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.14em;
+    color: rgba(255, 255, 255, 0.45);
+  }
+</style>
+
+<script>
+  import type { MapHandle, PinScreen } from "./maryland-scene";
+
+  type Root = HTMLElement & { __mdmCleanup?: () => void };
+  const clamp = (x: number, a: number, b: number) => Math.min(b, Math.max(a, x));
+
+  function webglAvailable() {
+    try {
+      const c = document.createElement("canvas");
+      const gl = c.getContext("webgl2") || c.getContext("webgl");
+      gl?.getExtension("WEBGL_lose_context")?.loseContext();
+      return !!gl;
+    } catch {
+      return false;
+    }
+  }
+
+  function initMap() {
+    document.querySelectorAll<Root>("[data-mdm]").forEach((root) => {
+      root.__mdmCleanup?.();
+      const canvas = root.querySelector<HTMLCanvasElement>("[data-mdm-canvas]")!;
+      const labels = [...root.querySelectorAll<HTMLElement>("[data-pin]")];
+      const cityEls = [...document.querySelectorAll<HTMLElement>("[data-city]")];
+      if (!webglAvailable()) {
+        root.setAttribute("data-static", "");
+        return;
+      }
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const lite = window.matchMedia("(max-width: 767px), (pointer: coarse)").matches;
+      let lifted: number | null = null;
+
+      /* 0 → 1 while the map travels from the bottom of the viewport to the top */
+      const progress = () => {
+        const r = root.getBoundingClientRect();
+        return clamp((innerHeight - r.top) / (innerHeight + r.height * 0.5), 0, 1);
+      };
+      const onPins = (pins: PinScreen[]) => {
+        pins.forEach((s, i) => {
+          const el = labels[i];
+          if (!el) return;
+          const show = s.visible && (el.classList.contains("mdm-label-hq") || lifted === i);
+          el.toggleAttribute("data-show", show);
+          if (s.visible) el.style.transform = `translate(${s.x.toFixed(1)}px, ${s.y.toFixed(1)}px) translate(-50%, -140%)`;
+        });
+      };
+
+      let ctl: MapHandle | null = null;
+      let disposed = false;
+      const onScroll = () => ctl?.kick();
+      const onResize = () => ctl?.resize();
+      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("resize", onResize);
+
+      /* the list lifts pins: mouse hover and keyboard focus only */
+      const enter = (e: Event) => {
+        const i = Number((e.currentTarget as HTMLElement).dataset.city);
+        lifted = i;
+        ctl?.lift(i);
+      };
+      const leave = () => {
+        lifted = null;
+        ctl?.lift(null);
+      };
+      const onPointerEnter = (e: PointerEvent) => {
+        if (e.pointerType === "mouse") enter(e);
+      };
+      cityEls.forEach((el) => {
+        el.addEventListener("pointerenter", onPointerEnter);
+        el.addEventListener("pointerleave", leave);
+        el.addEventListener("focus", enter);
+        el.addEventListener("blur", leave);
+      });
+
+      const goStatic = () => {
+        root.setAttribute("data-static", "");
+        window.removeEventListener("scroll", onScroll);
+      };
+
+      import("./maryland-scene")
+        .then(({ createMap }) => createMap({ canvas, host: root, lite, getTarget: progress, onPins, still: reduced ? 1 : undefined }))
+        .then((c) => {
+          if (disposed) return c?.dispose();
+          if (!c) return goStatic();
+          ctl = c;
+          if (import.meta.env.DEV) (window as unknown as { __nvMap?: MapHandle }).__nvMap = c;
+          root.setAttribute("data-ready", "");
+          ctl.kick();
+        })
+        .catch(goStatic);
+
+      root.__mdmCleanup = () => {
+        disposed = true;
+        window.removeEventListener("scroll", onScroll);
+        window.removeEventListener("resize", onResize);
+        cityEls.forEach((el) => {
+          el.removeEventListener("pointerenter", onPointerEnter);
+          el.removeEventListener("pointerleave", leave);
+          el.removeEventListener("focus", enter);
+          el.removeEventListener("blur", leave);
+        });
+        ctl?.dispose();
+        ctl = null;
+        root.removeAttribute("data-ready");
+        delete root.__mdmCleanup;
+      };
+    });
+  }
+
+  document.addEventListener("astro:page-load", initMap);
+  document.addEventListener("astro:before-swap", () => {
+    document.querySelectorAll<Root>("[data-mdm]").forEach((r) => r.__mdmCleanup?.());
+  });
+</script>

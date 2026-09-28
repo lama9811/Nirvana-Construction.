@@ -92,9 +92,10 @@ site without touching component CSS.
   - deploy to **Netlify** and add `data-netlify="true"` to enable Netlify Forms.
   Until then the form runs in *demo* mode and shows the success state without
   delivering anything.
-- **Real project photos** for the 5 projects that currently have no photo
-  (ALDI · 7-Eleven · Chipotle · Mill Station · DaVita) — they render as styled
-  type cards until photos are dropped into `public/images/projects/`.
+- **Every project shown has a real photograph.** 7-Eleven, Mill Station and
+  DaVita were removed 2026-09-28: the site shows only projects the client has
+  supplied photographs for. To add one, drop the photo into
+  `public/images/projects/` (via the image pipeline) and add the project.
 
 ## Credits
 

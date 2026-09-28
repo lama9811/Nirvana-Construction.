@@ -1,0 +1,370 @@
+---
+/* ============================================================
+   TradeDeck — the six self-performed trades as a 3D card deck.
+
+   The section pins while you scroll and the deck turns card by
+   card, coverflow style: the trade in focus sits flat and lit,
+   its neighbours angle back into depth. The chips (desktop) and
+   the arrows (phones) jump straight to a trade. Pose maths:
+   src/lib/card-deck.ts (unit tested). No three.js.
+
+   Progressive: with no JS or with reduced motion it is simply a
+   tidy grid of the same six cards — nothing is hidden.
+   ============================================================ */
+import { trades } from "../../data/services";
+import Icon from "../Icon.astro";
+---
+
+<section id="expertise" class="td" data-td>
+  <div class="td-head">
+    <h2 class="font-headline-lg text-headline-lg uppercase tracking-tight text-primary mb-lg">
+      Trades We Self-Perform
+    </h2>
+    <p data-reveal class="font-body-lg text-body-lg text-on-surface-variant max-w-[36rem]">
+      We carry all six of these trades in-house rather than brokering them
+      out, which is why the framing, the board, the ceiling and the
+      insulation all arrive coordinated instead of arguing with each other
+      on site.
+    </p>
+  </div>
+
+  <div class="td-track" data-td-track>
+    <div class="td-sticky">
+      <ul class="td-stage" data-td-stage>
+        {
+          trades.map((t, i) => (
+            <li class="td-card" data-td-card={i}>
+              <article class="td-face">
+                <span class="td-watermark" aria-hidden="true"><Icon name={t.icon} strokeWidth={1} /></span>
+                <span class="td-icon">
+                  <Icon name={t.icon} strokeWidth={1.5} />
+                </span>
+                <h3 class="td-title">{t.title}</h3>
+                <p class="td-detail">{t.detail}</p>
+                <p class="td-tag">
+                  <span class="td-dot" aria-hidden="true" />
+                  Self-performed
+                </p>
+              </article>
+            </li>
+          ))
+        }
+      </ul>
+
+      <nav class="td-rail" aria-label="Trades">
+        <div class="td-chips">
+          {trades.map((t, i) => (
+            <button type="button" class="td-chip" data-td-go={i}>{t.title}</button>
+          ))}
+        </div>
+        <div class="td-compact">
+          <button type="button" class="td-arrow" data-td-step="-1" aria-label="Previous trade">
+            <Icon name="chevron_right" class="rotate-180" />
+          </button>
+          <span class="td-now" data-td-now aria-live="polite">{trades[0].title}</span>
+          <button type="button" class="td-arrow" data-td-step="1" aria-label="Next trade">
+            <Icon name="chevron_right" />
+          </button>
+        </div>
+        <span class="td-bar" aria-hidden="true"><span data-td-fill></span></span>
+      </nav>
+    </div>
+  </div>
+</section>
+
+<style>
+  .td-head { margin-bottom: 2rem; }
+
+  /* ---------- the card itself (shared by grid + deck) ---------- */
+  .td-face {
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+    background: #fff;
+    border: 1px solid var(--color-hairline);
+    box-shadow: 0 1px 2px rgba(10, 31, 20, 0.06);
+    transition: border-color 0.5s, box-shadow 0.5s;
+  }
+  .td-face::before {
+    /* the logo-orange rule along the top edge */
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 3px;
+    background: linear-gradient(90deg, #ff6600, #009933);
+    transform: scaleX(0.18);
+    transform-origin: left;
+    transition: transform 0.7s cubic-bezier(0.2, 0.7, 0, 1);
+  }
+  .td-watermark {
+    position: absolute;
+    right: -1.5rem;
+    bottom: -1.5rem;
+    font-size: 11rem;
+    line-height: 1;
+    color: #009933;
+    opacity: 0.06;
+    pointer-events: none;
+  }
+  .td-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    margin-bottom: 1.5rem;
+    font-size: 1.75rem;
+    color: var(--color-secondary);
+    background: #fff4ec;
+    border: 1px solid #ffd9bf;
+  }
+  .td-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.5rem, 2.2vw, 1.9rem);
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: var(--color-primary);
+    margin-bottom: 0.75rem;
+  }
+  .td-detail { font-size: 0.9375rem; line-height: 1.65; color: var(--color-on-surface-variant); }
+  .td-tag {
+    margin-top: auto;
+    padding-top: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #00852c;
+  }
+  .td-dot { width: 0.4rem; height: 0.4rem; border-radius: 999px; background: #009933; }
+
+  /* ---------- static: the grid (no JS, reduced motion) ---------- */
+  .td-stage { display: grid; gap: 1.5rem; grid-template-columns: 1fr; }
+  @media (min-width: 768px) { .td-stage { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1024px) { .td-stage { grid-template-columns: repeat(3, 1fr); } }
+  .td-rail { display: none; }
+
+  /* ---------- live: the pinned 3D deck ---------- */
+  .td[data-live] .td-track { height: calc(100svh + 6 * 42svh); }
+  .td[data-live] .td-sticky {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2.25rem;
+    padding-top: 5rem; /* clear the floating nav */
+    /* let the side cards spill past the container without a sideways scrollbar */
+    overflow-x: clip;
+    overflow-y: visible;
+    margin-inline: calc(50% - 50vw);
+    padding-inline: max(1rem, calc(50vw - 640px));
+  }
+  .td[data-live] .td-stage {
+    display: block;
+    position: relative;
+    height: min(26rem, 58svh);
+    perspective: 1500px;
+    perspective-origin: 50% 45%;
+  }
+  .td[data-live] .td-card {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: min(25rem, 80vw);
+    height: 100%;
+    margin-left: calc(min(25rem, 80vw) / -2);
+    will-change: transform, opacity;
+    cursor: pointer;
+  }
+  .td[data-live] .td-card[data-on] { cursor: default; }
+  .td[data-live] .td-face { box-shadow: 0 30px 60px -30px rgba(5, 41, 17, 0.35); }
+  .td[data-live] .td-card[data-on] .td-face {
+    border-color: #009933;
+    box-shadow: 0 50px 90px -35px rgba(5, 41, 17, 0.55), 0 0 0 1px rgba(0, 153, 51, 0.25);
+  }
+  .td[data-live] .td-card[data-on] .td-face::before { transform: scaleX(1); }
+  /* a soft shade on the cards turned away, so the one in focus reads first */
+  .td[data-live] .td-face::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(242, 248, 244, 0.35);
+    opacity: 1;
+    transition: opacity 0.5s;
+    pointer-events: none;
+  }
+  .td[data-live] .td-card[data-on] .td-face::after { opacity: 0; }
+  .td[data-live] .td-card[data-far] { pointer-events: none; }
+
+  /* rail */
+  .td[data-live] .td-rail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+  .td-chips { display: none; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
+  .td-chip {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--color-hairline);
+    background: rgba(255, 255, 255, 0.7);
+    color: var(--color-on-surface-variant);
+    border-radius: 999px;
+    transition: background 0.3s, color 0.3s, border-color 0.3s;
+  }
+  .td-chip:hover { border-color: #009933; color: var(--color-primary); }
+  .td-chip[aria-current="true"] { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
+  .td-compact { display: flex; align-items: center; gap: 1rem; }
+  .td-arrow {
+    display: inline-grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-hairline);
+    background: #fff;
+    color: var(--color-primary);
+    font-size: 1.25rem;
+  }
+  .td-arrow:disabled { opacity: 0.35; }
+  .td-now { min-width: 11rem; text-align: center; font-family: var(--font-display); font-weight: 600; color: var(--color-primary); }
+  .td-bar { position: relative; width: min(18rem, 60vw); height: 2px; background: var(--color-hairline); overflow: hidden; }
+  .td-bar > span { position: absolute; inset: 0; background: #009933; transform-origin: left; transform: scaleX(0); }
+  @media (min-width: 768px) {
+    .td-chips { display: flex; }
+    .td-compact { display: none; }
+  }
+</style>
+
+<script>
+  import { deckPose, pinProgress, nearestIndex, progressForIndex } from "../../lib/card-deck";
+  import { getLenis } from "../../lib/motion";
+
+  type Root = HTMLElement & { __tdCleanup?: () => void };
+
+  function initTradeDeck() {
+    document.querySelectorAll<Root>("[data-td]").forEach((root) => {
+      root.__tdCleanup?.();
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      const track = root.querySelector<HTMLElement>("[data-td-track]")!;
+      const cards = [...root.querySelectorAll<HTMLElement>("[data-td-card]")];
+      const chips = [...root.querySelectorAll<HTMLButtonElement>("[data-td-go]")];
+      const arrows = [...root.querySelectorAll<HTMLButtonElement>("[data-td-step]")];
+      const now = root.querySelector<HTMLElement>("[data-td-now]")!;
+      const fill = root.querySelector<HTMLElement>("[data-td-fill]")!;
+      const n = cards.length;
+      root.setAttribute("data-live", "");
+
+      const compactMq = window.matchMedia("(max-width: 767px)");
+      let shown = -1; // progress currently painted
+      let target = 0;
+      let active = -1;
+      let raf = 0;
+      let inView = false;
+
+      const paint = (p: number) => {
+        const compact = compactMq.matches;
+        const pos = p * (n - 1);
+        cards.forEach((c, i) => {
+          const d = i - pos;
+          const k = deckPose(d, compact);
+          c.style.transform =
+            `translate3d(${k.x.toFixed(2)}%, 0, ${k.z.toFixed(1)}px) rotateY(${k.ry.toFixed(2)}deg) scale(${k.scale.toFixed(3)})`;
+          c.style.opacity = k.opacity.toFixed(3);
+          c.style.zIndex = String(k.zIndex);
+          c.toggleAttribute("data-far", k.opacity < 0.02);
+        });
+        fill.style.transform = `scaleX(${p.toFixed(4)})`;
+        const a = nearestIndex(p, n);
+        if (a !== active) {
+          active = a;
+          cards.forEach((c, i) => c.toggleAttribute("data-on", i === a));
+          chips.forEach((b, i) => b.setAttribute("aria-current", i === a ? "true" : "false"));
+          now.textContent = cards[a].querySelector("h3")?.textContent ?? "";
+          arrows[0].disabled = a === 0;
+          arrows[1].disabled = a === n - 1;
+        }
+      };
+
+      const measure = () => {
+        const r = track.getBoundingClientRect();
+        target = pinProgress(r.top, r.height, window.innerHeight);
+      };
+
+      const frame = () => {
+        raf = 0;
+        /* a light ease on top of Lenis, so the deck settles rather than snaps */
+        const next = shown < 0 ? target : shown + (target - shown) * 0.22;
+        const done = Math.abs(target - next) < 0.0005;
+        shown = done ? target : next;
+        paint(shown);
+        if (!done) raf = requestAnimationFrame(frame);
+      };
+      const kick = () => {
+        if (!inView) return;
+        measure();
+        if (!raf) raf = requestAnimationFrame(frame);
+      };
+
+      const io = new IntersectionObserver((e) => {
+        inView = e.some((x) => x.isIntersecting);
+        kick();
+      });
+      io.observe(track);
+
+      const goTo = (i: number) => {
+        const r = track.getBoundingClientRect();
+        const travel = r.height - window.innerHeight;
+        const y = window.scrollY + r.top + progressForIndex(i, n) * travel + 2;
+        const lenis = getLenis();
+        if (lenis) lenis.scrollTo(y, { duration: 1.1 });
+        else window.scrollTo({ top: y, behavior: "smooth" });
+      };
+      const onClick = (e: MouseEvent) => {
+        const el = e.target as HTMLElement;
+        const chip = el.closest<HTMLElement>("[data-td-go]");
+        if (chip) return goTo(Number(chip.dataset.tdGo));
+        const step = el.closest<HTMLElement>("[data-td-step]");
+        if (step) return goTo(Math.max(0, Math.min(n - 1, active + Number(step.dataset.tdStep))));
+        /* tapping a side card brings it to the front */
+        const card = el.closest<HTMLElement>("[data-td-card]");
+        if (card && !card.hasAttribute("data-on")) goTo(Number(card.dataset.tdCard));
+      };
+      root.addEventListener("click", onClick);
+      window.addEventListener("scroll", kick, { passive: true });
+      window.addEventListener("resize", kick);
+      compactMq.addEventListener("change", kick);
+
+      measure();
+      shown = target;
+      paint(shown);
+
+      root.__tdCleanup = () => {
+        if (raf) cancelAnimationFrame(raf);
+        io.disconnect();
+        root.removeEventListener("click", onClick);
+        window.removeEventListener("scroll", kick);
+        window.removeEventListener("resize", kick);
+        compactMq.removeEventListener("change", kick);
+        delete root.__tdCleanup;
+      };
+    });
+  }
+
+  document.addEventListener("astro:page-load", initTradeDeck);
+  document.addEventListener("astro:before-swap", () => {
+    document.querySelectorAll<Root>("[data-td]").forEach((r) => r.__tdCleanup?.());
+  });
+</script>

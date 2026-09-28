@@ -1,0 +1,56 @@
+---
+/* ============================================================
+   ProjectImage — a <picture> whose srcset is built from the image
+   manifest, so it only ever advertises widths that really exist.
+
+   AVIF is offered first and carries its own srcset/sizes. Without
+   that, format negotiation resolves before width selection and a
+   phone downloads the largest AVIF regardless of viewport.
+   ============================================================ */
+
+import { srcsetFor, srcFor, dimensions } from "../lib/images";
+
+interface Props {
+  slug: string;
+  alt: string;
+  sizes?: string;
+  class?: string;
+  loading?: "lazy" | "eager";
+  fetchpriority?: "high" | "low" | "auto";
+}
+
+const {
+  slug,
+  alt,
+  sizes = "100vw",
+  class: className = "",
+  loading = "lazy",
+  fetchpriority,
+} = Astro.props;
+
+const webp = srcsetFor(slug, "webp");
+const avif = srcsetFor(slug, "avif");
+const dims = dimensions(slug);
+
+if (import.meta.env.DEV && !dims) {
+  console.warn(
+    `[ProjectImage] "${slug}" is not in the image manifest — run: npm run fetch-images -- --manifest-only`,
+  );
+}
+---
+
+<picture>
+  {avif && <source type="image/avif" srcset={avif} sizes={sizes} />}
+  <img
+    class={className}
+    src={srcFor(slug)}
+    srcset={webp}
+    sizes={sizes}
+    alt={alt}
+    width={dims?.width}
+    height={dims?.height}
+    loading={loading}
+    fetchpriority={fetchpriority}
+    decoding="async"
+  />
+</picture>
